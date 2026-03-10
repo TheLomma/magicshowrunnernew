@@ -95,7 +95,7 @@ const vibrate = (p = [200]) => { try { if ('vibrate' in navigator) navigator.vib
 const TRANSLATIONS = {
   de: {
     appTitle: '🎩✨ Magic Showrunner',
-    appVersion: 'v1.4',
+    appVersion: 'v1.7',
     appSub: 'Dein professioneller Bühnen-Assistent',
     backupReminder: '💾 Kein Backup seit {days} Tagen – jetzt sichern?',
     backupReminderBtn: '📥 Jetzt Backup erstellen',
@@ -110,7 +110,15 @@ const TRANSLATIONS = {
     newPart: '➕ Neuer Teil', startShow: '🎭 Show starten', testMode: '🧪 Testmodus',
     parts: 'Teile', totalTime: 'Gesamtzeit', settingsTitle: '⚙️ Einstellungen',
     tabDesign: '🎨 Design', tabAudio: '🔊 Audio', tabTest: '🧪 Test', tabLanguage: '🌐 Sprache',
-    tabTTS: '🗣 Stimme', tabFont: '🔤 Schrift',
+    tabTTS: '🗣 Stimme', tabFont: '🔤 Schrift', tabNotif: '🔔 Notif',
+    countdown: '⏳ Countdown-Animation (letzte 3 Sek.)',
+    pushNotif: '🔔 Push-Benachrichtigungen',
+    pushNotifHint: 'Auch bei gesperrtem Bildschirm & Apple Watch / WearOS',
+    enableNotif: '🔔 Benachrichtigungen aktivieren',
+    notifActive: '✅ Benachrichtigungen aktiv',
+    notifDenied: '❌ Abgelehnt – in Browser-Einstellungen aktivieren',
+    onboardingBtn: '📖 Einführung erneut anzeigen',
+    dragHint: '☰ Halten & ziehen zum Umsortieren',
     planTheme: 'Planungs-Theme', performTheme: 'Perform-Theme',
     beeps: '🔔 Signaltöne', vibration: '📳 Vibration', volume: '🔊 Lautstärke',
     testTone: '🔊 Testton', testDuration: '⏱ Testmodus-Dauer pro Teil',
@@ -153,7 +161,7 @@ const TRANSLATIONS = {
   },
   en: {
     appTitle: '🎩✨ Magic Showrunner',
-    appVersion: 'v1.4', appSub: 'Your professional stage assistant',
+    appVersion: 'v1.7', appSub: 'Your professional stage assistant',
     backupReminder: '💾 No backup for {days} days – save now?',
     backupReminderBtn: '📥 Create Backup now',
     backupReminderDismiss: 'Later',
@@ -167,7 +175,15 @@ const TRANSLATIONS = {
     newPart: '➕ New Part', startShow: '🎭 Start Show', testMode: '🧪 Test Mode',
     parts: 'Parts', totalTime: 'Total Time', settingsTitle: '⚙️ Settings',
     tabDesign: '🎨 Design', tabAudio: '🔊 Audio', tabTest: '🧪 Test', tabLanguage: '🌐 Language',
-    tabTTS: '🗣 Voice', tabFont: '🔤 Font',
+    tabTTS: '🗣 Voice', tabFont: '🔤 Font', tabNotif: '🔔 Notif',
+    countdown: '⏳ Countdown Animation (last 3 sec)',
+    pushNotif: '🔔 Push Notifications',
+    pushNotifHint: 'Also on locked screen & Apple Watch / WearOS',
+    enableNotif: '🔔 Enable Notifications',
+    notifActive: '✅ Notifications active',
+    notifDenied: '❌ Denied – enable in browser settings',
+    onboardingBtn: '📖 Show intro again',
+    dragHint: '☰ Hold & drag to reorder',
     planTheme: 'Planning Theme', performTheme: 'Perform Theme',
     beeps: '🔔 Beeps', vibration: '📳 Vibration', volume: '🔊 Volume',
     testTone: '🔊 Test Tone', testDuration: '⏱ Test mode duration per part',
@@ -253,6 +269,40 @@ const PERFORM_THEMES = {
   black: { name:'⚫ Schwarz', bg:'bg-black', card:'bg-gray-950 border border-gray-800', text:'text-gray-300', timerText:'text-indigo-400', warnBg:'bg-black border-2 border-red-800', warnTimer:'text-red-500' },
 };
 
+// ─── TEMPLATES ───
+const TEMPLATES = {
+  kinder: {
+    name: '🎈 Kinder-Show', icon: '🎈',
+    parts: [
+      { id:1, title:'Begrüßung & Zauberhut', duration:120, introText:'Hallo Kinder! Seid ihr bereit für Magie?', preAnnounceSec:10, announceNextText:'Gleich kommt ein toller Trick!', notes:'Laut und fröhlich!', musicUrl:'', musicVolume:0.5, musicFadeIn:2, musicFadeOut:2, musicLoop:false, color:'#f97316', isGroup:false },
+      { id:2, title:'Die bunte Tuchmagie', duration:180, introText:'Schaut alle her – jetzt wird es bunt!', preAnnounceSec:15, announceNextText:'Gleich: Münzentrick!', notes:'Bunte Tücher bereit.', musicUrl:'', musicVolume:0.5, musicFadeIn:2, musicFadeOut:2, musicLoop:false, color:'#ec4899', isGroup:false },
+      { id:3, title:'Münze aus dem Ohr', duration:150, introText:'Wer hat eine Münze im Ohr?', preAnnounceSec:10, announceNextText:'Gleich: Mitmachzauber!', notes:'Silbermünze.', musicUrl:'', musicVolume:0.5, musicFadeIn:2, musicFadeOut:2, musicLoop:false, color:'#eab308', isGroup:false },
+      { id:4, title:'Mitmach-Zauberei', duration:240, introText:'Jetzt seid ihr dran – alle mitmachen!', preAnnounceSec:20, announceNextText:'Gleich Verabschiedung!', notes:'Kinder einbeziehen.', musicUrl:'', musicVolume:0.5, musicFadeIn:2, musicFadeOut:2, musicLoop:false, color:'#22c55e', isGroup:false },
+      { id:5, title:'Verabschiedung', duration:90, introText:'Vielen Dank, ihr wart super!', preAnnounceSec:10, announceNextText:'', notes:'Luftballons verteilen.', musicUrl:'', musicVolume:0.5, musicFadeIn:2, musicFadeOut:2, musicLoop:false, color:'#6366f1', isGroup:false },
+    ]
+  },
+  abend: {
+    name: '🎭 Abendshow', icon: '🎭',
+    parts: [
+      { id:1, title:'Einlass & Musik', duration:600, introText:'', preAnnounceSec:30, announceNextText:'Bitte nehmen Sie Platz!', notes:'Hintergrundmusik läuft.', musicUrl:'', musicVolume:0.3, musicFadeIn:5, musicFadeOut:5, musicLoop:true, color:'#64748b', isGroup:false },
+      { id:2, title:'Begrüßung', duration:180, introText:'Herzlich willkommen zur heutigen Abendshow!', preAnnounceSec:15, announceNextText:'Gleich der erste Akt!', notes:'Spotlight Mitte.', musicUrl:'', musicVolume:0.5, musicFadeIn:2, musicFadeOut:2, musicLoop:false, color:'#6366f1', isGroup:false },
+      { id:3, title:'Akt 1 – Kartenmagie', duration:480, introText:'Zum ersten Akt!', preAnnounceSec:20, announceNextText:'Gleich: Mentalmagie!', notes:'2 Kartenspiele.', musicUrl:'', musicVolume:0.5, musicFadeIn:2, musicFadeOut:2, musicLoop:false, color:'#8b5cf6', isGroup:false },
+      { id:4, title:'Akt 2 – Mentalmagie', duration:420, introText:'Gedanken lesen – ist das möglich?', preAnnounceSec:20, announceNextText:'Gleich Pause!', notes:'Umschläge, Stift.', musicUrl:'', musicVolume:0.5, musicFadeIn:2, musicFadeOut:2, musicLoop:false, color:'#ec4899', isGroup:false },
+      { id:5, title:'Pause', duration:900, introText:'15 Minuten Pause!', preAnnounceSec:60, announceNextText:'Bitte Plätze einnehmen!', notes:'Bar geöffnet.', musicUrl:'', musicVolume:0.4, musicFadeIn:3, musicFadeOut:3, musicLoop:true, color:'#22c55e', isGroup:false },
+      { id:6, title:'Akt 3 – Großillusion', duration:600, introText:'Das Finale beginnt!', preAnnounceSec:30, announceNextText:'Gleich Abschluss!', notes:'Nebelmaschine!', musicUrl:'', musicVolume:0.5, musicFadeIn:2, musicFadeOut:2, musicLoop:false, color:'#ef4444', isGroup:false },
+      { id:7, title:'Abschluss & Verbeugung', duration:180, introText:'Vielen Dank für Ihren Applaus!', preAnnounceSec:10, announceNextText:'', notes:'Visitenkarten am Ausgang.', musicUrl:'', musicVolume:0.5, musicFadeIn:2, musicFadeOut:2, musicLoop:false, color:'#14b8a6', isGroup:false },
+    ]
+  },
+  kurz: {
+    name: '⚡ Kurzauftritt', icon: '⚡',
+    parts: [
+      { id:1, title:'Einstieg', duration:60, introText:'Hallo! Darf ich Ihnen etwas Erstaunliches zeigen?', preAnnounceSec:10, announceNextText:'Gleich der Haupttrick!', notes:'Kurz und knackig.', musicUrl:'', musicVolume:0.5, musicFadeIn:1, musicFadeOut:1, musicLoop:false, color:'#6366f1', isGroup:false },
+      { id:2, title:'Haupttrick', duration:180, introText:'Bitte wählen Sie eine Karte!', preAnnounceSec:15, announceNextText:'Gleich Abschluss!', notes:'Signature-Trick.', musicUrl:'', musicVolume:0.5, musicFadeIn:2, musicFadeOut:2, musicLoop:false, color:'#f97316', isGroup:false },
+      { id:3, title:'Abschluss', duration:60, introText:'Vielen Dank!', preAnnounceSec:10, announceNextText:'', notes:'Visitenkarte überreichen.', musicUrl:'', musicVolume:0.5, musicFadeIn:1, musicFadeOut:1, musicLoop:false, color:'#22c55e', isGroup:false },
+    ]
+  },
+};
+
 const FONT_FAMILIES = [
   { label: 'Inter (Standard)', value: '"Inter", "Segoe UI", system-ui, sans-serif' },
   { label: 'System', value: 'system-ui, sans-serif' },
@@ -262,6 +312,51 @@ const FONT_FAMILIES = [
 ];
 
 const isDarkTheme = (k) => ['dark','black','oceanDark','royalDark'].includes(k);
+
+// ─── Overflow Dropdown Component ───
+function MoreDropdown({ items, th }) {
+  const [open, setOpen] = React.useState(false);
+  const ref = React.useRef(null);
+  React.useEffect(() => {
+    const h = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', h);
+    return () => document.removeEventListener('mousedown', h);
+  }, []);
+  return (
+    <div /* RETURN_START */ ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(o => !o)}
+        aria-haspopup="true"
+        aria-expanded={open}
+        className={`px-3 py-2 rounded-xl text-sm font-bold flex items-center gap-1 ${th.accent} text-white hover:opacity-90 transition`}
+      >
+        ⋯ Mehr
+        <span className={`transition-transform duration-200 ${open ? 'rotate-180' : ''}`}>▾</span>
+      </button>
+      {open && (
+        <div
+          className={`absolute right-0 mt-2 w-52 rounded-2xl shadow-2xl z-50 overflow-hidden border ${th.border} ${th.card}`}
+          role="menu"
+        >
+          {items.map((item, i) =>
+            item === '---' ? (
+              <div key={i} className={`border-t ${th.border} my-1`} />
+            ) : (
+              <button
+                key={i}
+                onClick={() => { item.action(); setOpen(false); }}
+                className={`w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-black/10 ${th.text} flex items-center gap-2`}
+                role="menuitem"
+              >
+                {item.label}
+              </button>
+            )
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function ShowRunner() {
   const getSystemTheme = () => window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -282,7 +377,17 @@ export default function ShowRunner() {
   const [backupReminderDays, setBackupReminderDays] = useState(0);
   const BACKUP_REMINDER_DAYS = 5;
   const [wakeLockActive, setWakeLockActive] = useState(false);
+  const [countdownAnimation, setCountdownAnimation] = useState(() => localStorage.getItem('ms_countdown') !== 'false');
+  const [countdownNum, setCountdownNum] = useState(null);
+  const [showTemplates, setShowTemplates] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem('ms_onboarded'));
+  const [onboardingStep, setOnboardingStep] = useState(0);
+  const [notifPermission, setNotifPermission] = useState(() => typeof Notification !== 'undefined' ? Notification.permission : 'denied');
+  const dragItem = useRef(null);
+  const dragOver = useRef(null);
   const [offlineReady, setOfflineReady] = useState(false);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const swWaitingRef = useRef(null);
   const wakeLockRef = useRef(null);
   const touchStartX = useRef(null);
   const touchStartY = useRef(null);
@@ -309,6 +414,70 @@ export default function ShowRunner() {
   useEffect(() => { localStorage.setItem('ms_ttsRate', String(ttsRate)); }, [ttsRate]);
   useEffect(() => { localStorage.setItem('ms_ttsPitch', String(ttsPitch)); }, [ttsPitch]);
   useEffect(() => { localStorage.setItem('ms_ttsVoice', ttsVoiceURI); }, [ttsVoiceURI]);
+  useEffect(() => { localStorage.setItem('ms_countdown', countdownAnimation ? 'true' : 'false'); }, [countdownAnimation]);
+
+  // ─── Push Notification Permission ───
+  const requestNotifPermission = async () => {
+    if (typeof Notification === 'undefined') return;
+    const result = await Notification.requestPermission();
+    setNotifPermission(result);
+    if (result === 'granted') showToast('🔔 Benachrichtigungen aktiviert!');
+    else showToast('⚠️ Benachrichtigungen abgelehnt.');
+  };
+
+  const sendNotification = (title, body) => {
+    if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+    try {
+      const n = new Notification(title, {
+        body,
+        icon: '/icons/icon-192.png',
+        badge: '/icons/icon-192.png',
+        vibrate: [200, 100, 200],
+        tag: 'showrunner',
+        renotify: true,
+        silent: false,
+      });
+      setTimeout(() => n.close(), 8000);
+    } catch(e) {}
+  };
+
+  // ─── Countdown Animation ───
+  const triggerCountdown = useCallback((sec = 3) => {
+    if (!countdownAnimation) return;
+    let n = sec;
+    setCountdownNum(n);
+    const tick = () => {
+      n--;
+      if (n > 0) { setCountdownNum(n); setTimeout(tick, 1000); }
+      else setCountdownNum(null);
+    };
+    setTimeout(tick, 1000);
+  }, [countdownAnimation]);
+
+  // ─── Drag & Drop ───
+  const handleDragStart = (i) => { dragItem.current = i; };
+  const handleDragEnter = (i) => { dragOver.current = i; };
+  const handleDragEnd = () => {
+    if (dragItem.current === null || dragOver.current === null || dragItem.current === dragOver.current) return;
+    const np = [...parts];
+    const dragged = np.splice(dragItem.current, 1)[0];
+    np.splice(dragOver.current, 0, dragged);
+    setParts(np);
+    dragItem.current = null; dragOver.current = null;
+    showToast('🔀 Reihenfolge geändert');
+  };
+  // Touch Drag & Drop
+  const touchDragItem = useRef(null);
+  const handleTouchDragStart = (i) => { touchDragItem.current = i; };
+  const handleTouchDragEnd = (i) => {
+    if (touchDragItem.current === null || touchDragItem.current === i) { touchDragItem.current = null; return; }
+    const np = [...parts];
+    const dragged = np.splice(touchDragItem.current, 1)[0];
+    np.splice(i, 0, dragged);
+    setParts(np);
+    touchDragItem.current = null;
+    showToast('🔀 Reihenfolge geändert');
+  };
 
   const resolvedTheme = themeMode === 'auto' ? systemTheme : themeMode;
   const th = THEMES[resolvedTheme] || THEMES.light;
@@ -577,16 +746,32 @@ export default function ShowRunner() {
       playMusic(cp);
       setIntroAnnounced(true);
     }
+    // Countdown-Animation in letzten 3 Sekunden
+    if (countdownAnimation && rem <= 3 && rem > 0 && !isWarn) {
+      setCountdownNum(rem);
+    } else if (rem > 3) {
+      setCountdownNum(null);
+    }
+
     if (!preAnnounced && rem <= cp.preAnnounceSec && rem > 0) {
+      // Push Notification bei Vorankündigung
+      sendNotification(
+        `⏰ ${cp.title}`,
+        cp.announceNextText || `Noch ${cp.preAnnounceSec} Sekunden!`
+      );
       if (cp.announceNextText) AudioEngine.speak(cp.announceNextText, t.speechLang, ttsRate, ttsPitch, ttsVoiceURI || null);
       if (beepEnabled) AudioEngine.beep(volume, 440, 0.3);
       if (vibrationEnabled) vibrate([200, 100, 200]);
       setPreAnnounced(true);
     }
     if (partElapsed >= cp.duration) {
+      setCountdownNum(null);
       stopMusic();
       if (currentPartIndex < effectiveParts.length - 1) {
         setCurrentPartIndex(p => p+1); setPartElapsed(0); setPreAnnounced(false); setIntroAnnounced(false);
+        // Push Notification bei Teil-Wechsel
+        const nextP = effectiveParts[currentPartIndex + 1];
+        if (nextP) sendNotification(`🎭 ${nextP.title}`, `Jetzt startet: ${nextP.title}`);
       } else {
         AudioEngine.speak(t.endedMsg, t.speechLang, ttsRate, ttsPitch, ttsVoiceURI || null);
         if (beepEnabled) AudioEngine.beep(volume, 880, 0.5);
@@ -598,6 +783,8 @@ export default function ShowRunner() {
   }, [partElapsed, isRunning, isPaused, currentPartIndex, effectiveParts, preAnnounced, introAnnounced, beepEnabled, volume, vibrationEnabled, playMusic, stopMusic, ttsRate, ttsPitch, ttsVoiceURI]);
 
   const startShow = () => {
+    sendNotification('🎭 Show gestartet!', `${parts.length} Teile • ${fmt(totalDuration)} Gesamtdauer`);
+    triggerCountdown(3);
     if (!parts.length) return;
     setCurrentPartIndex(0); setPartElapsed(0); setTotalElapsed(0);
     setPreAnnounced(false); setIntroAnnounced(false);
@@ -682,6 +869,21 @@ export default function ShowRunner() {
 
   const effectiveFontSize = largeFontMode ? Math.max(fontSize, 22) : fontSize;
 
+  // ─── Mehr-Dropdown Items ───
+  const moreItems = [
+    { label: t.backup,      action: exportBackup },
+    { label: t.importBtn,   action: () => document.getElementById('import-file-hdr').click() },
+    '---',
+    { label: t.exportCSV,   action: exportCSV },
+    { label: t.exportPDF,   action: exportPDF },
+    { label: t.shareQR,     action: generateQR },
+    '---',
+    { label: t.shareGDrive, action: shareGoogleDrive },
+    { label: t.shareICloud, action: shareICloud },
+    '---',
+    { label: t.stats,       action: () => setShowStats(true) },
+  ];
+
   // ─── RENDER ───
   return (
     <div
@@ -715,6 +917,38 @@ export default function ShowRunner() {
             </div>
           </div>
         </div>
+      )}
+
+            {/* ─── Header v1.7 ─── */}
+      {mode !== 'perform' && (
+        <header className={`sticky top-0 z-40 ${th.card} border-b ${th.border} shadow-md`}>
+          <div className="flex items-center justify-between px-4 pt-3 pb-2">
+            <div>
+              <h1 className={`text-base font-black ${th.headText} leading-tight`}>{t.appTitle}</h1>
+              <p className={`text-xs ${th.textSub}`}>{t.appVersion} • {t.appSub}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setLang(l => l === 'de' ? 'en' : 'de')} className={`px-2 py-1 rounded-lg text-sm font-bold ${th.accent} text-white hover:opacity-90 transition`}>{LANG_FLAGS[lang]}</button>
+              <button onClick={toggleFullscreen} className={`px-2 py-1 rounded-lg text-sm font-bold ${th.accent} text-white hover:opacity-90 transition`}>{isFullscreen ? '⤢' : '⤢'}</button>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 px-4 pb-2">
+            <button onClick={() => setShowStageplan(true)} className={`px-3 py-1.5 rounded-xl text-sm font-bold ${th.accent} text-white hover:opacity-90 transition`}>{t.stage}</button>
+            <button onClick={() => setShowSaveMenu(true)} className="px-3 py-1.5 rounded-xl text-sm font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition">{t.save}</button>
+            <button onClick={() => setShowLoadMenu(true)} className="px-3 py-1.5 rounded-xl text-sm font-bold bg-sky-600 text-white hover:bg-sky-700 transition">{t.load}</button>
+            <button onClick={() => setShowSettings(true)} className="px-3 py-1.5 rounded-xl text-sm font-bold bg-gray-500 text-white hover:bg-gray-600 transition">{t.settings}</button>
+            <span className="flex-1" />
+            <MoreDropdown th={th} items={moreItems} />
+            <input id="import-file-hdr" type="file" accept=".json" className="hidden" onChange={importBackup} />
+          </div>
+          <div className={`flex flex-wrap gap-2 px-4 pb-3 pt-2 border-t ${th.border}`}>
+            <button onClick={startShow} disabled={!parts.length} className="px-4 py-1.5 rounded-xl text-sm font-black bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-40 transition">{t.startShow}</button>
+            <button onClick={() => setMode(m => m === 'test' ? 'plan' : 'test')} className={`px-3 py-1.5 rounded-xl text-sm font-bold transition ${mode === 'test' ? 'bg-amber-500 text-white' : 'bg-amber-100 text-amber-800 hover:bg-amber-200'}`}>{t.testMode}</button>
+            <button onClick={() => setShowTemplates(true)} className="px-3 py-1.5 rounded-xl text-sm font-bold bg-purple-100 text-purple-800 hover:bg-purple-200 transition">📝 Templates</button>
+            <button onClick={undo} title="Zurück" className="px-3 py-1.5 rounded-xl text-sm font-bold bg-gray-200 text-gray-700 hover:bg-gray-300 transition">↩️</button>
+            <button onClick={redo} title="Wiederherstellen" className="px-3 py-1.5 rounded-xl text-sm font-bold bg-gray-200 text-gray-700 hover:bg-gray-300 transition">↪️</button>
+          </div>
+        </header>
       )}
 
       {/* Toast */}
@@ -766,6 +1000,15 @@ export default function ShowRunner() {
               <button onClick={handleStop} className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold text-sm">{t.perform_stop}</button>
             </div>
           </div>
+
+          {/* Countdown Animation Overlay */}
+          {countdownNum !== null && (
+            <div className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none">
+              <div className="text-[20vw] font-black text-white drop-shadow-2xl animate-ping" style={{animationDuration:'0.8s'}}>
+                {countdownNum}
+              </div>
+            </div>
+          )}
 
           {/* Main perform content */}
           <div className="flex-1 flex flex-col items-center justify-center px-4 py-6 gap-4">
@@ -847,7 +1090,7 @@ export default function ShowRunner() {
               <div>
                 <h1 className={`font-black text-xl ${th.headText} flex items-baseline gap-2`}>
                   {t.appTitle}
-                  <span className={`text-xs font-normal opacity-40 ${th.textSub}`}>v1.4</span>
+                  <span className={`text-xs font-normal opacity-40 ${th.textSub}`}>v1.7</span>
                 </h1>
                 <p className={`text-xs ${th.textSub}`}>{t.appSub}</p>
               </div>
@@ -864,6 +1107,7 @@ export default function ShowRunner() {
                     ✅ {autosaveTime.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}
                   </span>
                 )}
+                <button onClick={() => setShowTemplates(true)} className={`text-xs px-3 py-1.5 rounded-lg border ${th.border} ${th.text} hover:border-indigo-400`}>📄 Templates</button>
                 <button onClick={() => { setShowSettings(true); setSettingsTab('design'); }} className={`text-xs px-3 py-1.5 rounded-lg border ${th.border} ${th.text} hover:opacity-80`}>{t.settings}</button>
                 <button onClick={toggleFullscreen} className={`text-xs px-3 py-1.5 rounded-lg border ${th.border} ${th.text} hover:opacity-80`}>{isFullscreen ? t.exitFullscreen : t.fullscreen}</button>
                 <select value={lang} onChange={e => setLang(e.target.value)} className={`text-xs px-2 py-1.5 rounded-lg border ${th.border} ${th.input}`}>
@@ -874,9 +1118,9 @@ export default function ShowRunner() {
 
             {/* Action buttons */}
             <div className="flex gap-2 flex-wrap">
-              <button onClick={() => setShowSaveMenu(true)} className={`text-xs px-3 py-1.5 rounded-lg ${th.accent} text-white hover:opacity-90`}>{t.save}</button>
-              <button onClick={() => setShowLoadMenu(true)} className={`text-xs px-3 py-1.5 rounded-lg border ${th.border} ${th.text} hover:opacity-80`}>{t.load}</button>
-              <button onClick={exportBackup} className={`text-xs px-3 py-1.5 rounded-lg border ${th.border} ${th.text} hover:opacity-80`}>{t.backup}</button>
+              <button onClick={() => setShowSaveMenu(true)}>{t.save}</button>
+            <button onClick={() => setShowLoadMenu(true)} className="px-3 py-1.5 rounded-xl text-sm font-bold bg-sky-600 text-white hover:bg-sky-700 transition">{t.load}</button>
+            <button onClick={exportBackup}>{t.backup}</button>
               <label className={`text-xs px-3 py-1.5 rounded-lg border ${th.border} ${th.text} hover:opacity-80 cursor-pointer`}>
                 {t.importBtn}<input type="file" accept=".json" onChange={importBackup} className="hidden" />
               </label>
@@ -997,7 +1241,29 @@ export default function ShowRunner() {
                 </>
               )}
 
-              {settingsTab === 'font' && (
+              {settingsTab === 'notif' && (
+              <div className="flex flex-col gap-4">
+                <div className={`p-4 rounded-xl ${th.card} border ${th.border}`}>
+                  <div className="font-bold mb-1">{t.pushNotif}</div>
+                  <div className={`text-xs mb-3 ${th.textSub}`}>{t.pushNotifHint}</div>
+                  {notifPermission === 'granted' ? (
+                    <div className="text-green-500 font-bold text-sm">{t.notifActive}</div>
+                  ) : notifPermission === 'denied' ? (
+                    <div className="text-red-500 font-bold text-sm">{t.notifDenied}</div>
+                  ) : (
+                    <button onClick={requestNotifPermission} className={`px-4 py-2 rounded-xl ${th.accent} text-white font-bold text-sm`}>{t.enableNotif}</button>
+                  )}
+                </div>
+                <label className={`flex items-center justify-between p-4 rounded-xl ${th.card} border ${th.border}`}>
+                  <span className="font-medium">{t.countdown}</span>
+                  <input type="checkbox" checked={countdownAnimation} onChange={e => setCountdownAnimation(e.target.checked)} className="w-5 h-5 accent-indigo-500" />
+                </label>
+                <button onClick={() => { setShowSettings(false); setShowOnboarding(true); setOnboardingStep(0); }}
+                  className={`px-4 py-2 rounded-xl border ${th.border} ${th.text} font-bold text-sm`}>{t.onboardingBtn}</button>
+              </div>
+            )}
+
+            {settingsTab === 'font' && (
                 <>
                   <div>
                     <label className={`text-xs font-bold ${th.textSub} block mb-1`}>{t.fontSize}: {fontSize}px</label>
