@@ -266,6 +266,14 @@ function PerformMode(props) {
   var _pa = useState(""); var preAnnMsg = _pa[0]; var setPreAnnMsg = _pa[1];
   var _sz = useState(cfg.performSize || "XL"); var perfSize = _sz[0]; var setPerfSize = _sz[1];
   var sizeMap = { XXL: { timer: 240, title: 36 }, XL: { timer: 120, title: 22 }, M: { timer: 72, title: 18 }, S: { timer: 44, title: 15 } };
+  var wakeLockRef = useRef(null);
+  useEffect(function() {
+    var acquire = function() { if (navigator.wakeLock) { navigator.wakeLock.request("screen").then(function(wl) { wakeLockRef.current = wl; }).catch(function() {}); } };
+    acquire();
+    var onVis = function() { if (document.visibilityState === "visible") acquire(); };
+    document.addEventListener("visibilitychange", onVis);
+    return function() { if (wakeLockRef.current) { wakeLockRef.current.release(); wakeLockRef.current = null; } document.removeEventListener("visibilitychange", onVis); };
+  }, []);
   var szCfg = sizeMap[perfSize] || sizeMap["XL"];
 
   useEffect(function() {
