@@ -3,6 +3,252 @@ import { useReducer, useEffect, useRef, useCallback, useState } from "react";
 // ============================================================
 // CONSTANTS & HELPERS
 // ============================================================
+// ============================================================
+// LANGUAGE / TRANSLATIONS
+// ============================================================
+const LANG_FLAGS = { de:'🇩🇪', en:'🇬🇧', fr:'🇫🇷', es:'🇪🇸', it:'🇮🇹', nl:'🇳🇱' };
+const LANG_NAMES = { de:'Deutsch', en:'English', fr:'Français', es:'Español', it:'Italiano', nl:'Nederlands' };
+
+const TRANSLATIONS = {
+  de: {
+    appTitle:'🎩✨ Magic Showrunner', appVersion:'v2.0',
+    save:'💾 Speichern', load:'📂 Laden', backup:'📥 Backup', settings:'⚙️ Einstellungen',
+    newPart:'➕ Neuer Teil', startShow:'🎭 Show starten', testMode:'🧪 Testmodus',
+    parts:'Teile', totalTime:'Gesamtzeit', settingsTitle:'⚙️ Einstellungen',
+    tabDesign:'🎨 Design', tabAudio:'🔊 Audio', tabTTS:'🗣️ Stimme', tabFont:'🔤 Schrift', tabLicense:'🔑 Lizenz', tabLang:'🌐 Sprache',
+    licenseTitle:'🔑 Freischaltcode', licenseRedeem:'🔑 Einlösen',
+    licenseSuccess:'✅ Code eingelöst!', licenseError:'❌ Ungültiger Code.', licenseAlready:'ℹ️ Bereits aktiv.',
+    licenseReset:'🗑 Lizenz zurücksetzen', licenseActive:'✅ Aktive Features:', licenseNone:'Keine Features freigeschaltet.',
+    licensePlaceholder:'z.B. MAGIC-PRO-2026',
+    planTheme:'Planungs-Theme', performTheme:'Perform-Theme',
+    beeps:'🔔 Signaltöne', vibration:'📳 Vibration', volume:'🔊 Lautstärke',
+    testTone:'🔊 Testton', testDuration:'⏱ Testmodus-Dauer pro Teil',
+    titleLabel:'Titel', durationLabel:'Dauer (Sek.)', introLabel:'Intro-Ansage (TTS)',
+    preAnnounceLabel:'Vorankündigung (Sek.)', preAnnounceText:'Vorankündigungs-Text',
+    notesLabel:'Notizen', musicUrl:'Musik-URL', vol:'Vol', fadeIn:'Fade In', fadeOut:'Fade Out',
+    saveBtn:'💾 Speichern', cancelBtn:'Abbrechen', testBtn:'🔊 Test',
+    saveShowTitle:'💾 Show speichern', showName:'Show-Name', overwrite:'Überschreiben:',
+    loadShowTitle:'📂 Show laden', noSaved:'Keine gespeicherten Shows.',
+    perform_pause:'⏸ Pause', perform_resume:'▶ Weiter', perform_stop:'⏹ Stop',
+    perform_prev:'← Zurück', perform_next:'Weiter →', perform_notes:'📝 Notizen',
+    perform_remaining:'verbleibend', perform_part:'Teil', perform_of:'/', perform_total:'Gesamt',
+    ttsVoice:'Stimme', ttsRate:'Geschwindigkeit', ttsPitch:'Tonhöhe', ttsPreview:'🔊 Vorschau',
+    ttsApply:'✅ Übernehmen', fontApply:'✅ Übernehmen', fontPreview:'Vorschau:',
+    fontSize:'Schriftgröße', fontFamily:'Schriftart', animations:'Animationen',
+    dragHint:'☰ Halten & ziehen zum Umsortieren',
+    partColor:'Farbe', duplicatePart:'📋 Duplizieren',
+    endedMsg:'Die Show ist beendet. Vielen Dank!',
+    idbSaved:'🗄️ IDB-Backup gespeichert', idbRestored:'🗄️ Daten aus IDB wiederhergestellt',
+    addPart:'➕ Neuer Teil', editPart:'✏️ Teil bearbeiten',
+    noStats:'Noch keine Shows.', shows:'Shows', clearHistory:'🗑 Verlauf löschen',
+    statsTitle:'📊 Statistiken', stageTitle:'🎪 Bühnenplan',
+    wakelock:'📱 Bildschirm aktiv halten',
+    fullscreen:'⛶ Vollbild', exitFullscreen:'✕ Vollbild beenden',
+    exportPDF:'📄 PDF Export', exportCSV:'📊 CSV Export',
+    stageAdd:'➕ Element hinzufügen', stageClear:'🗑 Alles löschen', stageHint:'Klicke auf die Bühne um Elemente zu platzieren',
+    langTitle:'🌐 Sprache wählen',
+    deleteShow:'🗑 Löschen', loadShow:'📂 Laden',
+  },
+  en: {
+    appTitle:'🎩✨ Magic Showrunner', appVersion:'v2.0',
+    save:'💾 Save', load:'📂 Load', backup:'📥 Backup', settings:'⚙️ Settings',
+    newPart:'➕ New Part', startShow:'🎭 Start Show', testMode:'🧪 Test Mode',
+    parts:'Parts', totalTime:'Total Time', settingsTitle:'⚙️ Settings',
+    tabDesign:'🎨 Design', tabAudio:'🔊 Audio', tabTTS:'🗣️ Voice', tabFont:'🔤 Font', tabLicense:'🔑 License', tabLang:'🌐 Language',
+    licenseTitle:'🔑 Activation Code', licenseRedeem:'🔑 Redeem',
+    licenseSuccess:'✅ Code redeemed!', licenseError:'❌ Invalid code.', licenseAlready:'ℹ️ Already active.',
+    licenseReset:'🗑 Reset License', licenseActive:'✅ Active Features:', licenseNone:'No features unlocked.',
+    licensePlaceholder:'e.g. MAGIC-PRO-2026',
+    planTheme:'Plan Theme', performTheme:'Perform Theme',
+    beeps:'🔔 Beeps', vibration:'📳 Vibration', volume:'🔊 Volume',
+    testTone:'🔊 Test Tone', testDuration:'⏱ Test Mode Duration per Part',
+    titleLabel:'Title', durationLabel:'Duration (sec)', introLabel:'Intro Announcement (TTS)',
+    preAnnounceLabel:'Pre-Announce (sec)', preAnnounceText:'Pre-Announce Text',
+    notesLabel:'Notes', musicUrl:'Music URL', vol:'Vol', fadeIn:'Fade In', fadeOut:'Fade Out',
+    saveBtn:'💾 Save', cancelBtn:'Cancel', testBtn:'🔊 Test',
+    saveShowTitle:'💾 Save Show', showName:'Show Name', overwrite:'Overwrite:',
+    loadShowTitle:'📂 Load Show', noSaved:'No saved shows.',
+    perform_pause:'⏸ Pause', perform_resume:'▶ Resume', perform_stop:'⏹ Stop',
+    perform_prev:'← Back', perform_next:'Next →', perform_notes:'📝 Notes',
+    perform_remaining:'remaining', perform_part:'Part', perform_of:'/', perform_total:'Total',
+    ttsVoice:'Voice', ttsRate:'Speed', ttsPitch:'Pitch', ttsPreview:'🔊 Preview',
+    ttsApply:'✅ Apply', fontApply:'✅ Apply', fontPreview:'Preview:',
+    fontSize:'Font Size', fontFamily:'Font Family', animations:'Animations',
+    dragHint:'☰ Hold & drag to reorder',
+    partColor:'Color', duplicatePart:'📋 Duplicate',
+    endedMsg:'The show is over. Thank you!',
+    idbSaved:'🗄️ IDB Backup saved', idbRestored:'🗄️ Data restored from IDB',
+    addPart:'➕ New Part', editPart:'✏️ Edit Part',
+    noStats:'No shows yet.', shows:'Shows', clearHistory:'🗑 Clear History',
+    statsTitle:'📊 Statistics', stageTitle:'🎪 Stage Plan',
+    wakelock:'📱 Keep screen awake',
+    fullscreen:'⛶ Fullscreen', exitFullscreen:'✕ Exit Fullscreen',
+    exportPDF:'📄 PDF Export', exportCSV:'📊 CSV Export',
+    stageAdd:'➕ Add Element', stageClear:'🗑 Clear All', stageHint:'Click on the stage to place elements',
+    langTitle:'🌐 Choose Language',
+    deleteShow:'🗑 Delete', loadShow:'📂 Load',
+  },
+  fr: {
+    appTitle:'🎩✨ Magic Showrunner', appVersion:'v2.0',
+    save:'💾 Sauvegarder', load:'📂 Charger', backup:'📥 Sauvegarde', settings:'⚙️ Paramètres',
+    newPart:'➕ Nouvelle partie', startShow:'🎭 Démarrer le show', testMode:'🧪 Mode test',
+    parts:'Parties', totalTime:'Durée totale', settingsTitle:'⚙️ Paramètres',
+    tabDesign:'🎨 Design', tabAudio:'🔊 Audio', tabTTS:'🗣️ Voix', tabFont:'🔤 Police', tabLicense:'🔑 Licence', tabLang:'🌐 Langue',
+    licenseTitle:'🔑 Code d\'activation', licenseRedeem:'🔑 Activer',
+    licenseSuccess:'✅ Code activé!', licenseError:'❌ Code invalide.', licenseAlready:'ℹ️ Déjà actif.',
+    licenseReset:'🗑 Réinitialiser', licenseActive:'✅ Fonctionnalités actives:', licenseNone:'Aucune fonctionnalité activée.',
+    licensePlaceholder:'ex. MAGIC-PRO-2026',
+    planTheme:'Thème de planification', performTheme:'Thème de performance',
+    beeps:'🔔 Bips', vibration:'📳 Vibration', volume:'🔊 Volume',
+    testTone:'🔊 Ton test', testDuration:'⏱ Durée mode test par partie',
+    titleLabel:'Titre', durationLabel:'Durée (sec)', introLabel:'Annonce intro (TTS)',
+    preAnnounceLabel:'Pré-annonce (sec)', preAnnounceText:'Texte de pré-annonce',
+    notesLabel:'Notes', musicUrl:'URL musique', vol:'Vol', fadeIn:'Fondu entrée', fadeOut:'Fondu sortie',
+    saveBtn:'💾 Sauvegarder', cancelBtn:'Annuler', testBtn:'🔊 Test',
+    saveShowTitle:'💾 Sauvegarder le show', showName:'Nom du show', overwrite:'Écraser:',
+    loadShowTitle:'📂 Charger un show', noSaved:'Aucun show sauvegardé.',
+    perform_pause:'⏸ Pause', perform_resume:'▶ Reprendre', perform_stop:'⏹ Arrêter',
+    perform_prev:'← Retour', perform_next:'Suivant →', perform_notes:'📝 Notes',
+    perform_remaining:'restant', perform_part:'Partie', perform_of:'/', perform_total:'Total',
+    ttsVoice:'Voix', ttsRate:'Vitesse', ttsPitch:'Hauteur', ttsPreview:'🔊 Aperçu',
+    ttsApply:'✅ Appliquer', fontApply:'✅ Appliquer', fontPreview:'Aperçu:',
+    fontSize:'Taille police', fontFamily:'Police', animations:'Animations',
+    dragHint:'☰ Maintenir & glisser pour réordonner',
+    partColor:'Couleur', duplicatePart:'📋 Dupliquer',
+    endedMsg:'Le show est terminé. Merci!',
+    idbSaved:'🗄️ Sauvegarde IDB effectuée', idbRestored:'🗄️ Données restaurées depuis IDB',
+    addPart:'➕ Nouvelle partie', editPart:'✏️ Modifier la partie',
+    noStats:'Aucun show.', shows:'Shows', clearHistory:'🗑 Effacer l\'historique',
+    statsTitle:'📊 Statistiques', stageTitle:'🎪 Plan de scène',
+    wakelock:'📱 Garder l\'écran allumé',
+    fullscreen:'⛶ Plein écran', exitFullscreen:'✕ Quitter plein écran',
+    exportPDF:'📄 Export PDF', exportCSV:'📊 Export CSV',
+    stageAdd:'➕ Ajouter élément', stageClear:'🗑 Tout effacer', stageHint:'Cliquez sur la scène pour placer des éléments',
+    langTitle:'🌐 Choisir la langue',
+    deleteShow:'🗑 Supprimer', loadShow:'📂 Charger',
+  },
+  es: {
+    appTitle:'🎩✨ Magic Showrunner', appVersion:'v2.0',
+    save:'💾 Guardar', load:'📂 Cargar', backup:'📥 Copia', settings:'⚙️ Ajustes',
+    newPart:'➕ Nueva parte', startShow:'🎭 Iniciar show', testMode:'🧪 Modo prueba',
+    parts:'Partes', totalTime:'Tiempo total', settingsTitle:'⚙️ Ajustes',
+    tabDesign:'🎨 Diseño', tabAudio:'🔊 Audio', tabTTS:'🗣️ Voz', tabFont:'🔤 Fuente', tabLicense:'🔑 Licencia', tabLang:'🌐 Idioma',
+    licenseTitle:'🔑 Código de activación', licenseRedeem:'🔑 Canjear',
+    licenseSuccess:'✅ ¡Código canjeado!', licenseError:'❌ Código inválido.', licenseAlready:'ℹ️ Ya activo.',
+    licenseReset:'🗑 Restablecer licencia', licenseActive:'✅ Funciones activas:', licenseNone:'Sin funciones activadas.',
+    licensePlaceholder:'ej. MAGIC-PRO-2026',
+    planTheme:'Tema de planificación', performTheme:'Tema de actuación',
+    beeps:'🔔 Pitidos', vibration:'📳 Vibración', volume:'🔊 Volumen',
+    testTone:'🔊 Tono de prueba', testDuration:'⏱ Duración modo prueba por parte',
+    titleLabel:'Título', durationLabel:'Duración (seg)', introLabel:'Anuncio intro (TTS)',
+    preAnnounceLabel:'Pre-anuncio (seg)', preAnnounceText:'Texto pre-anuncio',
+    notesLabel:'Notas', musicUrl:'URL música', vol:'Vol', fadeIn:'Fade In', fadeOut:'Fade Out',
+    saveBtn:'💾 Guardar', cancelBtn:'Cancelar', testBtn:'🔊 Prueba',
+    saveShowTitle:'💾 Guardar show', showName:'Nombre del show', overwrite:'Sobrescribir:',
+    loadShowTitle:'📂 Cargar show', noSaved:'Sin shows guardados.',
+    perform_pause:'⏸ Pausa', perform_resume:'▶ Continuar', perform_stop:'⏹ Detener',
+    perform_prev:'← Atrás', perform_next:'Siguiente →', perform_notes:'📝 Notas',
+    perform_remaining:'restante', perform_part:'Parte', perform_of:'/', perform_total:'Total',
+    ttsVoice:'Voz', ttsRate:'Velocidad', ttsPitch:'Tono', ttsPreview:'🔊 Vista previa',
+    ttsApply:'✅ Aplicar', fontApply:'✅ Aplicar', fontPreview:'Vista previa:',
+    fontSize:'Tamaño fuente', fontFamily:'Fuente', animations:'Animaciones',
+    dragHint:'☰ Mantener & arrastrar para reordenar',
+    partColor:'Color', duplicatePart:'📋 Duplicar',
+    endedMsg:'¡El show ha terminado. Gracias!',
+    idbSaved:'🗄️ Copia IDB guardada', idbRestored:'🗄️ Datos restaurados desde IDB',
+    addPart:'➕ Nueva parte', editPart:'✏️ Editar parte',
+    noStats:'Sin shows aún.', shows:'Shows', clearHistory:'🗑 Borrar historial',
+    statsTitle:'📊 Estadísticas', stageTitle:'🎪 Plan de escenario',
+    wakelock:'📱 Mantener pantalla activa',
+    fullscreen:'⛶ Pantalla completa', exitFullscreen:'✕ Salir pantalla completa',
+    exportPDF:'📄 Exportar PDF', exportCSV:'📊 Exportar CSV',
+    stageAdd:'➕ Agregar elemento', stageClear:'🗑 Borrar todo', stageHint:'Haz clic en el escenario para colocar elementos',
+    langTitle:'🌐 Elegir idioma',
+    deleteShow:'🗑 Eliminar', loadShow:'📂 Cargar',
+  },
+  it: {
+    appTitle:'🎩✨ Magic Showrunner', appVersion:'v2.0',
+    save:'💾 Salva', load:'📂 Carica', backup:'📥 Backup', settings:'⚙️ Impostazioni',
+    newPart:'➕ Nuova parte', startShow:'🎭 Avvia show', testMode:'🧪 Modalità test',
+    parts:'Parti', totalTime:'Tempo totale', settingsTitle:'⚙️ Impostazioni',
+    tabDesign:'🎨 Design', tabAudio:'🔊 Audio', tabTTS:'🗣️ Voce', tabFont:'🔤 Font', tabLicense:'🔑 Licenza', tabLang:'🌐 Lingua',
+    licenseTitle:'🔑 Codice di attivazione', licenseRedeem:'🔑 Riscatta',
+    licenseSuccess:'✅ Codice riscattato!', licenseError:'❌ Codice non valido.', licenseAlready:'ℹ️ Già attivo.',
+    licenseReset:'🗑 Ripristina licenza', licenseActive:'✅ Funzioni attive:', licenseNone:'Nessuna funzione attivata.',
+    licensePlaceholder:'es. MAGIC-PRO-2026',
+    planTheme:'Tema pianificazione', performTheme:'Tema esecuzione',
+    beeps:'🔔 Segnali', vibration:'📳 Vibrazione', volume:'🔊 Volume',
+    testTone:'🔊 Tono test', testDuration:'⏱ Durata modalità test per parte',
+    titleLabel:'Titolo', durationLabel:'Durata (sec)', introLabel:'Annuncio intro (TTS)',
+    preAnnounceLabel:'Pre-annuncio (sec)', preAnnounceText:'Testo pre-annuncio',
+    notesLabel:'Note', musicUrl:'URL musica', vol:'Vol', fadeIn:'Fade In', fadeOut:'Fade Out',
+    saveBtn:'💾 Salva', cancelBtn:'Annulla', testBtn:'🔊 Test',
+    saveShowTitle:'💾 Salva show', showName:'Nome show', overwrite:'Sovrascrivi:',
+    loadShowTitle:'📂 Carica show', noSaved:'Nessuno show salvato.',
+    perform_pause:'⏸ Pausa', perform_resume:'▶ Riprendi', perform_stop:'⏹ Ferma',
+    perform_prev:'← Indietro', perform_next:'Avanti →', perform_notes:'📝 Note',
+    perform_remaining:'rimanente', perform_part:'Parte', perform_of:'/', perform_total:'Totale',
+    ttsVoice:'Voce', ttsRate:'Velocità', ttsPitch:'Tono', ttsPreview:'🔊 Anteprima',
+    ttsApply:'✅ Applica', fontApply:'✅ Applica', fontPreview:'Anteprima:',
+    fontSize:'Dimensione font', fontFamily:'Font', animations:'Animazioni',
+    dragHint:'☰ Tieni & trascina per riordinare',
+    partColor:'Colore', duplicatePart:'📋 Duplica',
+    endedMsg:'Lo show è terminato. Grazie!',
+    idbSaved:'🗄️ Backup IDB salvato', idbRestored:'🗄️ Dati ripristinati da IDB',
+    addPart:'➕ Nuova parte', editPart:'✏️ Modifica parte',
+    noStats:'Nessuno show.', shows:'Shows', clearHistory:'🗑 Cancella cronologia',
+    statsTitle:'📊 Statistiche', stageTitle:'🎪 Piano palco',
+    wakelock:'📱 Mantieni schermo attivo',
+    fullscreen:'⛶ Schermo intero', exitFullscreen:'✕ Esci da schermo intero',
+    exportPDF:'📄 Esporta PDF', exportCSV:'📊 Esporta CSV',
+    stageAdd:'➕ Aggiungi elemento', stageClear:'🗑 Cancella tutto', stageHint:'Clicca sul palco per posizionare elementi',
+    langTitle:'🌐 Scegli lingua',
+    deleteShow:'🗑 Elimina', loadShow:'📂 Carica',
+  },
+  nl: {
+    appTitle:'🎩✨ Magic Showrunner', appVersion:'v2.0',
+    save:'💾 Opslaan', load:'📂 Laden', backup:'📥 Back-up', settings:'⚙️ Instellingen',
+    newPart:'➕ Nieuw deel', startShow:'🎭 Show starten', testMode:'🧪 Testmodus',
+    parts:'Delen', totalTime:'Totale tijd', settingsTitle:'⚙️ Instellingen',
+    tabDesign:'🎨 Design', tabAudio:'🔊 Audio', tabTTS:'🗣️ Stem', tabFont:'🔤 Lettertype', tabLicense:'🔑 Licentie', tabLang:'🌐 Taal',
+    licenseTitle:'🔑 Activatiecode', licenseRedeem:'🔑 Inwisselen',
+    licenseSuccess:'✅ Code ingewisseld!', licenseError:'❌ Ongeldige code.', licenseAlready:'ℹ️ Al actief.',
+    licenseReset:'🗑 Licentie resetten', licenseActive:'✅ Actieve functies:', licenseNone:'Geen functies ontgrendeld.',
+    licensePlaceholder:'bijv. MAGIC-PRO-2026',
+    planTheme:'Planningsthema', performTheme:'Uitvoeringsthema',
+    beeps:'🔔 Piepgeluiden', vibration:'📳 Trillen', volume:'🔊 Volume',
+    testTone:'🔊 Testgeluid', testDuration:'⏱ Testmodus duur per deel',
+    titleLabel:'Titel', durationLabel:'Duur (sec)', introLabel:'Intro-aankondiging (TTS)',
+    preAnnounceLabel:'Vooraankondiging (sec)', preAnnounceText:'Vooraankondigingstekst',
+    notesLabel:'Notities', musicUrl:'Muziek-URL', vol:'Vol', fadeIn:'Fade In', fadeOut:'Fade Out',
+    saveBtn:'💾 Opslaan', cancelBtn:'Annuleren', testBtn:'🔊 Test',
+    saveShowTitle:'💾 Show opslaan', showName:'Shownaam', overwrite:'Overschrijven:',
+    loadShowTitle:'📂 Show laden', noSaved:'Geen opgeslagen shows.',
+    perform_pause:'⏸ Pauze', perform_resume:'▶ Verder', perform_stop:'⏹ Stop',
+    perform_prev:'← Terug', perform_next:'Verder →', perform_notes:'📝 Notities',
+    perform_remaining:'resterend', perform_part:'Deel', perform_of:'/', perform_total:'Totaal',
+    ttsVoice:'Stem', ttsRate:'Snelheid', ttsPitch:'Toonhoogte', ttsPreview:'🔊 Voorbeeld',
+    ttsApply:'✅ Toepassen', fontApply:'✅ Toepassen', fontPreview:'Voorbeeld:',
+    fontSize:'Lettergrootte', fontFamily:'Lettertype', animations:'Animaties',
+    dragHint:'☰ Vasthouden & slepen om te herordenen',
+    partColor:'Kleur', duplicatePart:'📋 Dupliceren',
+    endedMsg:'De show is afgelopen. Bedankt!',
+    idbSaved:'🗄️ IDB-back-up opgeslagen', idbRestored:'🗄️ Gegevens hersteld uit IDB',
+    addPart:'➕ Nieuw deel', editPart:'✏️ Deel bewerken',
+    noStats:'Nog geen shows.', shows:'Shows', clearHistory:'🗑 Geschiedenis wissen',
+    statsTitle:'📊 Statistieken', stageTitle:'🎪 Podiumplan',
+    wakelock:'📱 Scherm actief houden',
+    fullscreen:'⛶ Volledig scherm', exitFullscreen:'✕ Volledig scherm sluiten',
+    exportPDF:'📄 PDF exporteren', exportCSV:'📊 CSV exporteren',
+    stageAdd:'➕ Element toevoegen', stageClear:'🗑 Alles wissen', stageHint:'Klik op het podium om elementen te plaatsen',
+    langTitle:'🌐 Taal kiezen',
+    deleteShow:'🗑 Verwijderen', loadShow:'📂 Laden',
+  },
+};
+
+// ============================================================
+// CONSTANTS & HELPERS
+// ============================================================
 const IDB_NAME = 'ShowRunnerDB';
 const IDB_STORE = 'backups';
 const IDB_VERSION = 1;
@@ -91,40 +337,7 @@ const PERFORM_THEMES = {
   black: { name:'⚫ Schwarz', bg:'bg-black', card:'bg-gray-950 border border-gray-800', text:'text-gray-300', timerText:'text-indigo-400', warnBg:'bg-black border-2 border-red-800', warnTimer:'text-red-500' },
 };
 
-const T = {
-  appTitle:'🎩✨ Magic Showrunner', appVersion:'v2.0',
-  save:'💾 Speichern', load:'📂 Laden', backup:'📥 Backup', settings:'⚙️ Einstellungen',
-  newPart:'➕ Neuer Teil', startShow:'🎭 Show starten', testMode:'🧪 Testmodus',
-  parts:'Teile', totalTime:'Gesamtzeit', settingsTitle:'⚙️ Einstellungen',
-  tabDesign:'🎨 Design', tabAudio:'🔊 Audio', tabTTS:'🗣️ Stimme', tabFont:'🔤 Schrift', tabLicense:'🔑 Lizenz',
-  licenseTitle:'🔑 Freischaltcode', licenseRedeem:'🔑 Einlösen',
-  licenseSuccess:'✅ Code eingelöst!', licenseError:'❌ Ungültiger Code.', licenseAlready:'ℹ️ Bereits aktiv.',
-  licenseReset:'🗑 Lizenz zurücksetzen', licenseActive:'✅ Aktive Features:', licenseNone:'Keine Features freigeschaltet.',
-  licensePlaceholder:'z.B. MAGIC-PRO-2026',
-  planTheme:'Planungs-Theme', performTheme:'Perform-Theme',
-  beeps:'🔔 Signaltöne', vibration:'📳 Vibration', volume:'🔊 Lautstärke',
-  testTone:'🔊 Testton', testDuration:'⏱ Testmodus-Dauer pro Teil',
-  titleLabel:'Titel', durationLabel:'Dauer (Sek.)', introLabel:'Intro-Ansage (TTS)',
-  preAnnounceLabel:'Vorankündigung (Sek.)', preAnnounceText:'Vorankündigungs-Text',
-  notesLabel:'Notizen', musicUrl:'Musik-URL', vol:'Vol', fadeIn:'Fade In', fadeOut:'Fade Out',
-  saveBtn:'💾 Speichern', cancelBtn:'Abbrechen', testBtn:'🔊 Test',
-  saveShowTitle:'💾 Show speichern', showName:'Show-Name', overwrite:'Überschreiben:',
-  loadShowTitle:'📂 Show laden', noSaved:'Keine gespeicherten Shows.',
-  perform_pause:'⏸ Pause', perform_resume:'▶ Weiter', perform_stop:'⏹ Stop',
-  perform_prev:'← Zurück', perform_next:'Weiter →', perform_notes:'📝 Notizen',
-  perform_remaining:'verbleibend', perform_part:'Teil', perform_of:'/', perform_total:'Gesamt',
-  ttsVoice:'Stimme', ttsRate:'Geschwindigkeit', ttsPitch:'Tonhöhe', ttsPreview:'🔊 Vorschau',
-  ttsApply:'✅ Übernehmen', fontApply:'✅ Übernehmen', fontPreview:'Vorschau:',
-  fontSize:'Schriftgröße', fontFamily:'Schriftart', animations:'Animationen',
-  dragHint:'☰ Halten & ziehen zum Umsortieren',
-  partColor:'Farbe', duplicatePart:'📋 Duplizieren',
-  endedMsg:'Die Show ist beendet. Vielen Dank!',
-  idbSaved:'🗄️ IDB-Backup gespeichert', idbRestored:'🗄️ Daten aus IDB wiederhergestellt',
-  addPart:'➕ Neuer Teil', editPart:'✏️ Teil bearbeiten',
-  noStats:'Noch keine Shows.', shows:'Shows', clearHistory:'🗑 Verlauf löschen',
-  statsTitle:'📊 Statistiken', stageTitle:'🎪 Bühnenplan',
-  wakelock:'📱 Bildschirm aktiv halten',
-};
+// T is resolved dynamically from TRANSLATIONS based on current lang (see App)
 
 const PART_COLORS = ['#6366f1','#8b5cf6','#ec4899','#ef4444','#f97316','#eab308','#22c55e','#14b8a6','#06b6d4','#3b82f6','#64748b'];
 
@@ -159,10 +372,50 @@ const FONT_FAMILIES = [
 ];
 
 // ============================================================
+// PDF & CSV EXPORT HELPERS
+// ============================================================
+function exportCSV(parts, lang) {
+  const T = TRANSLATIONS[lang] || TRANSLATIONS.de;
+  const header = ['#', T.titleLabel, T.durationLabel, T.introLabel, T.notesLabel].join(';');
+  const rows = parts.map((p, i) =>
+    [i+1, `"${p.title}"`, p.duration, `"${p.introText || ''}"`, `"${p.notes || ''}"`].join(';')
+  );
+  const csv = [header, ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'showrunner_export.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function exportPDF(parts, lang) {
+  const T = TRANSLATIONS[lang] || TRANSLATIONS.de;
+  const totalSec = parts.reduce((a, p) => a + p.duration, 0);
+  const fmt2 = (s) => { s = Math.abs(Math.floor(s)); return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`; };
+  const rows = parts.map((p, i) =>
+    `<tr style="background:${i%2===0?'#f9f9f9':'#fff'}">
+      <td style="padding:6px 10px;border:1px solid #ddd">${i+1}</td>
+      <td style="padding:6px 10px;border:1px solid #ddd"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${p.color};margin-right:6px"></span>${p.title}</td>
+      <td style="padding:6px 10px;border:1px solid #ddd;text-align:center">${fmt2(p.duration)}</td>
+      <td style="padding:6px 10px;border:1px solid #ddd">${p.introText || ''}</td>
+      <td style="padding:6px 10px;border:1px solid #ddd">${p.notes || ''}</td>
+    </tr>`
+  ).join('');
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Magic Showrunner Export</title>
+  <style>body{font-family:sans-serif;padding:30px;color:#222}h1{color:#4f46e5}table{width:100%;border-collapse:collapse;font-size:13px}th{background:#4f46e5;color:#fff;padding:8px 10px;border:1px solid #4f46e5;text-align:left}.footer{margin-top:20px;font-size:12px;color:#888}</style></head>
+  <body><h1>🎩✨ Magic Showrunner</h1><p>${new Date().toLocaleString()}</p>
+  <table><thead><tr><th>#</th><th>${T.titleLabel}</th><th>${T.durationLabel}</th><th>${T.introLabel}</th><th>${T.notesLabel}</th></tr></thead><tbody>${rows}</tbody></table>
+  <div class="footer">${T.totalTime}: ${fmt2(totalSec)} · ${parts.length} ${T.parts}</div></body></html>`;
+  const w = window.open('', '_blank');
+  if (w) { w.document.write(html); w.document.close(); w.print(); }
+}
+
+// ============================================================
 // REDUCER
 // ============================================================
 const initialState = {
   // UI
+  lang: localStorage.getItem('ms_lang') || 'de',
+  isFullscreen: false,
   mode: 'plan', // 'plan' | 'perform' | 'settings' | 'stats' | 'stage'
   settingsTab: 'design',
   toast: null,
@@ -172,6 +425,8 @@ const initialState = {
   showLoadModal: false,
   showTemplates: false,
   countdownNum: null,
+  // Stage
+  stageItems: (() => { try { return JSON.parse(localStorage.getItem('ms_stage') || '[]'); } catch(e) { return []; } })(),
   // Parts
   parts: (() => {
     try { const s = localStorage.getItem('ms_autosave'); if (s) { const d = JSON.parse(s); if (d.parts?.length) return d.parts; } } catch(e) {}
@@ -216,6 +471,8 @@ const initialState = {
 function reducer(state, action) {
   switch(action.type) {
     // UI
+    case 'SET_LANG': return { ...state, lang: action.payload };
+    case 'SET_FULLSCREEN': return { ...state, isFullscreen: action.payload };
     case 'SET_MODE': return { ...state, mode: action.payload };
     case 'SET_SETTINGS_TAB': return { ...state, settingsTab: action.payload };
     case 'SET_TOAST': return { ...state, toast: action.payload };
@@ -301,6 +558,14 @@ function reducer(state, action) {
       return { ...state, savedShows: updated };
     }
     case 'SET_SAVED_SHOWS': return { ...state, savedShows: action.payload };
+    // Stage
+    case 'SET_STAGE_ITEMS': return { ...state, stageItems: action.payload };
+    case 'ADD_STAGE_ITEM': return { ...state, stageItems: [...state.stageItems, action.payload] };
+    case 'UPDATE_STAGE_ITEM': {
+      const items = state.stageItems.map((it, i) => i === action.idx ? { ...it, ...action.payload } : it);
+      return { ...state, stageItems: items };
+    }
+    case 'DELETE_STAGE_ITEM': return { ...state, stageItems: state.stageItems.filter((_,i) => i !== action.idx) };
     default: return state;
   }
 }
@@ -348,6 +613,7 @@ function Modal({ title, onClose, children, th }) {
 // PART EDITOR
 // ============================================================
 function PartEditor({ state, dispatch, th }) {
+  const T = TRANSLATIONS[state.lang] || TRANSLATIONS.de;
   const { form, editIdx } = state;
   const set = (k, v) => dispatch({ type: 'SET_FORM', payload: { [k]: v } });
 
@@ -431,6 +697,7 @@ function PartEditor({ state, dispatch, th }) {
 // PERFORM VIEW
 // ============================================================
 function PerformView({ state, dispatch, pth, sendNotification, wakeLockRef }) {
+  const T = TRANSLATIONS[state.lang] || TRANSLATIONS.de;
   const { parts, currentPartIndex, partElapsed, totalElapsed, isRunning, isPaused, testMode, testDuration, showEnded, preAnnounced, beepsEnabled, vibrationEnabled, volume, countdownAnimation, ttsRate, ttsPitch, ttsVoiceURI } = state;
   const intervalRef = useRef(null);
   const part = parts[currentPartIndex];
@@ -551,9 +818,10 @@ function PerformView({ state, dispatch, pth, sendNotification, wakeLockRef }) {
 // SETTINGS PANEL
 // ============================================================
 function SettingsPanel({ state, dispatch, th }) {
+  const T = TRANSLATIONS[state.lang] || TRANSLATIONS.de;
   const { settingsTab, themeMode, performTheme, animationsEnabled, fontSize, fontFamily,
     ttsRate, ttsPitch, ttsVoiceURI, beepsEnabled, vibrationEnabled, volume,
-    countdownAnimation, unlockedFeatures, licenseInput, licenseStatus } = state;
+    countdownAnimation, unlockedFeatures, licenseInput, licenseStatus, lang } = state;
 
   const [pendingFont, setPendingFont] = useState({ size: fontSize, family: fontFamily });
   const [pendingTTS, setPendingTTS] = useState({ rate: ttsRate, pitch: ttsPitch, voiceURI: ttsVoiceURI });
@@ -600,8 +868,8 @@ function SettingsPanel({ state, dispatch, th }) {
   };
 
   const inputCls = `w-full rounded-lg border px-3 py-2 text-sm ${th.input}`;
-  const tabs = ['design','audio','tts','font','license'];
-  const tabLabels = { design: T.tabDesign, audio: T.tabAudio, tts: T.tabTTS, font: T.tabFont, license: T.tabLicense };
+  const tabs = ['design','audio','tts','font','license','lang'];
+  const tabLabels = { design: T.tabDesign, audio: T.tabAudio, tts: T.tabTTS, font: T.tabFont, license: T.tabLicense, lang: T.tabLang };
 
   return (
     <div className={`${th.card} ${th.text} rounded-2xl shadow-xl max-w-xl mx-auto my-4`}>
@@ -701,6 +969,19 @@ function SettingsPanel({ state, dispatch, th }) {
             {fontApplied ? '✅ Übernommen!' : T.fontApply}
           </button>
         </>}
+        {/* LANG */}
+        {settingsTab === 'lang' && <>
+          <div className={`text-sm font-semibold mb-3 ${th.textSub}`}>{T.langTitle}</div>
+          <div className="grid grid-cols-2 gap-2">
+            {Object.keys(TRANSLATIONS).map(l => (
+              <button key={l} onClick={() => { dispatch({ type: 'SET_LANG', payload: l }); localStorage.setItem('ms_lang', l); }}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors text-sm ${lang === l ? `${th.accent} text-white border-transparent` : `${th.border} ${th.text}`}`}>
+                <span className="text-lg">{LANG_FLAGS[l]}</span>
+                <span>{LANG_NAMES[l]}</span>
+              </button>
+            ))}
+          </div>
+        </>}
         {/* LICENSE */}
         {settingsTab === 'license' && <>
           <div className={`text-xs ${th.textSub}`}>{T.licenseTitle}</div>
@@ -725,9 +1006,128 @@ function SettingsPanel({ state, dispatch, th }) {
 }
 
 // ============================================================
+// STAGE VIEW
+// ============================================================
+const STAGE_ELEMENT_TYPES = [
+  { type:'mic',   icon:'🎤', label:'Mikrofon' },
+  { type:'spot',  icon:'💡', label:'Spotlight' },
+  { type:'table', icon:'🪄', label:'Tisch' },
+  { type:'chair', icon:'🪑', label:'Stuhl' },
+  { type:'box',   icon:'📦', label:'Box/Prop' },
+  { type:'person',icon:'🧍', label:'Person' },
+  { type:'exit',  icon:'🚪', label:'Ausgang' },
+  { type:'cam',   icon:'📷', label:'Kamera' },
+];
+
+function StageView({ state, dispatch, th }) {
+  const T = TRANSLATIONS[state.lang] || TRANSLATIONS.de;
+  const { stageItems } = state;
+  const [selectedType, setSelectedType] = useState('mic');
+  const [draggingIdx, setDraggingIdx] = useState(null);
+  const [dragOffset, setDragOffset] = useState({ x:0, y:0 });
+  const stageRef = useRef(null);
+
+  const handleStageClick = (e) => {
+    if (e.target !== stageRef.current && !e.target.classList.contains('stage-bg')) return;
+    const rect = stageRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width * 100).toFixed(1);
+    const y = ((e.clientY - rect.top) / rect.height * 100).toFixed(1);
+    const el = STAGE_ELEMENT_TYPES.find(t => t.type === selectedType);
+    const newItem = { id: Date.now(), type: selectedType, icon: el?.icon || '📦', label: el?.label || '', x: parseFloat(x), y: parseFloat(y) };
+    const updated = [...stageItems, newItem];
+    dispatch({ type: 'SET_STAGE_ITEMS', payload: updated });
+    localStorage.setItem('ms_stage', JSON.stringify(updated));
+  };
+
+  const handleMouseDown = (e, idx) => {
+    e.stopPropagation();
+    const rect = stageRef.current.getBoundingClientRect();
+    const item = stageItems[idx];
+    setDraggingIdx(idx);
+    setDragOffset({
+      x: e.clientX - rect.left - (item.x / 100 * rect.width),
+      y: e.clientY - rect.top - (item.y / 100 * rect.height),
+    });
+  };
+
+  const handleMouseMove = useCallback((e) => {
+    if (draggingIdx === null || !stageRef.current) return;
+    const rect = stageRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(100, ((e.clientX - rect.left - dragOffset.x) / rect.width * 100)));
+    const y = Math.max(0, Math.min(100, ((e.clientY - rect.top - dragOffset.y) / rect.height * 100)));
+    const updated = stageItems.map((it, i) => i === draggingIdx ? { ...it, x: parseFloat(x.toFixed(1)), y: parseFloat(y.toFixed(1)) } : it);
+    dispatch({ type: 'SET_STAGE_ITEMS', payload: updated });
+  }, [draggingIdx, dragOffset, stageItems]);
+
+  const handleMouseUp = useCallback(() => {
+    if (draggingIdx !== null) {
+      localStorage.setItem('ms_stage', JSON.stringify(stageItems));
+      setDraggingIdx(null);
+    }
+  }, [draggingIdx, stageItems]);
+
+  useEffect(() => {
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => { window.removeEventListener('mousemove', handleMouseMove); window.removeEventListener('mouseup', handleMouseUp); };
+  }, [handleMouseMove, handleMouseUp]);
+
+  return (
+    <div className={`${th.card} ${th.text} rounded-2xl shadow-xl max-w-2xl mx-auto my-4 p-4`}>
+      <div className="flex items-center justify-between mb-3">
+        <span className="font-bold text-lg">{T.stageTitle}</span>
+        <button onClick={() => dispatch({ type: 'SET_MODE', payload: 'plan' })} className="text-2xl opacity-60 hover:opacity-100">×</button>
+      </div>
+      {/* Element picker */}
+      <div className="flex flex-wrap gap-2 mb-3">
+        {STAGE_ELEMENT_TYPES.map(el => (
+          <button key={el.type} onClick={() => setSelectedType(el.type)}
+            className={`px-2 py-1 rounded-lg text-sm border transition-colors ${selectedType === el.type ? `${th.accent} text-white border-transparent` : `${th.border} ${th.text}`}`}>
+            {el.icon} {el.label}
+          </button>
+        ))}
+      </div>
+      <div className={`text-xs ${th.textSub} mb-2`}>{T.stageHint}</div>
+      {/* Stage canvas */}
+      <div
+        ref={stageRef}
+        className="stage-bg relative w-full rounded-xl border-2 border-dashed cursor-crosshair select-none"
+        style={{ height: 320, background: 'linear-gradient(to bottom, #1e1b4b 0%, #312e81 40%, #4c1d95 100%)', borderColor: '#6366f1' }}
+        onClick={handleStageClick}
+      >
+        {/* Stage label */}
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-white/40 text-xs font-semibold tracking-widest pointer-events-none">STAGE</div>
+        {/* Stage front line */}
+        <div className="absolute bottom-8 left-4 right-4 border-t border-white/20 pointer-events-none" />
+        {stageItems.map((item, idx) => (
+          <div key={item.id}
+            className="absolute flex flex-col items-center cursor-move group"
+            style={{ left: `${item.x}%`, top: `${item.y}%`, transform: 'translate(-50%, -50%)', zIndex: draggingIdx === idx ? 10 : 1 }}
+            onMouseDown={(e) => handleMouseDown(e, idx)}
+          >
+            <span className="text-2xl drop-shadow-lg">{item.icon}</span>
+            <span className="text-white text-xs mt-0.5 bg-black/40 px-1 rounded">{item.label}</span>
+            <button
+              className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white rounded-full text-xs hidden group-hover:flex items-center justify-center leading-none"
+              onClick={(e) => { e.stopPropagation(); const updated = stageItems.filter((_,i) => i !== idx); dispatch({ type: 'SET_STAGE_ITEMS', payload: updated }); localStorage.setItem('ms_stage', JSON.stringify(updated)); }}
+            >×</button>
+          </div>
+        ))}
+      </div>
+      {/* Clear */}
+      <div className="flex justify-end mt-3">
+        <button onClick={() => { dispatch({ type: 'SET_STAGE_ITEMS', payload: [] }); localStorage.setItem('ms_stage', '[]'); }}
+          className="text-xs text-red-500 underline">{T.stageClear}</button>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================
 // STATS VIEW
 // ============================================================
 function StatsView({ state, dispatch, th }) {
+  const T = TRANSLATIONS[state.lang] || TRANSLATIONS.de;
   const { showHistory } = state;
   return (
     <div className={`${th.card} ${th.text} rounded-2xl shadow-xl max-w-xl mx-auto my-4 p-4`}>
@@ -769,9 +1169,37 @@ function StatsView({ state, dispatch, th }) {
 }
 
 // ============================================================
+// FULLSCREEN HOOK
+// ============================================================
+function useFullscreen(dispatch) {
+  useEffect(() => {
+    const onChange = () => {
+      if (!document.fullscreenElement) dispatch({ type: 'SET_FULLSCREEN', payload: false });
+    };
+    document.addEventListener('fullscreenchange', onChange);
+    return () => document.removeEventListener('fullscreenchange', onChange);
+  }, [dispatch]);
+
+  const toggleFullscreen = useCallback(async (ref) => {
+    try {
+      if (!document.fullscreenElement) {
+        await (ref?.current || document.documentElement).requestFullscreen();
+        dispatch({ type: 'SET_FULLSCREEN', payload: true });
+      } else {
+        await document.exitFullscreen();
+        dispatch({ type: 'SET_FULLSCREEN', payload: false });
+      }
+    } catch(e) {}
+  }, [dispatch]);
+
+  return toggleFullscreen;
+}
+
+// ============================================================
 // PLAN VIEW (main part list)
 // ============================================================
 function PlanView({ state, dispatch, th }) {
+  const T = TRANSLATIONS[state.lang] || TRANSLATIONS.de;
   const { parts, testMode, testDuration } = state;
   const totalDuration = parts.reduce((a, p) => a + p.duration, 0);
   const dragItem = useRef(null);
@@ -795,6 +1223,15 @@ function PlanView({ state, dispatch, th }) {
             className={`px-4 py-2 rounded-lg border ${th.border} ${th.text}`}>📋 Templates</button>
         </div>
         <div className={`text-sm ${th.textSub}`}>{parts.length} {T.parts} · {fmt(totalDuration)}</div>
+      </div>
+      {/* Export buttons */}
+      <div className="flex flex-wrap gap-2">
+        <button onClick={() => exportCSV(parts, state.lang)}
+          className={`px-3 py-1.5 rounded-lg text-sm border ${th.border} ${th.text} hover:opacity-80`}>{T.exportCSV}</button>
+        <button onClick={() => exportPDF(parts, state.lang)}
+          className={`px-3 py-1.5 rounded-lg text-sm border ${th.border} ${th.text} hover:opacity-80`}>{T.exportPDF}</button>
+        <button onClick={() => dispatch({ type: 'SET_MODE', payload: 'stage' })}
+          className={`px-3 py-1.5 rounded-lg text-sm border ${th.border} ${th.text} hover:opacity-80`}>{T.stageTitle}</button>
       </div>
       {/* Test mode */}
       <div className={`flex items-center gap-3 ${th.card} rounded-xl p-3 border ${th.border}`}>
@@ -853,6 +1290,7 @@ function PlanView({ state, dispatch, th }) {
 // SAVE / LOAD MODALS
 // ============================================================
 function SaveModal({ state, dispatch, th }) {
+  const T = TRANSLATIONS[state.lang] || TRANSLATIONS.de;
   const { saveShowName, savedShows } = state;
   const doSave = () => {
     if (!saveShowName.trim()) return;
@@ -913,6 +1351,9 @@ function LoadModal({ state, dispatch, th }) {
 export default function ShowRunner() {
   const [state, dispatch] = useReducer(reducer, initialState);
   const wakeLockRef = useRef(null);
+  const appRef = useRef(null);
+  const T = TRANSLATIONS[state.lang] || TRANSLATIONS.de;
+  const toggleFullscreen = useFullscreen(state.isFullscreen, dispatch);
 
   const { mode, parts, toast, showForm, themeMode, performTheme, fontSize, fontFamily,
     isRunning, showSaveModal, showLoadModal } = state;
