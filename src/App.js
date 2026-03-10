@@ -91,7 +91,12 @@ const TRANSLATIONS = {
     newPart: '➕ Neuer Teil', startShow: '🎭 Show starten', testMode: '🧪 Testmodus',
     parts: 'Teile', totalTime: 'Gesamtzeit', settingsTitle: '⚙️ Einstellungen',
     tabDesign: '🎨 Design', tabAudio: '🔊 Audio', tabTest: '🧪 Test', tabLanguage: '🌐 Sprache',
-    tabTTS: '🗣️ Stimme', tabFont: '🔤 Schrift', tabNotif: '🔔 Notif',
+    tabTTS: '🗣️ Stimme', tabFont: '🔤 Schrift', tabNotif: '🔔 Notif', tabLicense: '🔑 Lizenz',
+    licenseTitle: '🔑 Freischaltcode', licenseInputLabel: 'Code eingeben', licenseRedeem: '🔑 Einlösen',
+    licenseSuccess: '✅ Code eingelöst! Features freigeschaltet.', licenseError: '❌ Ungültiger Code.',
+    licenseAlready: 'ℹ️ Bereits freigeschaltet.', licenseReset: '🗑 Lizenz zurücksetzen',
+    licenseActive: '✅ Aktive Features:', licenseNone: 'Keine Features freigeschaltet.',
+    licensePlaceholder: 'z.B. MAGIC-PRO-2026',
     countdown: '⏳ Countdown-Animation (letzte 3 Sek.)',
     pushNotif: '🔔 Push-Benachrichtigungen',
     pushNotifHint: 'Auch bei gesperrtem Bildschirm & Apple Watch / WearOS',
@@ -154,7 +159,12 @@ const TRANSLATIONS = {
     newPart: '➕ New Part', startShow: '🎭 Start Show', testMode: '🧪 Test Mode',
     parts: 'Parts', totalTime: 'Total Time', settingsTitle: '⚙️ Settings',
     tabDesign: '🎨 Design', tabAudio: '🔊 Audio', tabTest: '🧪 Test', tabLanguage: '🌐 Language',
-    tabTTS: '🗣️ Voice', tabFont: '🔤 Font', tabNotif: '🔔 Notif',
+    tabTTS: '🗣️ Voice', tabFont: '🔤 Font', tabNotif: '🔔 Notif', tabLicense: '🔑 License',
+    licenseTitle: '🔑 Unlock Code', licenseInputLabel: 'Enter code', licenseRedeem: '🔑 Redeem',
+    licenseSuccess: '✅ Code redeemed! Features unlocked.', licenseError: '❌ Invalid code.',
+    licenseAlready: 'ℹ️ Already unlocked.', licenseReset: '🗑 Reset License',
+    licenseActive: '✅ Active Features:', licenseNone: 'No features unlocked.',
+    licensePlaceholder: 'e.g. MAGIC-PRO-2026',
     countdown: '⏳ Countdown Animation (last 3 sec)',
     pushNotif: '🔔 Push Notifications',
     pushNotifHint: 'Also on locked screen & Apple Watch / WearOS',
@@ -217,7 +227,12 @@ const TRANSLATIONS = {
     newPart: '➕ Nouvelle partie', startShow: '🎭 Démarrer le show', testMode: '🧪 Mode test',
     parts: 'Parties', totalTime: 'Durée totale', settingsTitle: '⚙️ Paramètres',
     tabDesign: '🎨 Design', tabAudio: '🔊 Audio', tabTest: '🧪 Test', tabLanguage: '🌐 Langue',
-    tabTTS: '🗣️ Voix', tabFont: '🔤 Police', tabNotif: '🔔 Notif',
+    tabTTS: '🗣️ Voix', tabFont: '🔤 Police', tabNotif: '🔔 Notif', tabLicense: '🔑 Licence',
+    licenseTitle: '🔑 Code d\'activation', licenseInputLabel: 'Entrer le code', licenseRedeem: '🔑 Activer',
+    licenseSuccess: '✅ Code activé ! Fonctionnalités débloquées.', licenseError: '❌ Code invalide.',
+    licenseAlready: 'ℹ️ Déjà débloqué.', licenseReset: '🗑 Réinitialiser la licence',
+    licenseActive: '✅ Fonctionnalités actives :', licenseNone: 'Aucune fonctionnalité débloquée.',
+    licensePlaceholder: 'ex. MAGIC-PRO-2026',
     countdown: '⏳ Animation compte à rebours (3 dernières sec.)',
     pushNotif: '🔔 Notifications push',
     pushNotifHint: 'Aussi sur écran verrouillé & Apple Watch / WearOS',
@@ -280,7 +295,12 @@ const TRANSLATIONS = {
     newPart: '➕ Nueva parte', startShow: '🎭 Iniciar show', testMode: '🧪 Modo prueba',
     parts: 'Partes', totalTime: 'Tiempo total', settingsTitle: '⚙️ Ajustes',
     tabDesign: '🎨 Diseño', tabAudio: '🔊 Audio', tabTest: '🧪 Prueba', tabLanguage: '🌐 Idioma',
-    tabTTS: '🗣️ Voz', tabFont: '🔤 Fuente', tabNotif: '🔔 Notif',
+    tabTTS: '🗣️ Voz', tabFont: '🔤 Fuente', tabNotif: '🔔 Notif', tabLicense: '🔑 Licencia',
+    licenseTitle: '🔑 Código de activación', licenseInputLabel: 'Introducir código', licenseRedeem: '🔑 Canjear',
+    licenseSuccess: '✅ ¡Código canjeado! Funciones desbloqueadas.', licenseError: '❌ Código inválido.',
+    licenseAlready: 'ℹ️ Ya desbloqueado.', licenseReset: '🗑 Restablecer licencia',
+    licenseActive: '✅ Funciones activas:', licenseNone: 'No hay funciones desbloqueadas.',
+    licensePlaceholder: 'ej. MAGIC-PRO-2026',
     countdown: '⏳ Animación cuenta atrás (últimos 3 seg.)',
     pushNotif: '🔔 Notificaciones push',
     pushNotifHint: 'También en pantalla bloqueada & Apple Watch / WearOS',
@@ -343,7 +363,12 @@ const TRANSLATIONS = {
     newPart: '➕ Nieuw deel', startShow: '🎭 Show starten', testMode: '🧪 Testmodus',
     parts: 'Delen', totalTime: 'Totale tijd', settingsTitle: '⚙️ Instellingen',
     tabDesign: '🎨 Design', tabAudio: '🔊 Audio', tabTest: '🧪 Test', tabLanguage: '🌐 Taal',
-    tabTTS: '🗣️ Stem', tabFont: '🔤 Lettertype', tabNotif: '🔔 Notif',
+    tabTTS: '🗣️ Stem', tabFont: '🔤 Lettertype', tabNotif: '🔔 Notif', tabLicense: '🔑 Licentie',
+    licenseTitle: '🔑 Activeringscode', licenseInputLabel: 'Code invoeren', licenseRedeem: '🔑 Inwisselen',
+    licenseSuccess: '✅ Code ingewisseld! Functies ontgrendeld.', licenseError: '❌ Ongeldige code.',
+    licenseAlready: 'ℹ️ Al ontgrendeld.', licenseReset: '🗑 Licentie resetten',
+    licenseActive: '✅ Actieve functies:', licenseNone: 'Geen functies ontgrendeld.',
+    licensePlaceholder: 'bijv. MAGIC-PRO-2026',
     countdown: '⏳ Aftelling animatie (laatste 3 sec.)',
     pushNotif: '🔔 Pushmeldingen',
     pushNotifHint: 'Ook op vergrendeld scherm & Apple Watch / WearOS',
@@ -465,6 +490,14 @@ const TEMPLATES = {
   },
 };
 
+// 🔐 Freischaltcode-System
+const LICENSE_CODES = {
+  'MAGIC-PRO-2026':  ['pro', 'exportPDF', 'unlimitedParts'],
+  'SHOW-VIP-2026':   ['pro', 'exportPDF', 'unlimitedParts', 'tts_pro'],
+  'DEMO-TEST-CODE':  ['exportPDF'],
+  'CODEBREAKERS':    ['pro', 'exportPDF', 'unlimitedParts', 'tts_pro'],
+};
+
 const FONT_FAMILIES = [
   { label: 'Inter (Standard)', value: '"Inter", "Segoe UI", system-ui, sans-serif' },
   { label: 'System', value: 'system-ui, sans-serif' },
@@ -495,6 +528,34 @@ export default function ShowRunner() {
   const [fontSize, setFontSize] = useState(() => parseInt(localStorage.getItem('ms_fontSize') || '15'));
   const [fontFamily, setFontFamily] = useState(() => localStorage.getItem('ms_fontFamily') || FONT_FAMILIES[0].value);
   const [largeFontMode, setLargeFontMode] = useState(false);
+
+  // 🔐 Lizenz / Freischaltcodes
+  const [unlockedFeatures, setUnlockedFeatures] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('ms_features') || '[]'); } catch(e) { return []; }
+  });
+  const [licenseInput, setLicenseInput] = useState('');
+  const [licenseStatus, setLicenseStatus] = useState(null); // null | 'success' | 'error' | 'already'
+  const isUnlocked = (feature) => unlockedFeatures.includes(feature);
+
+  const redeemCode = (code) => {
+    const features = LICENSE_CODES[code.toUpperCase().trim()];
+    if (!features) { setLicenseStatus('error'); return; }
+    const already = features.every(f => unlockedFeatures.includes(f));
+    if (already) { setLicenseStatus('already'); return; }
+    const merged = [...new Set([...unlockedFeatures, ...features])];
+    setUnlockedFeatures(merged);
+    localStorage.setItem('ms_features', JSON.stringify(merged));
+    setLicenseStatus('success');
+    showToast('🎉 Freischaltcode eingelöst!');
+  };
+
+  const resetLicense = () => {
+    setUnlockedFeatures([]);
+    localStorage.removeItem('ms_features');
+    setLicenseStatus(null);
+    setLicenseInput('');
+    showToast('🗑 Lizenz zurückgesetzt');
+  };
 
   // Pending font states (not applied until "Übernehmen")
   const [pendingFontSize, setPendingFontSize] = useState(() => parseInt(localStorage.getItem('ms_fontSize') || '15'));
@@ -637,6 +698,8 @@ export default function ShowRunner() {
   const [volume, setVolume] = useState(0.5);
   const [testSpeed, setTestSpeed] = useState(10);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMobileFakeFS, setIsMobileFakeFS] = useState(false);
+  const isMobileDevice = () => /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   const [showSaveMenu, setShowSaveMenu] = useState(false);
   const [savedShows, setSavedShows] = useState(() => { try { return JSON.parse(localStorage.getItem('ms_shows') || '[]'); } catch(e) { return []; } });
   const [showLoadMenu, setShowLoadMenu] = useState(false);
@@ -1400,7 +1463,60 @@ export default function ShowRunner() {
           )}
 
           {/* NOTIF TAB */}
-          {settingsTab === 'notif' && (
+          {settingsTab === 'license' && (
+              <div className="space-y-4">
+                <h3 className={`font-bold text-lg ${th.headText}`}>{t.licenseTitle}</h3>
+
+                {/* Aktive Features */}
+                <div className={`rounded-xl p-3 border ${th.border} ${th.card}`}>
+                  <p className={`text-sm font-semibold mb-2 ${th.text}`}>{unlockedFeatures.length > 0 ? t.licenseActive : t.licenseNone}</p>
+                  {unlockedFeatures.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {unlockedFeatures.map(f => (
+                        <span key={f} className={`px-2 py-1 rounded-full text-xs font-bold ${th.badgeBg} ${th.badgeText}`}>
+                          {f === 'pro' ? '🌟 PRO' : f === 'exportPDF' ? '📄 PDF-Export' : f === 'unlimitedParts' ? '♾️ Unbegrenzte Teile' : f === 'tts_pro' ? '🗣️ TTS Pro' : f}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Code eingeben */}
+                <div className="space-y-2">
+                  <label className={`text-sm font-medium ${th.text}`}>{t.licenseInputLabel}</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={licenseInput}
+                      onChange={e => { setLicenseInput(e.target.value); setLicenseStatus(null); }}
+                      onKeyDown={e => e.key === 'Enter' && redeemCode(licenseInput)}
+                      placeholder={t.licensePlaceholder}
+                      className={`flex-1 rounded-lg border px-3 py-2 text-sm font-mono tracking-widest ${th.input}`}
+                    />
+                    <button
+                      onClick={() => redeemCode(licenseInput)}
+                      className={`px-4 py-2 rounded-lg text-white text-sm font-bold ${th.accent} ${th.accentHover} transition-colors`}
+                    >
+                      {t.licenseRedeem}
+                    </button>
+                  </div>
+                  {licenseStatus === 'success' && <p className="text-green-500 text-sm font-medium">{t.licenseSuccess}</p>}
+                  {licenseStatus === 'error'   && <p className="text-red-500 text-sm font-medium">{t.licenseError}</p>}
+                  {licenseStatus === 'already' && <p className="text-yellow-500 text-sm font-medium">{t.licenseAlready}</p>}
+                </div>
+
+                {/* Reset */}
+                {unlockedFeatures.length > 0 && (
+                  <button
+                    onClick={resetLicense}
+                    className="w-full px-4 py-2 rounded-lg border border-red-400 text-red-400 text-sm hover:bg-red-50 dark:hover:bg-red-950 transition-colors"
+                  >
+                    {t.licenseReset}
+                  </button>
+                )}
+              </div>
+            )}
+            {settingsTab === 'notif' && (
             <div className="space-y-4">
               <div className="font-bold text-sm">{t.pushNotif}</div>
               <p className={`text-sm ${th.textSub}`}>{t.pushNotifHint}</p>
