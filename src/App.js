@@ -4,8 +4,8 @@ var uid = function() { return Math.random().toString(36).slice(2, 9); };
 var fmt = function(s) { var m = Math.floor(s / 60); var sec = s % 60; return m + ":" + String(sec).padStart(2, "0"); };
 
 var T = {
-  de: { title: "Magic Showrunner", ver: "v3.2", save: "Speichern", load: "Laden", newPart: "Neuer Teil", start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen", planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration", volume: "Lautstaerke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel", durL: "Dauer (Sek)", introL: "Intro-Ansage", preAnnL: "Vorankuendigung (Sek)", preAnnTxt: "Vorankuendigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern", cancel: "Abbrechen", showName: "Show-Name", overwrite: "Ueberschreiben", noSaved: "Keine Shows.", pause: "Pause", resume: "Weiter", prev: "Zurueck", next: "Weiter", partOf: "Teil", of: "/", dup: "Duplizieren", del: "Löschen", edit: "Bearbeiten", sek: "Sek", csv: "CSV", fontSize: "Größe", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo", ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen", stop: "Stop" },
-  en: { title: "Magic Showrunner", ver: "v3.2", save: "Save", load: "Load", newPart: "New Part", start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings", planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration", volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title", durL: "Duration (sec)", introL: "Intro (TTS)", preAnnL: "Pre-announce (sec)", preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save", cancel: "Cancel", showName: "Show Name", overwrite: "Overwrite", noSaved: "No saved shows.", pause: "Pause", resume: "Resume", prev: "Back", next: "Next", partOf: "Part", of: "/", dup: "Duplicate", del: "Delete", edit: "Edit", sek: "sec", csv: "CSV", fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed", ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes", stop: "Stop" }
+  de: { title: "Magic Showrunner", ver: "v3.3", save: "Speichern", load: "Laden", newPart: "Neuer Teil", start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen", planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration", volume: "Lautstaerke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel", durL: "Dauer (Sek)", introL: "Intro-Ansage", preAnnL: "Vorankuendigung (Sek)", preAnnTxt: "Vorankuendigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern", cancel: "Abbrechen", showName: "Show-Name", overwrite: "Ueberschreiben", noSaved: "Keine Shows.", pause: "Pause", resume: "Weiter", prev: "Zurueck", next: "Weiter", partOf: "Teil", of: "/", dup: "Duplizieren", del: "Löschen", edit: "Bearbeiten", sek: "Sek", csv: "CSV", fontSize: "Größe", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo", ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen", stop: "Stop" },
+  en: { title: "Magic Showrunner", ver: "v3.3", save: "Save", load: "Load", newPart: "New Part", start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings", planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration", volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title", durL: "Duration (sec)", introL: "Intro (TTS)", preAnnL: "Pre-announce (sec)", preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save", cancel: "Cancel", showName: "Show Name", overwrite: "Overwrite", noSaved: "No saved shows.", pause: "Pause", resume: "Resume", prev: "Back", next: "Next", partOf: "Part", of: "/", dup: "Duplicate", del: "Delete", edit: "Edit", sek: "sec", csv: "CSV", fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed", ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes", stop: "Stop" }
 };
 
 var TH = {
@@ -201,13 +201,7 @@ function SettingsModal(props) {
         React.createElement("input", { type: "checkbox", checked: cfg.vibrate, onChange: function(e) { upCfg("vibrate", e.target.checked); } }), t.vibration),
       React.createElement("label", { style: { fontSize: 12, color: th.sub } }, t.volume),
       React.createElement("input", { type: "range", min: 0, max: 1, step: 0.1, value: cfg.volume, onChange: function(e) { upCfg("volume", +e.target.value); }, style: { width: "100%", marginBottom: 8 } }),
-      React.createElement("button", { onClick: function() { doBeep(cfg.volume); }, style: { padding: "8px 16px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", cursor: "pointer" } }, t.testTone),
-      React.createElement("label", { style: { fontSize: 12, color: th.sub, marginTop: 12, display: "block" } }, cfg.lang === "de" ? "Countdown (Sek)" : "Countdown (sec)"),
-      React.createElement("div", { style: { display: "flex", gap: 6, marginTop: 4 } },
-        [0, 3, 5, 10].map(function(v) {
-          return React.createElement("button", { key: v, onClick: function() { upCfg("countdown", v); }, style: { flex: 1, padding: "8px 4px", borderRadius: 8, border: cfg.countdown === v ? "2px solid " + th.acc : "2px solid transparent", background: cfg.countdown === v ? th.acc + "22" : th.inp, color: th.text, cursor: "pointer", fontSize: 13, fontWeight: cfg.countdown === v ? 700 : 400 } }, v === 0 ? (cfg.lang === "de" ? "Aus" : "Off") : v + "s");
-        })
-      )
+      React.createElement("button", { onClick: function() { doBeep(cfg.volume); }, style: { padding: "8px 16px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", cursor: "pointer" } }, t.testTone)
     );
   } else if (tab === "voice") {
     content = React.createElement("div", null,
@@ -261,6 +255,7 @@ function PerformMode(props) {
   var _p = useState(false); var paused = _p[0]; var setPaused = _p[1];
   var _n = useState(false); var showNotes = _n[0]; var setShowNotes = _n[1];
   var _a = useState(false); var preAnnDone = _a[0]; var setPreAnnDone = _a[1];
+  var _pa = useState(""); var preAnnMsg = _pa[0]; var setPreAnnMsg = _pa[1];
 
   useEffect(function() {
     if (cfg.countdown > 0) { setCdVal(cfg.countdown); setCdRunning(true); } else { setCdRunning(false); }
@@ -282,6 +277,7 @@ function PerformMode(props) {
   var pct = dur > 0 ? Math.min(100, (elapsed / dur) * 100) : 100;
 
   useEffect(function() {
+    clearInterval(timerRef.current);
     setElapsed(0); setPaused(false); setPreAnnDone(false);
     if (part && part.intro) doSpeak(part.intro, cfg.ttsRate, cfg.ttsPitch, cfg.ttsVoice);
   }, [idx]);
@@ -306,6 +302,7 @@ function PerformMode(props) {
     if (!preAnnDone && part && part.preAnn > 0 && remaining <= part.preAnn && remaining > 0) {
       setPreAnnDone(true);
       if (part.preAnnText) doSpeak(part.preAnnText, cfg.ttsRate, cfg.ttsPitch, cfg.ttsVoice);
+      if (part.preAnnText) { setPreAnnMsg(part.preAnnText); setTimeout(function() { setPreAnnMsg(""); }, 5000); }
       if (cfg.beeps) doBeep(cfg.volume, 440, 100);
       if (cfg.vibrate) doVibrate(100);
     }
@@ -315,12 +312,34 @@ function PerformMode(props) {
   var totalDur = parts.reduce(function(a, p) { return a + (cfg.testMode ? cfg.testDur : p.duration); }, 0);
   var bs = { padding: "12px 20px", borderRadius: 12, border: "none", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 15 };
 
-  var handleBarClick = function(ev) {
-    var rect = ev.currentTarget.getBoundingClientRect();
-    var ratio = Math.max(0, Math.min(1, (ev.clientX - rect.left) / rect.width));
+  var isDragging = useRef(false);
+
+  var seekTo = function(clientX, barEl) {
+    var rect = barEl.getBoundingClientRect();
+    var ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
     var ne = Math.round(ratio * dur);
     setElapsed(ne);
     if (ne >= (dur - ((part && part.preAnn) || 0))) setPreAnnDone(true);
+  };
+
+  var handleBarMouseDown = function(ev) {
+    isDragging.current = true;
+    seekTo(ev.clientX, ev.currentTarget);
+    var bar = ev.currentTarget;
+    var onMove = function(e) { if (isDragging.current) seekTo(e.clientX, bar); };
+    var onUp = function() { isDragging.current = false; window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  };
+
+  var handleBarTouchStart = function(ev) {
+    isDragging.current = true;
+    seekTo(ev.touches[0].clientX, ev.currentTarget);
+    var bar = ev.currentTarget;
+    var onMove = function(e) { if (isDragging.current) seekTo(e.touches[0].clientX, bar); };
+    var onEnd = function() { isDragging.current = false; window.removeEventListener("touchmove", onMove); window.removeEventListener("touchend", onEnd); };
+    window.addEventListener("touchmove", onMove);
+    window.addEventListener("touchend", onEnd);
   };
 
   if (cdRunning && cdVal > 0) {
@@ -342,13 +361,17 @@ function PerformMode(props) {
         React.createElement("div", { style: { height: "100%", borderRadius: 3, background: pt.bar, width: (totalDur > 0 ? Math.min(100, (totalElapsed / totalDur) * 100) : 0) + "%", transition: cfg.animations ? "width 1s linear" : "none", opacity: 0.6 } })
       )
     ),
-    React.createElement("div", { style: { width: "80%", maxWidth: 400, position: "relative", cursor: "pointer", padding: "8px 0", marginTop: 4, marginBottom: 24 }, onClick: handleBarClick },
+    React.createElement("div", { style: { width: "80%", maxWidth: 400, position: "relative", cursor: "pointer", padding: "8px 0", marginTop: 4, marginBottom: 24, userSelect: "none" }, onMouseDown: handleBarMouseDown, onTouchStart: handleBarTouchStart },
       React.createElement("style", null, "@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }"),
       React.createElement("div", { style: { width: "100%", height: 10, borderRadius: 5, background: pt.barBg, overflow: "hidden", boxShadow: remaining <= 10 && remaining > 0 ? "0 0 12px #ef444488" : "none", transition: "box-shadow 0.3s" } },
         React.createElement("div", { style: { height: "100%", borderRadius: 4, background: remaining <= 10 && remaining > 0 ? "#ef4444" : pt.bar, width: pct + "%", transition: cfg.animations ? "width 1s linear" : "none", animation: remaining <= 10 && remaining > 0 ? "pulse 0.8s ease-in-out infinite" : "none" } })
       ),
       React.createElement("div", { style: { position: "absolute", left: "calc(" + pct + "% - 7px)", top: 2, width: 14, height: 14, borderRadius: "50%", background: remaining <= 10 ? "#ef4444" : pt.bar, border: "2px solid " + pt.text, boxShadow: "0 2px 6px rgba(0,0,0,0.3)", transition: cfg.animations ? "left 1s linear" : "none", pointerEvents: "none" } })
     ),
+    preAnnMsg ? React.createElement("div", { style: { position: "fixed", top: 32, left: "50%", transform: "translateX(-50%)", background: "#f59e0b", color: "#000", padding: "14px 28px", borderRadius: 16, fontWeight: 800, fontSize: 18, zIndex: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.4)", textAlign: "center", maxWidth: 360, animation: "fadeInDown 0.4s ease" } },
+      React.createElement("style", null, "@keyframes fadeInDown { from { opacity:0; transform:translateX(-50%) translateY(-20px);} to { opacity:1; transform:translateX(-50%) translateY(0);} }"),
+      "⚡ " + preAnnMsg
+    ) : null,
     showNotes && part && part.notes ? React.createElement("div", { style: { background: "rgba(0,0,0,0.2)", padding: "12px 20px", borderRadius: 12, marginBottom: 16, maxWidth: 400, fontSize: 14, textAlign: "center" } }, part.notes) : null,
     React.createElement("div", { style: { display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" } },
       React.createElement("button", { onClick: function() { if (idx > 0) setIdx(function(i) { return i - 1; }); else setElapsed(0); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, t.prev),
