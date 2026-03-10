@@ -78,7 +78,7 @@ const vibrate = (p = [200]) => { try { if ('vibrate' in navigator) navigator.vib
 
 const TRANSLATIONS = {
   de: {
-    appTitle: '🎩✨ Magic Showrunner', appVersion: 'v1.7',
+    appTitle: '🎩✨ Magic Showrunner', appVersion: 'v1.9',
     appSub: 'Dein professioneller Bühnen-Assistent',
     backupReminder: '💾 Kein Backup seit {days} Tagen – jetzt sichern?',
     backupReminderBtn: '📥 Jetzt Backup erstellen', backupReminderDismiss: 'Später',
@@ -91,7 +91,7 @@ const TRANSLATIONS = {
     newPart: '➕ Neuer Teil', startShow: '🎭 Show starten', testMode: '🧪 Testmodus',
     parts: 'Teile', totalTime: 'Gesamtzeit', settingsTitle: '⚙️ Einstellungen',
     tabDesign: '🎨 Design', tabAudio: '🔊 Audio', tabTest: '🧪 Test', tabLanguage: '🌐 Sprache',
-    tabTTS: '🗣 Stimme', tabFont: '🔤 Schrift', tabNotif: '🔔 Notif',
+    tabTTS: '🗣️ Stimme', tabFont: '🔤 Schrift', tabNotif: '🔔 Notif',
     countdown: '⏳ Countdown-Animation (letzte 3 Sek.)',
     pushNotif: '🔔 Push-Benachrichtigungen',
     pushNotifHint: 'Auch bei gesperrtem Bildschirm & Apple Watch / WearOS',
@@ -137,9 +137,11 @@ const TRANSLATIONS = {
     ttsVoice: 'Stimme', ttsRate: 'Geschwindigkeit', ttsPitch: 'Tonhöhe', ttsPreview: '🔊 Vorschau',
     ttsPreviewText: 'Das ist eine Vorschau der Stimme.',
     wakelock: '📱 Bildschirm aktiv halten', offlineReady: 'Offline bereit',
+    fontApply: '✅ Übernehmen', fontPreview: 'Vorschau:', fontPreviewText: 'Hallo! Das ist ein Beispieltext.',
+    ttsApply: '✅ Übernehmen',
   },
   en: {
-    appTitle: '🎩✨ Magic Showrunner', appVersion: 'v1.7',
+    appTitle: '🎩✨ Magic Showrunner', appVersion: 'v1.9',
     appSub: 'Your professional stage assistant',
     backupReminder: '💾 No backup for {days} days – save now?',
     backupReminderBtn: '📥 Create Backup now', backupReminderDismiss: 'Later',
@@ -152,7 +154,7 @@ const TRANSLATIONS = {
     newPart: '➕ New Part', startShow: '🎭 Start Show', testMode: '🧪 Test Mode',
     parts: 'Parts', totalTime: 'Total Time', settingsTitle: '⚙️ Settings',
     tabDesign: '🎨 Design', tabAudio: '🔊 Audio', tabTest: '🧪 Test', tabLanguage: '🌐 Language',
-    tabTTS: '🗣 Voice', tabFont: '🔤 Font', tabNotif: '🔔 Notif',
+    tabTTS: '🗣️ Voice', tabFont: '🔤 Font', tabNotif: '🔔 Notif',
     countdown: '⏳ Countdown Animation (last 3 sec)',
     pushNotif: '🔔 Push Notifications',
     pushNotifHint: 'Also on locked screen & Apple Watch / WearOS',
@@ -198,16 +200,211 @@ const TRANSLATIONS = {
     ttsVoice: 'Voice', ttsRate: 'Speed', ttsPitch: 'Pitch', ttsPreview: '🔊 Preview',
     ttsPreviewText: 'This is a voice preview.',
     wakelock: '📱 Keep screen active', offlineReady: 'Offline ready',
+    fontApply: '✅ Apply', fontPreview: 'Preview:', fontPreviewText: 'Hello! This is a sample text.',
+    ttsApply: '✅ Apply',
+  },
+  fr: {
+    appTitle: '🎩✨ Magic Showrunner', appVersion: 'v1.9',
+    appSub: 'Votre assistant de scène professionnel',
+    backupReminder: '💾 Aucune sauvegarde depuis {days} jours – sauvegarder maintenant ?',
+    backupReminderBtn: '📥 Créer une sauvegarde', backupReminderDismiss: 'Plus tard',
+    storagePersistent: '🛡️ Stockage sécurisé (persistant)',
+    storageNotPersistent: '⚠️ Stockage non persistant – créez des sauvegardes régulièrement !',
+    idbSaved: '🗄️ Sauvegarde IDB enregistrée', idbRestored: '🗄️ Données restaurées depuis la sauvegarde IDB',
+    save: '💾 Enregistrer', load: '📂 Charger', backup: '📥 Sauvegarde', tutorial: '📖 Tutoriel',
+    about: 'ℹ️ À propos', importBtn: '📤 Importer', settings: '⚙️ Paramètres',
+    fullscreen: '⛶ Plein écran', exitFullscreen: '⛶ Fenêtre', stage: '🎪 Scène', stats: '📊 Stats',
+    newPart: '➕ Nouvelle partie', startShow: '🎭 Démarrer le show', testMode: '🧪 Mode test',
+    parts: 'Parties', totalTime: 'Durée totale', settingsTitle: '⚙️ Paramètres',
+    tabDesign: '🎨 Design', tabAudio: '🔊 Audio', tabTest: '🧪 Test', tabLanguage: '🌐 Langue',
+    tabTTS: '🗣️ Voix', tabFont: '🔤 Police', tabNotif: '🔔 Notif',
+    countdown: '⏳ Animation compte à rebours (3 dernières sec.)',
+    pushNotif: '🔔 Notifications push',
+    pushNotifHint: 'Aussi sur écran verrouillé & Apple Watch / WearOS',
+    enableNotif: '🔔 Activer les notifications', notifActive: '✅ Notifications actives',
+    notifDenied: '❌ Refusé – activer dans les paramètres du navigateur',
+    onboardingBtn: "📖 Revoir l'introduction", dragHint: '☰ Maintenir & glisser pour réorganiser',
+    planTheme: 'Thème planification', performTheme: 'Thème performance',
+    beeps: '🔔 Signaux sonores', vibration: '📳 Vibration', volume: '🔊 Volume',
+    testTone: '🔊 Ton de test', testDuration: '⏱ Durée mode test par partie',
+    testHint: 'En mode test, chaque partie est raccourcie à cette durée.',
+    selectLanguage: 'Choisir la langue', tutorialTitle: '📖 Tutoriel & Aide',
+    tutorialIntro: 'Choisissez un sujet :', aboutTitle: 'ℹ️ À propos de Magic Showrunner',
+    stageTitle: '🎪 Plan de scène', statsTitle: '📊 Statistiques',
+    noStats: 'Aucun show effectué.', shows: 'Shows',
+    totalTimeLabel: 'Durée totale', avgParts: 'Moy. parties', clearHistory: "🗑 Effacer l'historique",
+    editPart: '✏️ Modifier la partie', addPart: '➕ Nouvelle partie', titleLabel: 'Titre',
+    durationLabel: 'Durée (sec)', introLabel: 'Annonce intro (TTS)',
+    preAnnounceLabel: 'Pré-annonce (sec)', preAnnounceText: 'Texte de pré-annonce',
+    notesLabel: 'Notes', musicUrl: 'URL musique', vol: 'Vol', fadeIn: 'Fondu entrée', fadeOut: 'Fondu sortie',
+    saveBtn: '💾 Enregistrer', cancelBtn: 'Annuler', testBtn: '🔊 Test',
+    saveShowTitle: '💾 Enregistrer le show', showName: 'Nom du show', overwrite: 'Écraser :',
+    loadShowTitle: '📂 Charger un show', noSaved: 'Aucun show enregistré.', deletedHistory: '🗑 Historique effacé',
+    perform_remaining: 'restant', perform_part: 'Partie', perform_of: '/',
+    perform_total: 'Total', perform_remaining2: 'Restant',
+    perform_pause: '⏸ Pause', perform_resume: '▶ Reprendre', perform_stop: '⏹ Stop',
+    perform_prev: '← Retour', perform_next: 'Suivant →', perform_notes: '📝 Notes',
+    perform_testAnnounce: '🔊 Test annonce', perform_testMusic: '🎵 Test musique',
+    audience: 'Public', backstage: 'Coulisses', addItem: '➕ Ajouter',
+    updateItem: '💾 Mettre à jour', cancelItem: 'Annuler', itemName: 'Nom', itemIcon: 'Icône',
+    tutoBasicsTitle: 'Bases', tutoBasicsDesc: 'Créer un show, ajouter des parties',
+    tutoPerformTitle: 'Jouer le show', tutoPerformDesc: 'Mode live, minuteur, contrôles',
+    tutoSaveTitle: 'Sauvegarder', tutoSaveDesc: 'Enregistrer, exporter, importer',
+    tutoThemesTitle: 'Designs & Paramètres', tutoThemesDesc: 'Thèmes, plein écran, volume',
+    developer: '👨‍💻 Développeur', devRole: 'Magicien, Développeur & Passionné de show',
+    rights: 'Tous droits réservés. React & Tailwind CSS.',
+    autoSystem: '🔄 Auto (Système)', endedMsg: 'Le show est terminé. Merci !',
+    speechLang: 'fr-FR', partColor: 'Couleur', duplicatePart: '📋 Dupliquer',
+    addGroup: '📁 Groupe', groupName: 'Nom du groupe', fontSize: 'Taille de police',
+    fontFamily: 'Police', animations: 'Animations', largeStageFontMode: '🔡 Mode grande police',
+    autosaveLabel: 'Sauvegarde auto', leaveConfirm: 'Show en cours – vraiment quitter ?',
+    exportPDF: '📄 PDF', exportCSV: '📊 CSV', shareQR: '🔲 QR Code',
+    shareGDrive: '☁️ Google Drive', shareICloud: '☁️ iCloud',
+    ttsVoice: 'Voix', ttsRate: 'Vitesse', ttsPitch: 'Hauteur', ttsPreview: '🔊 Aperçu',
+    ttsPreviewText: 'Ceci est un aperçu de la voix.',
+    wakelock: "📱 Garder l'écran actif", offlineReady: 'Prêt hors ligne',
+    fontApply: '✅ Appliquer', fontPreview: 'Aperçu :', fontPreviewText: 'Bonjour ! Voici un exemple de texte.',
+    ttsApply: '✅ Appliquer',
+  },
+  es: {
+    appTitle: '🎩✨ Magic Showrunner', appVersion: 'v1.9',
+    appSub: 'Tu asistente profesional de escenario',
+    backupReminder: '💾 Sin copia de seguridad desde hace {days} días – ¿guardar ahora?',
+    backupReminderBtn: '📥 Crear copia ahora', backupReminderDismiss: 'Más tarde',
+    storagePersistent: '🛡️ Almacenamiento seguro (persistente)',
+    storageNotPersistent: '⚠️ Almacenamiento no persistente – ¡haz copias regularmente!',
+    idbSaved: '🗄️ Copia IDB guardada', idbRestored: '🗄️ Datos restaurados desde copia IDB',
+    save: '💾 Guardar', load: '📂 Cargar', backup: '📥 Copia', tutorial: '📖 Tutorial',
+    about: 'ℹ️ Acerca de', importBtn: '📤 Importar', settings: '⚙️ Ajustes',
+    fullscreen: '⛶ Pantalla completa', exitFullscreen: '⛶ Ventana', stage: '🎪 Escenario', stats: '📊 Stats',
+    newPart: '➕ Nueva parte', startShow: '🎭 Iniciar show', testMode: '🧪 Modo prueba',
+    parts: 'Partes', totalTime: 'Tiempo total', settingsTitle: '⚙️ Ajustes',
+    tabDesign: '🎨 Diseño', tabAudio: '🔊 Audio', tabTest: '🧪 Prueba', tabLanguage: '🌐 Idioma',
+    tabTTS: '🗣️ Voz', tabFont: '🔤 Fuente', tabNotif: '🔔 Notif',
+    countdown: '⏳ Animación cuenta atrás (últimos 3 seg.)',
+    pushNotif: '🔔 Notificaciones push',
+    pushNotifHint: 'También en pantalla bloqueada & Apple Watch / WearOS',
+    enableNotif: '🔔 Activar notificaciones', notifActive: '✅ Notificaciones activas',
+    notifDenied: '❌ Denegado – activar en ajustes del navegador',
+    onboardingBtn: '📖 Ver introducción de nuevo', dragHint: '☰ Mantener & arrastrar para reordenar',
+    planTheme: 'Tema planificación', performTheme: 'Tema actuación',
+    beeps: '🔔 Señales sonoras', vibration: '📳 Vibración', volume: '🔊 Volumen',
+    testTone: '🔊 Tono de prueba', testDuration: '⏱ Duración modo prueba por parte',
+    testHint: 'En modo prueba, cada parte se acorta a esta duración.',
+    selectLanguage: 'Seleccionar idioma', tutorialTitle: '📖 Tutorial & Ayuda',
+    tutorialIntro: 'Elige un tema:', aboutTitle: 'ℹ️ Acerca de Magic Showrunner',
+    stageTitle: '🎪 Plan de escenario', statsTitle: '📊 Estadísticas',
+    noStats: 'Aún no se han realizado shows.', shows: 'Shows',
+    totalTimeLabel: 'Tiempo total', avgParts: 'Prom. partes', clearHistory: '🗑 Borrar historial',
+    editPart: '✏️ Editar parte', addPart: '➕ Nueva parte', titleLabel: 'Título',
+    durationLabel: 'Duración (seg)', introLabel: 'Anuncio intro (TTS)',
+    preAnnounceLabel: 'Pre-anuncio (seg)', preAnnounceText: 'Texto de pre-anuncio',
+    notesLabel: 'Notas', musicUrl: 'URL música', vol: 'Vol', fadeIn: 'Entrada', fadeOut: 'Salida',
+    saveBtn: '💾 Guardar', cancelBtn: 'Cancelar', testBtn: '🔊 Prueba',
+    saveShowTitle: '💾 Guardar show', showName: 'Nombre del show', overwrite: 'Sobrescribir:',
+    loadShowTitle: '📂 Cargar show', noSaved: 'No hay shows guardados.', deletedHistory: '🗑 Historial borrado',
+    perform_remaining: 'restante', perform_part: 'Parte', perform_of: '/',
+    perform_total: 'Total', perform_remaining2: 'Restante',
+    perform_pause: '⏸ Pausa', perform_resume: '▶ Continuar', perform_stop: '⏹ Stop',
+    perform_prev: '← Atrás', perform_next: 'Siguiente →', perform_notes: '📝 Notas',
+    perform_testAnnounce: '🔊 Test anuncio', perform_testMusic: '🎵 Test música',
+    audience: 'Público', backstage: 'Backstage', addItem: '➕ Añadir',
+    updateItem: '💾 Actualizar', cancelItem: 'Cancelar', itemName: 'Nombre', itemIcon: 'Icono',
+    tutoBasicsTitle: 'Básico', tutoBasicsDesc: 'Crear show, añadir partes',
+    tutoPerformTitle: 'Realizar show', tutoPerformDesc: 'Modo en vivo, temporizador, controles',
+    tutoSaveTitle: 'Guardar & Copia', tutoSaveDesc: 'Guardar, exportar, importar shows',
+    tutoThemesTitle: 'Diseños & Ajustes', tutoThemesDesc: 'Temas, pantalla completa, volumen',
+    developer: '👨‍💻 Desarrollador', devRole: 'Mago, Desarrollador & Entusiasta del show',
+    rights: 'Todos los derechos reservados. React & Tailwind CSS.',
+    autoSystem: '🔄 Auto (Sistema)', endedMsg: '¡El show ha terminado. Muchas gracias!',
+    speechLang: 'es-ES', partColor: 'Color', duplicatePart: '📋 Duplicar',
+    addGroup: '📁 Grupo', groupName: 'Nombre del grupo', fontSize: 'Tamaño de fuente',
+    fontFamily: 'Fuente', animations: 'Animaciones', largeStageFontMode: '🔡 Modo letra grande',
+    autosaveLabel: 'Autoguardado', leaveConfirm: 'Show en curso – ¿realmente salir?',
+    exportPDF: '📄 PDF', exportCSV: '📊 CSV', shareQR: '🔲 Código QR',
+    shareGDrive: '☁️ Google Drive', shareICloud: '☁️ iCloud',
+    ttsVoice: 'Voz', ttsRate: 'Velocidad', ttsPitch: 'Tono', ttsPreview: '🔊 Vista previa',
+    ttsPreviewText: 'Esta es una vista previa de la voz.',
+    wakelock: '📱 Mantener pantalla activa', offlineReady: 'Listo sin conexión',
+    fontApply: '✅ Aplicar', fontPreview: 'Vista previa:', fontPreviewText: '¡Hola! Este es un texto de ejemplo.',
+    ttsApply: '✅ Aplicar',
+  },
+  nl: {
+    appTitle: '🎩✨ Magic Showrunner', appVersion: 'v1.9',
+    appSub: 'Jouw professionele podiumassistent',
+    backupReminder: '💾 Geen back-up sinds {days} dagen – nu opslaan?',
+    backupReminderBtn: '📥 Back-up maken', backupReminderDismiss: 'Later',
+    storagePersistent: '🛡️ Opslag beveiligd (persistent)',
+    storageNotPersistent: '⚠️ Opslag niet persistent – maak regelmatig back-ups!',
+    idbSaved: '🗄️ IDB-back-up opgeslagen', idbRestored: '🗄️ Gegevens hersteld uit IDB-back-up',
+    save: '💾 Opslaan', load: '📂 Laden', backup: '📥 Back-up', tutorial: '📖 Tutorial',
+    about: 'ℹ️ Over', importBtn: '📤 Importeren', settings: '⚙️ Instellingen',
+    fullscreen: '⛶ Volledig scherm', exitFullscreen: '⛶ Venster', stage: '🎪 Podium', stats: '📊 Stats',
+    newPart: '➕ Nieuw deel', startShow: '🎭 Show starten', testMode: '🧪 Testmodus',
+    parts: 'Delen', totalTime: 'Totale tijd', settingsTitle: '⚙️ Instellingen',
+    tabDesign: '🎨 Design', tabAudio: '🔊 Audio', tabTest: '🧪 Test', tabLanguage: '🌐 Taal',
+    tabTTS: '🗣️ Stem', tabFont: '🔤 Lettertype', tabNotif: '🔔 Notif',
+    countdown: '⏳ Aftelling animatie (laatste 3 sec.)',
+    pushNotif: '🔔 Pushmeldingen',
+    pushNotifHint: 'Ook op vergrendeld scherm & Apple Watch / WearOS',
+    enableNotif: '🔔 Meldingen inschakelen', notifActive: '✅ Meldingen actief',
+    notifDenied: '❌ Geweigerd – inschakelen in browserinstellingen',
+    onboardingBtn: '📖 Introductie opnieuw tonen', dragHint: '☰ Vasthouden & slepen om te herordenen',
+    planTheme: 'Planningsthema', performTheme: 'Uitvoeringsthema',
+    beeps: '🔔 Signaaltonen', vibration: '📳 Trillen', volume: '🔊 Volume',
+    testTone: '🔊 Testtoon', testDuration: '⏱ Testmodus-duur per deel',
+    testHint: 'In testmodus wordt elk deel ingekort tot deze duur.',
+    selectLanguage: 'Taal kiezen', tutorialTitle: '📖 Tutorial & Hulp',
+    tutorialIntro: 'Kies een onderwerp:', aboutTitle: 'ℹ️ Over Magic Showrunner',
+    stageTitle: '🎪 Podiumplan', statsTitle: '📊 Statistieken',
+    noStats: 'Nog geen shows uitgevoerd.', shows: 'Shows',
+    totalTimeLabel: 'Totale tijd', avgParts: 'Gem. delen', clearHistory: '🗑 Geschiedenis wissen',
+    editPart: '✏️ Deel bewerken', addPart: '➕ Nieuw deel', titleLabel: 'Titel',
+    durationLabel: 'Duur (sec)', introLabel: 'Intro-aankondiging (TTS)',
+    preAnnounceLabel: 'Vooraankondiging (sec)', preAnnounceText: 'Vooraankondigingstekst',
+    notesLabel: 'Notities', musicUrl: 'Muziek-URL', vol: 'Vol', fadeIn: 'Fade in', fadeOut: 'Fade out',
+    saveBtn: '💾 Opslaan', cancelBtn: 'Annuleren', testBtn: '🔊 Test',
+    saveShowTitle: '💾 Show opslaan', showName: 'Shownaam', overwrite: 'Overschrijven:',
+    loadShowTitle: '📂 Show laden', noSaved: 'Geen opgeslagen shows.', deletedHistory: '🗑 Geschiedenis gewist',
+    perform_remaining: 'resterend', perform_part: 'Deel', perform_of: '/',
+    perform_total: 'Totaal', perform_remaining2: 'Resterend',
+    perform_pause: '⏸ Pauze', perform_resume: '▶ Doorgaan', perform_stop: '⏹ Stop',
+    perform_prev: '← Terug', perform_next: 'Volgende →', perform_notes: '📝 Notities',
+    perform_testAnnounce: '🔊 Test aankondiging', perform_testMusic: '🎵 Test muziek',
+    audience: 'Publiek', backstage: 'Backstage', addItem: '➕ Toevoegen',
+    updateItem: '💾 Bijwerken', cancelItem: 'Annuleren', itemName: 'Naam', itemIcon: 'Icoon',
+    tutoBasicsTitle: 'Basis', tutoBasicsDesc: 'Show maken, delen toevoegen',
+    tutoPerformTitle: 'Show uitvoeren', tutoPerformDesc: 'Live-modus, timer, bediening',
+    tutoSaveTitle: 'Opslaan & Back-up', tutoSaveDesc: 'Shows opslaan, exporteren',
+    tutoThemesTitle: 'Designs & Instellingen', tutoThemesDesc: "Thema’s, volledig scherm, volume",
+    developer: '👨‍💻 Ontwikkelaar', devRole: 'Goochelaar, Ontwikkelaar & Show-enthousiasteling',
+    rights: 'Alle rechten voorbehouden. React & Tailwind CSS.',
+    autoSystem: '🔄 Auto (Systeem)', endedMsg: 'De show is afgelopen. Hartelijk dank!',
+    speechLang: 'nl-NL', partColor: 'Kleur', duplicatePart: '📋 Dupliceren',
+    addGroup: '📁 Groep', groupName: 'Groepsnaam', fontSize: 'Lettergrootte',
+    fontFamily: 'Lettertype', animations: 'Animaties', largeStageFontMode: '🔡 Grote lettermode',
+    autosaveLabel: 'Automatisch opslaan', leaveConfirm: 'Show loopt – echt verlaten?',
+    exportPDF: '📄 PDF', exportCSV: '📊 CSV', shareQR: '🔲 QR-code',
+    shareGDrive: '☁️ Google Drive', shareICloud: '☁️ iCloud',
+    ttsVoice: 'Stem', ttsRate: 'Snelheid', ttsPitch: 'Toonhoogte', ttsPreview: '🔊 Voorbeeld',
+    ttsPreviewText: 'Dit is een voorbeeld van de stem.',
+    wakelock: '📱 Scherm actief houden', offlineReady: 'Offline gereed',
+    fontApply: '✅ Toepassen', fontPreview: 'Voorbeeld:', fontPreviewText: 'Hallo! Dit is een voorbeeldtekst.',
+    ttsApply: '✅ Toepassen',
   },
 };
 
-const LANG_FLAGS = { de: '🇩🇪', en: '🇬🇧' };
-const LANG_NAMES = { de: 'Deutsch', en: 'English' };
+const LANG_FLAGS = { de: '🇩🇪', en: '🇬🇧', fr: '🇫🇷', es: '🇪🇸', nl: '🇳🇱' };
+const LANG_NAMES = { de: 'Deutsch', en: 'English', fr: 'Français', es: 'Español', nl: 'Nederlands' };
 const fmt = (s) => { s = Math.abs(Math.floor(s)); return `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`; };
 
 const PART_COLORS = ['#6366f1','#8b5cf6','#ec4899','#ef4444','#f97316','#eab308','#22c55e','#14b8a6','#06b6d4','#3b82f6','#64748b'];
 
-const EMPTY = { title:'', duration:300, introText:'', preAnnounceSec:10, announceNextText:'', notes:'', musicUrl:'', musicVolume:0.5, musicFadeIn:2, musicFadeOut:2, musicLoop:false, color:'#6366f1', isGroup:false, groupName:'' };
+const EMPTY = {
+  title:'', duration:300, introText:'', preAnnounceSec:10, announceNextText:'',
+  notes:'', musicUrl:'', musicVolume:0.5, musicFadeIn:2, musicFadeOut:2,
+  musicLoop:false, color:'#6366f1', isGroup:false, groupName:''
+};
 
 const DEMO = [
   { id:1, title:'Begrüßung & Einleitung', duration:180, introText:'Meine Damen und Herren, willkommen!', preAnnounceSec:15, announceNextText:'Gleich der erste Trick!', notes:'Spotlight Mitte.', musicUrl:'', musicVolume:0.5, musicFadeIn:2, musicFadeOut:2, musicLoop:false, color:'#6366f1', isGroup:false },
@@ -298,10 +495,23 @@ export default function ShowRunner() {
   const [fontSize, setFontSize] = useState(() => parseInt(localStorage.getItem('ms_fontSize') || '15'));
   const [fontFamily, setFontFamily] = useState(() => localStorage.getItem('ms_fontFamily') || FONT_FAMILIES[0].value);
   const [largeFontMode, setLargeFontMode] = useState(false);
+
+  // Pending font states (not applied until "Übernehmen")
+  const [pendingFontSize, setPendingFontSize] = useState(() => parseInt(localStorage.getItem('ms_fontSize') || '15'));
+  const [pendingFontFamily, setPendingFontFamily] = useState(() => localStorage.getItem('ms_fontFamily') || FONT_FAMILIES[0].value);
+  const [fontApplied, setFontApplied] = useState(false);
+
   const [ttsRate, setTtsRate] = useState(() => parseFloat(localStorage.getItem('ms_ttsRate') || '1'));
   const [ttsPitch, setTtsPitch] = useState(() => parseFloat(localStorage.getItem('ms_ttsPitch') || '1'));
   const [ttsVoiceURI, setTtsVoiceURI] = useState(() => localStorage.getItem('ms_ttsVoice') || '');
   const [availableVoices, setAvailableVoices] = useState([]);
+
+  // Pending TTS states
+  const [pendingTtsRate, setPendingTtsRate] = useState(() => parseFloat(localStorage.getItem('ms_ttsRate') || '1'));
+  const [pendingTtsPitch, setPendingTtsPitch] = useState(() => parseFloat(localStorage.getItem('ms_ttsPitch') || '1'));
+  const [pendingTtsVoiceURI, setPendingTtsVoiceURI] = useState(() => localStorage.getItem('ms_ttsVoice') || '');
+  const [ttsApplied, setTtsApplied] = useState(false);
+
   const [autosaveTime, setAutosaveTime] = useState(null);
   const [showBackupReminder, setShowBackupReminder] = useState(false);
   const [backupReminderDays, setBackupReminderDays] = useState(0);
@@ -343,6 +553,21 @@ export default function ShowRunner() {
   useEffect(() => { localStorage.setItem('ms_ttsPitch', String(ttsPitch)); }, [ttsPitch]);
   useEffect(() => { localStorage.setItem('ms_ttsVoice', ttsVoiceURI); }, [ttsVoiceURI]);
   useEffect(() => { localStorage.setItem('ms_countdown', countdownAnimation ? 'true' : 'false'); }, [countdownAnimation]);
+
+  const applyFont = () => {
+    setFontSize(pendingFontSize);
+    setFontFamily(pendingFontFamily);
+    setFontApplied(true);
+    setTimeout(() => setFontApplied(false), 2000);
+  };
+
+  const applyTTS = () => {
+    setTtsRate(pendingTtsRate);
+    setTtsPitch(pendingTtsPitch);
+    setTtsVoiceURI(pendingTtsVoiceURI);
+    setTtsApplied(true);
+    setTimeout(() => setTtsApplied(false), 2000);
+  };
 
   const requestNotifPermission = async () => {
     if (typeof Notification === 'undefined') return;
@@ -441,7 +666,6 @@ export default function ShowRunner() {
   const isUndoRedo = useRef(false);
 
   useEffect(() => { localStorage.setItem('ms_lang', lang); }, [lang]);
-
   const showToast = useCallback((msg) => { setToast(msg); setTimeout(() => setToast(''), 2500); }, []);
 
   const requestWakeLock = async () => {
@@ -454,7 +678,6 @@ export default function ShowRunner() {
     } catch(e) {}
   };
   const releaseWakeLock = () => { wakeLockRef.current?.release?.(); wakeLockRef.current = null; setWakeLockActive(false); };
-
   useEffect(() => { if (isRunning) requestWakeLock(); else releaseWakeLock(); return () => releaseWakeLock(); }, [isRunning]);
 
   const handleTouchStart = (e) => { touchStartX.current = e.touches[0].clientX; touchStartY.current = e.touches[0].clientY; };
@@ -741,7 +964,6 @@ export default function ShowRunner() {
     </div>
   );
 
-  // ── ONBOARDING ──
   const onboardingSteps = [
     { title: '👋 Willkommen!', desc: 'Magic Showrunner hilft dir, deine Show professionell zu managen.' },
     { title: '➕ Teile hinzufügen', desc: 'Klicke auf "Neuer Teil" um Acts, Pausen und Gruppen zu erstellen.' },
@@ -774,610 +996,638 @@ export default function ShowRunner() {
     );
   }
 
-  // ── PERFORM MODE ──
   if (mode === 'perform' || mode === 'test') {
     const performBg = isWarn ? pth.warnBg : pth.bg;
     return (
       <div ref={containerRef} className={`min-h-screen ${performBg} ${pth.text} flex flex-col ${anim}`}
         style={{fontFamily, fontSize: effectiveFontSize + 'px'}}
         onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-        {/* Countdown overlay */}
         {countdownNum && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-            <div className="text-9xl font-black text-white drop-shadow-2xl animate-bounce">{countdownNum}</div>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+            <div className="text-white font-black" style={{fontSize:'20vw'}}>{countdownNum}</div>
           </div>
         )}
-        {/* Leave Confirm */}
         {showLeaveConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center" style={{background:'rgba(0,0,0,0.8)'}}>
-            <div className={`${pth.card} rounded-2xl p-6 max-w-sm w-full mx-4 text-center`}>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{background:'rgba(0,0,0,0.8)'}}>
+            <div className={`${pth.card} ${pth.text} rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl`}>
               <div className="text-4xl mb-3">⚠️</div>
-              <p className="font-bold text-lg mb-4">{t.leaveConfirm}</p>
-              <div className="flex gap-3 justify-center">
-                <button onClick={() => setShowLeaveConfirm(false)} className="px-5 py-2 rounded-xl bg-gray-600 text-white font-bold">Abbrechen</button>
-                <button onClick={stopShow} className="px-5 py-2 rounded-xl bg-red-600 text-white font-bold">Beenden</button>
+              <h3 className="font-bold text-lg mb-2">{t.leaveConfirm}</h3>
+              <div className="flex gap-3 justify-center mt-4">
+                <button onClick={() => setShowLeaveConfirm(false)} className="px-5 py-2 rounded-xl bg-gray-500 text-white font-bold">{t.cancelBtn}</button>
+                <button onClick={stopShow} className="px-5 py-2 rounded-xl bg-red-600 text-white font-bold">{t.perform_stop}</button>
               </div>
             </div>
           </div>
         )}
-        {/* Header */}
-        <div className={`${pth.card} px-4 py-3 flex items-center justify-between shadow-lg`}>
-          <div>
-            <div className="font-black text-lg">{t.appTitle}</div>
-            {mode === 'test' && <div className="text-xs bg-yellow-500 text-black px-2 py-0.5 rounded-full font-bold inline-block">🧪 TESTMODUS</div>}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
+          <div className="font-bold text-sm opacity-70">{t.appTitle} {mode === 'test' ? '🧪' : ''}</div>
+          <div className="flex items-center gap-2">
+            {wakeLockActive && <span className="text-xs opacity-50">📱</span>}
+            <button onClick={toggleFullscreen} className="text-xs opacity-60 hover:opacity-100 px-2 py-1 rounded">
+              {isFullscreen ? t.exitFullscreen : t.fullscreen}
+            </button>
+            <button onClick={handleStop} className={`px-4 py-1.5 rounded-xl font-bold text-sm bg-red-600 hover:bg-red-700 text-white`}>{t.perform_stop}</button>
           </div>
-          <div className="flex gap-2">
-            <button onClick={toggleFullscreen} className="px-3 py-1.5 rounded-lg bg-white/10 text-sm font-bold">{isFullscreen ? t.exitFullscreen : t.fullscreen}</button>
-            <button onClick={handleStop} className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-sm font-bold">{t.perform_stop}</button>
+        </div>
+
+        <div className="flex-1 flex flex-col items-center justify-center px-4 py-6 gap-6">
+          <div className={`w-full max-w-xl ${pth.card} rounded-3xl p-6 shadow-2xl`}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-4 h-4 rounded-full flex-shrink-0" style={{background: cp?.color || '#6366f1'}} />
+              <div className={`font-black ${largeFontMode ? 'text-3xl' : 'text-2xl'} leading-tight`}>{cp?.title || '–'}</div>
+            </div>
+            <div className={`font-black text-center my-4 ${isWarn ? pth.warnTimer : pth.timerText}`}
+              style={{fontSize: largeFontMode ? '5rem' : '4rem', lineHeight:1, fontVariantNumeric:'tabular-nums'}}>
+              {fmt(partRem)}
+            </div>
+            <div className="w-full bg-black/20 rounded-full h-3 mb-2">
+              <div className={`h-3 rounded-full ${anim} ${isWarn ? 'bg-red-500' : 'bg-indigo-500'}`} style={{width: progressPct + '%'}} />
+            </div>
+            <div className="flex justify-between text-xs opacity-60 mb-4">
+              <span>{t.perform_part} {currentPartIndex+1} {t.perform_of} {effectiveParts.length}</span>
+              <span>{fmt(partElapsed)} / {fmt(cp?.duration||0)}</span>
+            </div>
+            {cp?.notes && (
+              <div className={`rounded-xl p-3 text-sm ${largeFontMode ? 'text-base' : ''} opacity-80 bg-black/10 mb-3`}>
+                📝 {cp.notes}
+              </div>
+            )}
+            <div className="flex gap-2 flex-wrap justify-center">
+              <button onClick={() => AudioEngine.speak(cp?.introText || '', t.speechLang, ttsRate, ttsPitch, ttsVoiceURI || null)} className="px-3 py-1.5 rounded-xl bg-indigo-600 text-white text-xs font-bold">{t.perform_testAnnounce}</button>
+              {cp?.musicUrl && <button onClick={() => playMusic(cp)} className="px-3 py-1.5 rounded-xl bg-purple-600 text-white text-xs font-bold">{t.perform_testMusic}</button>}
+            </div>
           </div>
-        </div>
-        {/* Progress Bar */}
-        <div className="h-1.5 bg-black/20">
-          <div className={`h-full bg-indigo-500 ${anim}`} style={{width: totalProgressPct + '%'}} />
-        </div>
-        {/* Main */}
-        <div className="flex-1 flex flex-col items-center justify-center px-4 py-6 gap-4">
-          {cp ? (
-            <>
-              <div className={`${pth.card} rounded-2xl p-6 w-full max-w-lg shadow-xl text-center`}>
-                <div className="text-xs opacity-60 mb-1">{t.perform_part} {currentPartIndex + 1} {t.perform_of} {effectiveParts.length}</div>
-                <div className="w-3 h-3 rounded-full mx-auto mb-3" style={{background: cp.color || '#6366f1'}} />
-                <h2 className={`text-2xl font-black mb-4 ${largeFontMode ? 'text-4xl' : ''}`}>{cp.title}</h2>
-                <div className={`font-mono font-black ${isWarn ? pth.warnTimer : pth.timerText} ${largeFontMode ? 'text-8xl' : 'text-6xl'}`}>
-                  {fmt(partRem)}
-                </div>
-                <div className="text-sm opacity-60 mt-2">{t.perform_remaining}</div>
-                {/* Part Progress */}
-                <div className="mt-4 h-2 rounded-full bg-black/10">
-                  <div className={`h-full rounded-full bg-indigo-500 ${anim}`} style={{width: progressPct + '%'}} />
-                </div>
-              </div>
-              {/* Notes */}
-              {cp.notes && (
-                <div className={`${pth.card} rounded-xl p-4 w-full max-w-lg text-sm opacity-80`}>
-                  <div className="font-bold mb-1">📝 Notizen:</div>
-                  <div>{cp.notes}</div>
-                </div>
-              )}
-              {/* Total */}
-              <div className={`${pth.card} rounded-xl px-5 py-3 w-full max-w-lg flex justify-between text-sm`}>
-                <span>{t.perform_total}: <b>{fmt(effectiveTotal)}</b></span>
-                <span>{t.perform_remaining2}: <b>{fmt(totalRem)}</b></span>
-              </div>
-              {/* Pause/Prev/Next */}
-              <div className="flex gap-3 flex-wrap justify-center">
-                <button onClick={() => jumpToPart(currentPartIndex - 1)} disabled={currentPartIndex === 0} className="px-4 py-2.5 rounded-xl bg-white/10 font-bold disabled:opacity-30 text-sm">{t.perform_prev}</button>
-                <button onClick={togglePause} className={`px-6 py-2.5 rounded-xl font-bold text-sm ${isPaused ? 'bg-green-600 text-white' : 'bg-yellow-500 text-black'}`}>
-                  {isPaused ? t.perform_resume : t.perform_pause}
-                </button>
-                <button onClick={() => jumpToPart(currentPartIndex + 1)} disabled={currentPartIndex >= effectiveParts.length - 1} className="px-4 py-2.5 rounded-xl bg-white/10 font-bold disabled:opacity-30 text-sm">{t.perform_next}</button>
-              </div>
-              {/* Test Announce/Music */}
-              <div className="flex gap-2 flex-wrap justify-center">
-                <button onClick={() => { if(cp.introText) AudioEngine.speak(cp.introText, t.speechLang, ttsRate, ttsPitch, ttsVoiceURI||null); }} className="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-bold">{t.perform_testAnnounce}</button>
-                <button onClick={() => playMusic(cp)} className="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-bold">{t.perform_testMusic}</button>
-                <button onClick={() => setLargeFontMode(l => !l)} className="px-3 py-1.5 rounded-lg bg-white/10 text-xs font-bold">{t.largeStageFontMode}</button>
-              </div>
-            </>
-          ) : (
-            <div className="text-center text-2xl font-black opacity-60">{t.endedMsg}</div>
-          )}
-        </div>
-        {/* Part list mini */}
-        <div className={`${pth.card} px-3 py-2 flex gap-2 overflow-x-auto`}>
-          {effectiveParts.map((p,i) => (
-            !p.isGroup && (
+
+          <div className="flex gap-3 flex-wrap justify-center">
+            <button onClick={() => jumpToPart(currentPartIndex-1)} disabled={currentPartIndex===0} className="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 font-bold disabled:opacity-30">{t.perform_prev}</button>
+            <button onClick={togglePause} className={`px-8 py-3 rounded-2xl font-bold text-white ${isPaused ? 'bg-green-600 hover:bg-green-700' : 'bg-yellow-600 hover:bg-yellow-700'}`}>
+              {isPaused ? t.perform_resume : t.perform_pause}
+            </button>
+            <button onClick={() => jumpToPart(currentPartIndex+1)} disabled={currentPartIndex>=effectiveParts.length-1} className="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/20 font-bold disabled:opacity-30">{t.perform_next}</button>
+          </div>
+
+          <div className={`w-full max-w-xl ${pth.card} rounded-2xl p-4`}>
+            <div className="flex justify-between text-sm mb-2 opacity-70">
+              <span>{t.perform_total}</span>
+              <span>{fmt(totalRem)} {t.perform_remaining}</span>
+            </div>
+            <div className="w-full bg-black/20 rounded-full h-2">
+              <div className={`h-2 rounded-full bg-indigo-400 ${anim}`} style={{width: totalProgressPct + '%'}} />
+            </div>
+          </div>
+
+          <div className="w-full max-w-xl flex gap-2 overflow-x-auto pb-1">
+            {effectiveParts.map((p,i) => (
               <button key={p.id||i} onClick={() => jumpToPart(i)}
-                className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-bold border transition ${i===currentPartIndex ? 'border-indigo-500 bg-indigo-500 text-white' : 'border-transparent bg-white/10'}`}>
+                className={`flex-shrink-0 px-3 py-2 rounded-xl text-xs font-bold border-2 ${anim} ${i===currentPartIndex ? 'border-white text-white' : 'border-white/20 opacity-50 hover:opacity-80'}`}
+                style={{borderColor: i===currentPartIndex ? p.color : undefined, color: i===currentPartIndex ? p.color : undefined}}>
                 {i+1}. {p.title.slice(0,12)}{p.title.length>12?'…':''}
               </button>
-            )
-          ))}
+            ))}
+          </div>
         </div>
+
+        {toast && <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-5 py-2.5 rounded-2xl shadow-xl text-sm font-medium z-50">{toast}</div>}
       </div>
     );
   }
 
   // ── PLAN MODE ──
   return (
-    <div ref={containerRef} className={`min-h-screen ${th.bg} ${th.text} ${anim}`}
-      style={{fontFamily, fontSize: fontSize+'px'}}>
-      <input type="file" id="import-file-hdr" accept=".json" className="hidden" onChange={importBackup} />
+    <div ref={containerRef} className={`min-h-screen ${th.bg} ${th.text} ${anim}`} style={{fontFamily, fontSize: effectiveFontSize+'px'}}>
+      {toast && <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 text-white px-5 py-2.5 rounded-2xl shadow-xl text-sm font-medium z-50">{toast}</div>}
 
-      {/* Toast */}
-      {toast && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-gray-900 text-white px-5 py-2.5 rounded-2xl shadow-xl text-sm font-bold animate-bounce">
-          {toast}
-        </div>
-      )}
-
-      {/* Countdown Overlay */}
       {countdownNum && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-          <div className="text-9xl font-black text-indigo-500 drop-shadow-2xl">{countdownNum}</div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
+          <div className="text-white font-black" style={{fontSize:'20vw'}}>{countdownNum}</div>
         </div>
       )}
 
-      {/* Backup Reminder */}
       {showBackupReminder && (
-        <div className={`${th.card} border-l-4 border-yellow-500 mx-4 mt-4 rounded-xl p-3 flex items-center justify-between gap-2`}>
-          <span className="text-sm">{t.backupReminder.replace('{days}', backupReminderDays >= 999 ? '?' : backupReminderDays)}</span>
-          <div className="flex gap-2 flex-shrink-0">
-            <button onClick={exportBackup} className="px-3 py-1 rounded-lg bg-yellow-500 text-black text-xs font-bold">{t.backupReminderBtn}</button>
-            <button onClick={() => setShowBackupReminder(false)} className="px-3 py-1 rounded-lg bg-gray-400 text-white text-xs font-bold">{t.backupReminderDismiss}</button>
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-40 max-w-md w-full mx-4">
+          <div className="bg-amber-500 text-white rounded-2xl shadow-xl p-4">
+            <p className="font-bold text-sm mb-2">{t.backupReminder.replace('{days}', backupReminderDays === 999 ? '?' : backupReminderDays)}</p>
+            <div className="flex gap-2">
+              <button onClick={exportBackup} className="px-4 py-1.5 rounded-xl bg-white text-amber-700 font-bold text-sm">{t.backupReminderBtn}</button>
+              <button onClick={() => setShowBackupReminder(false)} className="px-4 py-1.5 rounded-xl bg-amber-600 text-white font-bold text-sm">{t.backupReminderDismiss}</button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Header */}
-      <div className={`${th.card} px-4 py-3 shadow-md border-b ${th.border}`}>
-        <div className="flex items-center justify-between gap-2 flex-wrap">
+      {/* HEADER */}
+      <div className={`${th.card} border-b ${th.border} shadow-sm`}>
+        <div className="max-w-4xl mx-auto px-4 py-3">
+          <div className="flex items-center justify-between gap-2 flex-wrap">
+            <div>
+              <div className={`font-black text-lg ${th.headText}`}>{t.appTitle} <span className="text-xs font-normal opacity-50">{t.appVersion}</span></div>
+              <div className={`text-xs ${th.subText}`}>{t.appSub}</div>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button onClick={() => setShowSettings(true)} className={`px-3 py-2 rounded-xl text-sm font-bold ${th.accent} text-white hover:opacity-90`}>{t.settings}</button>
+              <button onClick={() => setShowSaveMenu(true)} className={`px-3 py-2 rounded-xl text-sm font-bold ${th.accent} text-white hover:opacity-90`}>{t.save}</button>
+              <button onClick={() => setShowLoadMenu(true)} className={`px-3 py-2 rounded-xl text-sm font-bold bg-gray-500 text-white hover:opacity-90`}>{t.load}</button>
+              <button onClick={exportBackup} className={`px-3 py-2 rounded-xl text-sm font-bold bg-green-600 text-white hover:opacity-90`}>{t.backup}</button>
+              <button onClick={() => setShowTutorial(true)} className={`px-3 py-2 rounded-xl text-sm font-bold bg-purple-600 text-white hover:opacity-90`}>{t.tutorial}</button>
+              <button onClick={toggleFullscreen} className={`px-3 py-2 rounded-xl text-sm font-bold bg-gray-600 text-white hover:opacity-90`}>{isFullscreen ? t.exitFullscreen : t.fullscreen}</button>
+            </div>
+          </div>
+          <div className="flex gap-2 mt-2 flex-wrap">
+            <button onClick={() => setShowStats(true)} className={`px-3 py-1.5 text-xs rounded-xl ${th.badgeBg} ${th.badgeText} font-bold`}>{t.stats}</button>
+            <button onClick={() => setShowStageplan(true)} className={`px-3 py-1.5 text-xs rounded-xl ${th.badgeBg} ${th.badgeText} font-bold`}>{t.stage}</button>
+            <button onClick={exportCSV} className={`px-3 py-1.5 text-xs rounded-xl ${th.badgeBg} ${th.badgeText} font-bold`}>{t.exportCSV}</button>
+            <button onClick={exportPDF} className={`px-3 py-1.5 text-xs rounded-xl ${th.badgeBg} ${th.badgeText} font-bold`}>{t.exportPDF}</button>
+            <button onClick={generateQR} className={`px-3 py-1.5 text-xs rounded-xl ${th.badgeBg} ${th.badgeText} font-bold`}>{t.shareQR}</button>
+            <button onClick={() => setShowAbout(true)} className={`px-3 py-1.5 text-xs rounded-xl ${th.badgeBg} ${th.badgeText} font-bold`}>{t.about}</button>
+            <label className={`px-3 py-1.5 text-xs rounded-xl ${th.badgeBg} ${th.badgeText} font-bold cursor-pointer`}>
+              {t.importBtn}<input type="file" accept=".json" className="hidden" onChange={importBackup} />
+            </label>
+            <button onClick={undo} disabled={historyIndex<=0} className={`px-3 py-1.5 text-xs rounded-xl ${th.badgeBg} ${th.badgeText} font-bold disabled:opacity-30`}>↩️</button>
+            <button onClick={redo} disabled={historyIndex>=history.length-1} className={`px-3 py-1.5 text-xs rounded-xl ${th.badgeBg} ${th.badgeText} font-bold disabled:opacity-30`}>↪️</button>
+            {autosaveTime && <span className={`px-3 py-1.5 text-xs rounded-xl ${th.badgeBg} ${th.textSub} font-medium`}>💾 {autosaveTime.toLocaleTimeString()}</span>}
+          </div>
+        </div>
+      </div>
+
+      {/* MAIN */}
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        {/* Summary */}
+        <div className={`${th.card} rounded-2xl p-4 mb-6 flex flex-wrap gap-4 items-center justify-between shadow`}>
           <div>
-            <h1 className={`font-black text-xl ${th.headText} flex items-baseline gap-2`}>
-              {t.appTitle}
-              <span className={`text-xs font-normal opacity-40`}>v1.7</span>
-            </h1>
-            <p className={`text-xs ${th.textSub}`}>{t.appSub}</p>
+            <div className={`text-xs ${th.textSub} mb-1`}>{t.parts}</div>
+            <div className="font-black text-2xl">{parts.filter(p=>!p.isGroup).length}</div>
           </div>
-          <div className="flex gap-2 flex-wrap items-center">
-            {/* Language */}
-            <select value={lang} onChange={e=>setLang(e.target.value)} className={`px-2 py-1 rounded-lg text-sm border ${th.input} ${th.border}`}>
-              {Object.entries(LANG_FLAGS).map(([k,f]) => <option key={k} value={k}>{f} {LANG_NAMES[k]}</option>)}
-            </select>
-            <button onClick={toggleFullscreen} className={`px-3 py-1.5 rounded-xl text-sm font-bold ${th.accent} text-white`}>{isFullscreen ? '⛶' : '⛶'}</button>
-            <button onClick={() => setShowSettings(true)} className={`px-3 py-1.5 rounded-xl text-sm font-bold ${th.accent} text-white`}>⚙️</button>
-            {/* Undo/Redo */}
-            <button onClick={undo} disabled={historyIndex <= 0} className={`px-2 py-1.5 rounded-xl text-sm font-bold bg-white/10 disabled:opacity-30 ${th.text}`}>↩️</button>
-            <button onClick={redo} disabled={historyIndex >= history.length-1} className={`px-2 py-1.5 rounded-xl text-sm font-bold bg-white/10 disabled:opacity-30 ${th.text}`}>↪️</button>
+          <div>
+            <div className={`text-xs ${th.textSub} mb-1`}>{t.totalTime}</div>
+            <div className="font-black text-2xl">{fmt(totalDuration)}</div>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <button onClick={() => setShowTemplates(true)} className={`px-4 py-2 rounded-xl font-bold text-sm bg-purple-600 text-white hover:opacity-90`}>🎨 Templates</button>
+            <button onClick={openAdd} className={`px-4 py-2 rounded-xl font-bold text-sm ${th.accent} text-white hover:opacity-90`}>{t.newPart}</button>
+            <button onClick={addGroup} className={`px-4 py-2 rounded-xl font-bold text-sm bg-gray-500 text-white hover:opacity-90`}>{t.addGroup}</button>
+            <button onClick={() => { setMode('test'); startShow(); }} className={`px-4 py-2 rounded-xl font-bold text-sm bg-yellow-600 text-white hover:opacity-90`}>{t.testMode}</button>
+            <button onClick={startShow} className={`px-5 py-2 rounded-xl font-bold text-sm bg-green-600 text-white hover:opacity-90`}>{t.startShow}</button>
           </div>
         </div>
-        {/* Toolbar */}
-        <div className="flex gap-2 mt-3 flex-wrap">
-          <button onClick={() => setShowSaveMenu(true)} className={`px-3 py-1.5 rounded-xl text-sm font-bold ${th.accent} text-white`}>{t.save}</button>
-          <button onClick={() => setShowLoadMenu(true)} className={`px-3 py-1.5 rounded-xl text-sm font-bold ${th.accent} text-white`}>{t.load}</button>
-          <button onClick={exportBackup} className={`px-3 py-1.5 rounded-xl text-sm font-bold ${th.accent} text-white`}>{t.backup}</button>
-          <button onClick={() => document.getElementById('import-file-hdr').click()} className={`px-3 py-1.5 rounded-xl text-sm font-bold ${th.accent} text-white`}>{t.importBtn}</button>
-          <button onClick={() => setShowTemplates(true)} className={`px-3 py-1.5 rounded-xl text-sm font-bold bg-white/10 ${th.text}`}>📋 Templates</button>
-          <button onClick={() => setShowStageplan(true)} className={`px-3 py-1.5 rounded-xl text-sm font-bold bg-white/10 ${th.text}`}>{t.stage}</button>
-          <button onClick={() => setShowStats(true)} className={`px-3 py-1.5 rounded-xl text-sm font-bold bg-white/10 ${th.text}`}>{t.stats}</button>
-          <button onClick={exportCSV} className={`px-3 py-1.5 rounded-xl text-sm font-bold bg-white/10 ${th.text}`}>{t.exportCSV}</button>
-          <button onClick={exportPDF} className={`px-3 py-1.5 rounded-xl text-sm font-bold bg-white/10 ${th.text}`}>{t.exportPDF}</button>
-          <button onClick={generateQR} className={`px-3 py-1.5 rounded-xl text-sm font-bold bg-white/10 ${th.text}`}>{t.shareQR}</button>
-          <button onClick={() => setShowTutorial(true)} className={`px-3 py-1.5 rounded-xl text-sm font-bold bg-white/10 ${th.text}`}>{t.tutorial}</button>
-          <button onClick={() => setShowAbout(true)} className={`px-3 py-1.5 rounded-xl text-sm font-bold bg-white/10 ${th.text}`}>{t.about}</button>
-        </div>
-      </div>
 
-      {/* Summary bar */}
-      <div className={`px-4 py-2 flex gap-4 text-sm ${th.textSub} border-b ${th.border} flex-wrap`}>
-        <span>📋 {parts.filter(p=>!p.isGroup).length} {t.parts}</span>
-        <span>⏱ {fmt(totalDuration)} {t.totalTime}</span>
-        {autosaveTime && <span>💾 {t.autosaveLabel}: {autosaveTime.toLocaleTimeString()}</span>}
-        {wakeLockActive && <span>📱 {t.wakelock}</span>}
-        {offlineReady && <span>✅ {t.offlineReady}</span>}
-      </div>
+        <div className={`text-xs ${th.textSub} mb-3`}>{t.dragHint}</div>
 
-      {/* Parts list */}
-      <div className="px-4 py-4 space-y-2 max-w-3xl mx-auto">
-        {parts.map((part, i) => (
-          <div key={part.id || i}
-            draggable onDragStart={() => handleDragStart(i)} onDragEnter={() => handleDragEnter(i)} onDragEnd={handleDragEnd}
-            onTouchStart={() => handleTouchDragStart(i)} onTouchEnd={() => handleTouchDragEnd(i)}
-            className={`${th.planCard} rounded-xl p-3 border ${th.border} ${anim} cursor-grab active:cursor-grabbing`}>
-            {part.isGroup ? (
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{background: part.color}} />
-                <span className="font-black text-sm opacity-70">📁 {part.title}</span>
-                <div className="flex-1" />
-                <button onClick={() => openEdit(i)} className="text-xs px-2 py-1 rounded-lg bg-black/10 font-bold">✏️</button>
-                <button onClick={() => deletePart(i)} className="text-xs px-2 py-1 rounded-lg bg-red-500 text-white font-bold">🗑</button>
-              </div>
-            ) : (
-              <div className="flex items-start gap-3">
-                <div className="w-1 self-stretch rounded-full flex-shrink-0" style={{background: part.color, minWidth:4}} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-bold text-sm">{i+1}. {part.title}</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${th.badgeBg} ${th.badgeText} font-mono`}>{fmt(part.duration)}</span>
-                    {part.musicUrl && <span className="text-xs">🎵</span>}
-                    {part.notes && <span className="text-xs opacity-50">📝</span>}
+        {/* Parts List */}
+        <div className="flex flex-col gap-3">
+          {parts.map((part, i) => (
+            <div key={part.id||i}
+              draggable
+              onDragStart={() => handleDragStart(i)}
+              onDragEnter={() => handleDragEnter(i)}
+              onDragEnd={handleDragEnd}
+              onDragOver={e => e.preventDefault()}
+              className={`${th.planCard} rounded-2xl p-4 ${anim} border ${th.border} ${part.isGroup ? 'opacity-80' : ''}`}>
+              {part.isGroup ? (
+                <div className="flex items-center gap-3">
+                  <div className="w-3 h-3 rounded-full" style={{background:part.color||'#64748b'}} />
+                  <div className="font-black text-base flex-1">📁 {part.title}</div>
+                  <button onClick={() => openEdit(i)} className="text-xs opacity-60 hover:opacity-100 px-2 py-1 rounded-lg bg-black/10">✏️</button>
+                  <button onClick={() => deletePart(i)} className="text-xs opacity-60 hover:opacity-100 px-2 py-1 rounded-lg bg-red-500/20 text-red-500">🗑</button>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex items-start gap-3">
+                    <div className="flex flex-col gap-1 pt-1">
+                      <span className="text-xs opacity-40 cursor-grab select-none">☰</span>
+                      <span className="text-xs font-bold opacity-50">{i+1}</span>
+                    </div>
+                    <div className="w-3 h-3 rounded-full mt-1.5 flex-shrink-0" style={{background:part.color||'#6366f1'}} />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-black text-base leading-tight">{part.title}</div>
+                      <div className={`text-xs ${th.textSub} mt-0.5`}>{fmt(part.duration)} • Vorankündigung: {part.preAnnounceSec}s</div>
+                      {part.notes && <div className={`text-xs ${th.textSub} mt-1 truncate`}>📝 {part.notes}</div>}
+                      {part.musicUrl && <div className="text-xs mt-1 text-purple-500">🎵 Musik</div>}
+                    </div>
+                    <div className="flex gap-1 flex-wrap justify-end">
+                      <button onClick={() => movePart(i,-1)} disabled={i===0} className="text-xs px-2 py-1 rounded-lg bg-black/10 disabled:opacity-20">↑</button>
+                      <button onClick={() => movePart(i,1)} disabled={i===parts.length-1} className="text-xs px-2 py-1 rounded-lg bg-black/10 disabled:opacity-20">↓</button>
+                      <button onClick={() => duplicatePart(i)} className="text-xs px-2 py-1 rounded-lg bg-black/10">📋</button>
+                      <button onClick={() => openEdit(i)} className="text-xs px-2 py-1 rounded-lg bg-indigo-500/20 text-indigo-500">✏️</button>
+                      <button onClick={() => deletePart(i)} className="text-xs px-2 py-1 rounded-lg bg-red-500/20 text-red-500">🗑</button>
+                    </div>
                   </div>
-                  {part.notes && <div className="text-xs opacity-50 mt-0.5 truncate">{part.notes}</div>}
                 </div>
-                <div className="flex gap-1 flex-shrink-0 flex-wrap justify-end">
-                  <button onClick={() => movePart(i,-1)} disabled={i===0} className="text-xs px-1.5 py-1 rounded-lg bg-black/10 disabled:opacity-30">↑</button>
-                  <button onClick={() => movePart(i,1)} disabled={i===parts.length-1} className="text-xs px-1.5 py-1 rounded-lg bg-black/10 disabled:opacity-30">↓</button>
-                  <button onClick={() => openEdit(i)} className="text-xs px-2 py-1 rounded-lg bg-black/10 font-bold">✏️</button>
-                  <button onClick={() => duplicatePart(i)} className="text-xs px-2 py-1 rounded-lg bg-black/10 font-bold">📋</button>
-                  <button onClick={() => deletePart(i)} className="text-xs px-2 py-1 rounded-lg bg-red-500 text-white font-bold">🗑</button>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+            </div>
+          ))}
+        </div>
+
         {parts.length === 0 && (
-          <div className={`text-center py-12 ${th.textSub}`}>
-            <div className="text-5xl mb-3">🎩</div>
-            <div className="font-bold">Noch keine Teile – füge einen neuen Teil hinzu!</div>
+          <div className={`text-center py-16 ${th.textSub}`}>
+            <div className="text-5xl mb-4">🎩</div>
+            <div className="font-bold text-lg mb-2">Keine Teile vorhanden</div>
+            <div className="text-sm mb-4">Füge deinen ersten Teil hinzu oder wähle ein Template.</div>
+            <button onClick={openAdd} className={`px-6 py-3 rounded-2xl font-bold ${th.accent} text-white`}>{t.newPart}</button>
           </div>
         )}
       </div>
 
-      {/* Bottom bar */}
-      <div className={`sticky bottom-0 ${th.card} border-t ${th.border} px-4 py-3 flex gap-2 flex-wrap justify-center shadow-lg`}>
-        <button onClick={openAdd} className={`px-4 py-2 rounded-xl font-bold text-sm ${th.accent} text-white`}>{t.newPart}</button>
-        <button onClick={addGroup} className={`px-4 py-2 rounded-xl font-bold text-sm bg-white/10 ${th.text}`}>{t.addGroup}</button>
-        <button onClick={startShow} disabled={!parts.filter(p=>!p.isGroup).length} className="px-5 py-2 rounded-xl font-bold text-sm bg-green-600 text-white disabled:opacity-40">{t.startShow}</button>
-        <button onClick={() => { setMode('test'); startShow(); }} disabled={!parts.filter(p=>!p.isGroup).length} className="px-4 py-2 rounded-xl font-bold text-sm bg-yellow-500 text-black disabled:opacity-40">{t.testMode}</button>
-      </div>
-
-      {/* ── MODALS ── */}
-
-      {/* Part Form */}
-      {showForm && (
-        <Modal title={editIdx !== null ? t.editPart : t.addPart} onClose={() => setShowForm(false)} wide>
-          <div className="space-y-3">
-            {/* Title & Color */}
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <label className={`text-xs font-bold ${th.textSub}`}>{t.titleLabel}</label>
-                <input className={`w-full mt-1 px-3 py-2 rounded-xl border ${th.input} ${th.border} text-sm`}
-                  value={form.title} onChange={e=>setForm({...form,title:e.target.value})} placeholder="Titel" />
-              </div>
-              <div>
-                <label className={`text-xs font-bold ${th.textSub}`}>{t.partColor}</label>
-                <div className="flex gap-1 mt-1 flex-wrap max-w-40">
-                  {PART_COLORS.map(c => (
-                    <button key={c} onClick={() => setForm({...form,color:c})}
-                      className={`w-6 h-6 rounded-full border-2 ${form.color===c ? 'border-white scale-125' : 'border-transparent'}`}
-                      style={{background:c}} />
-                  ))}
-                </div>
-              </div>
-            </div>
-            <Toggle checked={form.isGroup||false} onChange={v=>setForm({...form,isGroup:v})} label="Gruppe" />
-            {!form.isGroup && (
-              <>
-                <div>
-                  <label className={`text-xs font-bold ${th.textSub}`}>{t.durationLabel}</label>
-                  <input type="number" className={`w-full mt-1 px-3 py-2 rounded-xl border ${th.input} ${th.border} text-sm`}
-                    value={form.duration} onChange={e=>setForm({...form,duration:parseInt(e.target.value)||0})} />
-                </div>
-                <div>
-                  <label className={`text-xs font-bold ${th.textSub}`}>{t.introLabel}</label>
-                  <textarea className={`w-full mt-1 px-3 py-2 rounded-xl border ${th.input} ${th.border} text-sm`} rows={2}
-                    value={form.introText} onChange={e=>setForm({...form,introText:e.target.value})} />
-                  <button onClick={() => AudioEngine.speak(form.introText, t.speechLang, ttsRate, ttsPitch, ttsVoiceURI||null)} className={`mt-1 px-3 py-1 rounded-lg text-xs font-bold ${th.accent} text-white`}>{t.testBtn}</button>
-                </div>
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <label className={`text-xs font-bold ${th.textSub}`}>{t.preAnnounceLabel}</label>
-                    <input type="number" className={`w-full mt-1 px-3 py-2 rounded-xl border ${th.input} ${th.border} text-sm`}
-                      value={form.preAnnounceSec} onChange={e=>setForm({...form,preAnnounceSec:parseInt(e.target.value)||0})} />
-                  </div>
-                  <div className="flex-1">
-                    <label className={`text-xs font-bold ${th.textSub}`}>{t.preAnnounceText}</label>
-                    <input className={`w-full mt-1 px-3 py-2 rounded-xl border ${th.input} ${th.border} text-sm`}
-                      value={form.announceNextText} onChange={e=>setForm({...form,announceNextText:e.target.value})} />
-                  </div>
-                </div>
-                <div>
-                  <label className={`text-xs font-bold ${th.textSub}`}>{t.notesLabel}</label>
-                  <textarea className={`w-full mt-1 px-3 py-2 rounded-xl border ${th.input} ${th.border} text-sm`} rows={2}
-                    value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} />
-                </div>
-                <div>
-                  <label className={`text-xs font-bold ${th.textSub}`}>{t.musicUrl}</label>
-                  <input className={`w-full mt-1 px-3 py-2 rounded-xl border ${th.input} ${th.border} text-sm`}
-                    value={form.musicUrl} onChange={e=>setForm({...form,musicUrl:e.target.value})} placeholder="https://..." />
-                </div>
-                <div className="flex gap-3 flex-wrap">
-                  <div>
-                    <label className={`text-xs font-bold ${th.textSub}`}>{t.vol} ({Math.round(form.musicVolume*100)}%)</label>
-                    <input type="range" min="0" max="1" step="0.05" className="w-full mt-1"
-                      value={form.musicVolume} onChange={e=>setForm({...form,musicVolume:parseFloat(e.target.value)})} />
-                  </div>
-                  <div>
-                    <label className={`text-xs font-bold ${th.textSub}`}>{t.fadeIn} ({form.musicFadeIn}s)</label>
-                    <input type="range" min="0" max="10" step="0.5" className="w-full mt-1"
-                      value={form.musicFadeIn} onChange={e=>setForm({...form,musicFadeIn:parseFloat(e.target.value)})} />
-                  </div>
-                  <div>
-                    <label className={`text-xs font-bold ${th.textSub}`}>{t.fadeOut} ({form.musicFadeOut}s)</label>
-                    <input type="range" min="0" max="10" step="0.5" className="w-full mt-1"
-                      value={form.musicFadeOut} onChange={e=>setForm({...form,musicFadeOut:parseFloat(e.target.value)})} />
-                  </div>
-                  <Toggle checked={form.musicLoop||false} onChange={v=>setForm({...form,musicLoop:v})} label="Loop" />
-                </div>
-                <button onClick={() => playMusic(form)} className={`px-3 py-1.5 rounded-lg text-xs font-bold ${th.accent} text-white`}>{t.perform_testMusic}</button>
-              </>
-            )}
-            <div className="flex gap-2 justify-end pt-2">
-              <button onClick={() => setShowForm(false)} className={`px-4 py-2 rounded-xl text-sm font-bold bg-gray-400 text-white`}>{t.cancelBtn}</button>
-              <button onClick={saveForm} className={`px-4 py-2 rounded-xl text-sm font-bold ${th.accent} text-white`}>{t.saveBtn}</button>
-            </div>
-          </div>
-        </Modal>
-      )}
-
-      {/* Save Show */}
-      {showSaveMenu && (
-        <Modal title={t.saveShowTitle} onClose={() => setShowSaveMenu(false)}>
-          <div className="space-y-3">
-            <input className={`w-full px-3 py-2 rounded-xl border ${th.input} ${th.border} text-sm`}
-              placeholder={t.showName} value={saveName} onChange={e=>setSaveName(e.target.value)} />
-            <button onClick={() => saveName.trim() && saveShow(saveName.trim())} className={`w-full py-2 rounded-xl font-bold text-sm ${th.accent} text-white`}>{t.saveBtn}</button>
-            {savedShows.length > 0 && (
-              <div>
-                <div className={`text-xs font-bold mb-2 ${th.textSub}`}>{t.overwrite}</div>
-                <div className="space-y-1">
-                  {savedShows.map(s => (
-                    <button key={s.id} onClick={() => saveShow(s.name)} className={`w-full text-left px-3 py-2 rounded-xl text-sm border ${th.border} ${th.planCard} hover:bg-black/10`}>
-                      📌 {s.name} <span className={`text-xs ${th.textSub}`}>({new Date(s.savedAt).toLocaleDateString()})</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </Modal>
-      )}
-
-      {/* Load Show */}
-      {showLoadMenu && (
-        <Modal title={t.loadShowTitle} onClose={() => setShowLoadMenu(false)}>
-          {savedShows.length === 0 ? (
-            <div className={`text-center py-8 ${th.textSub}`}>{t.noSaved}</div>
-          ) : (
-            <div className="space-y-2">
-              {savedShows.map(s => (
-                <div key={s.id} className={`flex items-center gap-2 border ${th.border} rounded-xl px-3 py-2`}>
-                  <button onClick={() => loadShow(s)} className="flex-1 text-left text-sm font-bold">
-                    📌 {s.name} <span className={`text-xs font-normal ${th.textSub}`}>({new Date(s.savedAt).toLocaleDateString()} • {s.parts?.length} {t.parts})</span>
-                  </button>
-                  <button onClick={() => deleteShow(s.id)} className="text-xs px-2 py-1 rounded-lg bg-red-500 text-white font-bold">🗑</button>
-                </div>
-              ))}
-            </div>
-          )}
-        </Modal>
-      )}
-
-      {/* Settings */}
+      {/* ── SETTINGS MODAL ── */}
       {showSettings && (
         <Modal title={t.settingsTitle} onClose={() => setShowSettings(false)} wide>
-          <div className="flex gap-1 flex-wrap mb-4">
-            {['design','audio','test','language','tts','font','notif'].map(tab => (
-              <button key={tab} onClick={() => setSettingsTab(tab)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold ${settingsTab===tab ? th.accent+' text-white' : 'bg-black/10 '+th.text}`}>
-                {t['tab'+tab.charAt(0).toUpperCase()+tab.slice(1)]}
+          {/* Tab Bar */}
+          <div className="flex gap-1 flex-wrap mb-5 border-b pb-3" style={{borderColor:'rgba(128,128,128,0.2)'}}>
+            {[
+              { key:'design', label: t.tabDesign },
+              { key:'audio', label: t.tabAudio },
+              { key:'test', label: t.tabTest },
+              { key:'language', label: t.tabLanguage },
+              { key:'tts', label: t.tabTTS },
+              { key:'font', label: t.tabFont },
+              { key:'notif', label: t.tabNotif },
+            ].map(tab => (
+              <button key={tab.key} onClick={() => setSettingsTab(tab.key)}
+                className={`px-3 py-1.5 rounded-xl text-sm font-bold transition-all ${settingsTab===tab.key ? `${th.accent} text-white` : `${th.badgeBg} ${th.badgeText}`}`}>
+                {tab.label}
               </button>
             ))}
           </div>
+
+          {/* DESIGN TAB */}
           {settingsTab === 'design' && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <div className={`text-xs font-bold mb-2 ${th.textSub}`}>{t.planTheme}</div>
+                <div className="font-bold mb-2 text-sm">{t.planTheme}</div>
                 <div className="grid grid-cols-2 gap-2">
-                  {['auto',...Object.keys(THEMES)].map(k => (
+                  {[{k:'auto',n:t.autoSystem},...Object.entries(THEMES).map(([k,v])=>({k,n:v.name}))].map(({k,n}) => (
                     <button key={k} onClick={() => setThemeMode(k)}
-                      className={`px-3 py-2 rounded-xl text-sm font-bold border ${themeMode===k ? 'border-indigo-500 bg-indigo-500 text-white' : th.border+' '+th.text} ${th.card}`}>
-                      {k==='auto' ? t.autoSystem : THEMES[k].name}
+                      className={`px-3 py-2 rounded-xl text-sm font-bold border-2 ${anim} ${themeMode===k ? 'border-indigo-500 bg-indigo-500/10' : `${th.border} bg-transparent`}`}>
+                      {n}
                     </button>
                   ))}
                 </div>
               </div>
               <div>
-                <div className={`text-xs font-bold mb-2 ${th.textSub}`}>{t.performTheme}</div>
-                <div className="flex gap-2 flex-wrap">
-                  {Object.keys(PERFORM_THEMES).map(k => (
+                <div className="font-bold mb-2 text-sm">{t.performTheme}</div>
+                <div className="grid grid-cols-3 gap-2">
+                  {Object.entries(PERFORM_THEMES).map(([k,v]) => (
                     <button key={k} onClick={() => setPerformTheme(k)}
-                      className={`px-3 py-2 rounded-xl text-sm font-bold border ${performTheme===k ? 'border-indigo-500 bg-indigo-500 text-white' : th.border+' '+th.text}`}>
-                      {PERFORM_THEMES[k].name}
+                      className={`px-3 py-2 rounded-xl text-sm font-bold border-2 ${anim} ${performTheme===k ? 'border-indigo-500 bg-indigo-500/10' : `${th.border} bg-transparent`}`}>
+                      {v.name}
                     </button>
                   ))}
                 </div>
               </div>
               <Toggle checked={animationsEnabled} onChange={setAnimationsEnabled} label={t.animations} />
               <Toggle checked={countdownAnimation} onChange={setCountdownAnimation} label={t.countdown} />
-              <button onClick={() => { setShowSettings(false); setShowOnboarding(true); setOnboardingStep(0); }} className={`px-3 py-2 rounded-xl text-sm font-bold ${th.accent} text-white w-full`}>{t.onboardingBtn}</button>
+              <Toggle checked={largeFontMode} onChange={setLargeFontMode} label={t.largeStageFontMode} />
+              <button onClick={() => { setShowOnboarding(true); setOnboardingStep(0); setShowSettings(false); }} className={`w-full py-2 rounded-xl font-bold text-sm ${th.badgeBg} ${th.badgeText}`}>{t.onboardingBtn}</button>
             </div>
           )}
+
+          {/* AUDIO TAB */}
           {settingsTab === 'audio' && (
             <div className="space-y-4">
               <Toggle checked={beepEnabled} onChange={setBeepEnabled} label={t.beeps} />
               <Toggle checked={vibrationEnabled} onChange={setVibrationEnabled} label={t.vibration} />
               <div>
-                <label className={`text-xs font-bold ${th.textSub}`}>{t.volume} ({Math.round(volume*100)}%)</label>
-                <input type="range" min="0" max="1" step="0.05" className="w-full mt-1" value={volume} onChange={e=>setVolume(parseFloat(e.target.value))} />
+                <div className="font-bold mb-1 text-sm">{t.volume}: {Math.round(volume*100)}%</div>
+                <input type="range" min="0" max="1" step="0.05" value={volume} onChange={e=>setVolume(parseFloat(e.target.value))} className="w-full" />
               </div>
-              <button onClick={() => AudioEngine.beep(volume, 880, 0.3)} className={`px-4 py-2 rounded-xl text-sm font-bold ${th.accent} text-white`}>{t.testTone}</button>
+              <button onClick={() => AudioEngine.beep(volume, 880, 0.3)} className={`px-4 py-2 rounded-xl font-bold text-sm ${th.accent} text-white`}>{t.testTone}</button>
             </div>
           )}
+
+          {/* TEST TAB */}
           {settingsTab === 'test' && (
             <div className="space-y-4">
               <div>
-                <label className={`text-xs font-bold ${th.textSub}`}>{t.testDuration} ({testSpeed}s)</label>
-                <input type="range" min="3" max="60" step="1" className="w-full mt-1" value={testSpeed} onChange={e=>setTestSpeed(parseInt(e.target.value))} />
-                <div className={`text-xs mt-1 ${th.textSub}`}>{t.testHint}</div>
+                <div className="font-bold mb-1 text-sm">{t.testDuration}: {testSpeed}s</div>
+                <input type="range" min="5" max="60" step="5" value={testSpeed} onChange={e=>setTestSpeed(parseInt(e.target.value))} className="w-full" />
               </div>
+              <p className={`text-sm ${th.textSub}`}>{t.testHint}</p>
             </div>
           )}
+
+          {/* LANGUAGE TAB */}
           {settingsTab === 'language' && (
-            <div className="space-y-2">
-              {Object.entries(LANG_FLAGS).map(([k,f]) => (
-                <button key={k} onClick={() => setLang(k)}
-                  className={`w-full px-4 py-3 rounded-xl text-left font-bold border ${lang===k ? 'border-indigo-500 bg-indigo-500 text-white' : th.border+' '+th.text}`}>
-                  {f} {LANG_NAMES[k]}
+            <div className="space-y-3">
+              <div className="font-bold mb-2 text-sm">{t.selectLanguage}</div>
+              {Object.keys(TRANSLATIONS).map(lk => (
+                <button key={lk} onClick={() => setLang(lk)}
+                  className={`w-full px-4 py-3 rounded-xl font-bold text-left flex items-center gap-3 border-2 ${lang===lk ? 'border-indigo-500 bg-indigo-500/10' : `${th.border} bg-transparent`}`}>
+                  <span className="text-2xl">{LANG_FLAGS[lk]}</span>
+                  <span>{LANG_NAMES[lk]}</span>
+                  {lang===lk && <span className="ml-auto text-indigo-500">✓</span>}
                 </button>
               ))}
             </div>
           )}
+
+          {/* TTS / STIMME TAB */}
           {settingsTab === 'tts' && (
             <div className="space-y-4">
+              <div className="font-bold text-sm mb-1">{t.tabTTS}</div>
               <div>
-                <label className={`text-xs font-bold ${th.textSub}`}>{t.ttsVoice}</label>
-                <select className={`w-full mt-1 px-3 py-2 rounded-xl border ${th.input} ${th.border} text-sm`}
-                  value={ttsVoiceURI} onChange={e=>setTtsVoiceURI(e.target.value)}>
-                  <option value="">Auto</option>
-                  {availableVoices.map(v => <option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang})</option>)}
+                <div className="text-sm font-bold mb-1">{t.ttsVoice}</div>
+                <select
+                  value={pendingTtsVoiceURI}
+                  onChange={e => setPendingTtsVoiceURI(e.target.value)}
+                  className={`w-full rounded-xl px-3 py-2 border text-sm ${th.input}`}>
+                  <option value="">{t.autoSystem}</option>
+                  {availableVoices.map(v => (
+                    <option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang})</option>
+                  ))}
                 </select>
               </div>
               <div>
-                <label className={`text-xs font-bold ${th.textSub}`}>{t.ttsRate} ({ttsRate.toFixed(1)}x)</label>
-                <input type="range" min="0.5" max="2" step="0.1" className="w-full mt-1" value={ttsRate} onChange={e=>setTtsRate(parseFloat(e.target.value))} />
+                <div className="text-sm font-bold mb-1">{t.ttsRate}: {pendingTtsRate.toFixed(1)}x</div>
+                <input type="range" min="0.5" max="2" step="0.1" value={pendingTtsRate} onChange={e => setPendingTtsRate(parseFloat(e.target.value))} className="w-full" />
               </div>
               <div>
-                <label className={`text-xs font-bold ${th.textSub}`}>{t.ttsPitch} ({ttsPitch.toFixed(1)})</label>
-                <input type="range" min="0.5" max="2" step="0.1" className="w-full mt-1" value={ttsPitch} onChange={e=>setTtsPitch(parseFloat(e.target.value))} />
+                <div className="text-sm font-bold mb-1">{t.ttsPitch}: {pendingTtsPitch.toFixed(1)}</div>
+                <input type="range" min="0.5" max="2" step="0.1" value={pendingTtsPitch} onChange={e => setPendingTtsPitch(parseFloat(e.target.value))} className="w-full" />
               </div>
-              <button onClick={() => AudioEngine.speak(t.ttsPreviewText, t.speechLang, ttsRate, ttsPitch, ttsVoiceURI||null)} className={`px-4 py-2 rounded-xl text-sm font-bold ${th.accent} text-white`}>{t.ttsPreview}</button>
+              <div className={`rounded-xl p-3 text-sm ${th.badgeBg} ${th.badgeText}`}>
+                <div className="font-bold mb-1">{t.fontPreview}</div>
+                <div style={{fontFamily, fontSize: pendingFontSize + 'px'}}>{t.ttsPreviewText}</div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => AudioEngine.speak(t.ttsPreviewText, t.speechLang, pendingTtsRate, pendingTtsPitch, pendingTtsVoiceURI || null)}
+                  className={`flex-1 py-2 rounded-xl font-bold text-sm ${th.badgeBg} ${th.badgeText}`}>
+                  {t.ttsPreview}
+                </button>
+                <button
+                  onClick={applyTTS}
+                  className={`flex-1 py-2 rounded-xl font-bold text-sm text-white ${ttsApplied ? 'bg-green-600' : th.accent}`}>
+                  {ttsApplied ? '✅ Übernommen!' : t.ttsApply}
+                </button>
+              </div>
             </div>
           )}
+
+          {/* FONT / SCHRIFT TAB */}
           {settingsTab === 'font' && (
-            <div className="space-y-4">
+            <div className="space-y-5">
+              <div className="font-bold text-sm mb-1">{t.tabFont}</div>
               <div>
-                <label className={`text-xs font-bold ${th.textSub}`}>{t.fontSize} ({fontSize}px)</label>
-                <input type="range" min="12" max="24" step="1" className="w-full mt-1" value={fontSize} onChange={e=>setFontSize(parseInt(e.target.value))} />
-              </div>
-              <div>
-                <label className={`text-xs font-bold ${th.textSub} mb-2 block`}>{t.fontFamily}</label>
-                <div className="space-y-1">
+                <div className="text-sm font-bold mb-1">{t.fontFamily}</div>
+                <div className="flex flex-col gap-2">
                   {FONT_FAMILIES.map(f => (
-                    <button key={f.value} onClick={() => setFontFamily(f.value)}
-                      className={`w-full px-3 py-2 rounded-xl text-left text-sm border ${fontFamily===f.value ? 'border-indigo-500 bg-indigo-500 text-white' : th.border+' '+th.text}`}
+                    <button key={f.value} onClick={() => setPendingFontFamily(f.value)}
+                      className={`px-3 py-2 rounded-xl text-sm text-left border-2 ${anim} ${pendingFontFamily===f.value ? 'border-indigo-500 bg-indigo-500/10' : `${th.border} bg-transparent`}`}
                       style={{fontFamily: f.value}}>
                       {f.label}
                     </button>
                   ))}
                 </div>
               </div>
-              <Toggle checked={largeFontMode} onChange={setLargeFontMode} label={t.largeStageFontMode} />
+              <div>
+                <div className="text-sm font-bold mb-1">{t.fontSize}: {pendingFontSize}px</div>
+                <input type="range" min="12" max="24" step="1" value={pendingFontSize} onChange={e => setPendingFontSize(parseInt(e.target.value))} className="w-full" />
+              </div>
+              <div className={`rounded-xl p-4 border-2 border-dashed ${th.border}`}>
+                <div className={`text-xs ${th.textSub} mb-2 font-bold`}>{t.fontPreview}</div>
+                <div style={{fontFamily: pendingFontFamily, fontSize: pendingFontSize + 'px', lineHeight: 1.5}}>
+                  {t.fontPreviewText}
+                </div>
+                <div style={{fontFamily: pendingFontFamily, fontSize: (pendingFontSize + 4) + 'px', fontWeight: 900, marginTop: 6}}>
+                  🎩 Showrunner v1.8
+                </div>
+              </div>
+              <button
+                onClick={applyFont}
+                className={`w-full py-3 rounded-xl font-black text-sm text-white ${anim} ${fontApplied ? 'bg-green-600' : th.accent}`}>
+                {fontApplied ? '✅ Schrift übernommen!' : t.fontApply}
+              </button>
             </div>
           )}
+
+          {/* NOTIF TAB */}
           {settingsTab === 'notif' && (
             <div className="space-y-4">
-              <div className={`text-sm ${th.textSub}`}>{t.pushNotifHint}</div>
+              <div className="font-bold text-sm">{t.pushNotif}</div>
+              <p className={`text-sm ${th.textSub}`}>{t.pushNotifHint}</p>
               {notifPermission === 'granted'
-                ? <div className="text-green-500 font-bold">{t.notifActive}</div>
+                ? <div className="px-4 py-3 rounded-xl bg-green-500/10 text-green-600 font-bold text-sm">{t.notifActive}</div>
                 : notifPermission === 'denied'
-                  ? <div className="text-red-500 font-bold">{t.notifDenied}</div>
-                  : <button onClick={requestNotifPermission} className={`px-4 py-2 rounded-xl font-bold text-sm ${th.accent} text-white`}>{t.enableNotif}</button>
+                  ? <div className="px-4 py-3 rounded-xl bg-red-500/10 text-red-500 font-bold text-sm">{t.notifDenied}</div>
+                  : <button onClick={requestNotifPermission} className={`w-full py-3 rounded-xl font-bold text-sm text-white ${th.accent}`}>{t.enableNotif}</button>
               }
             </div>
           )}
         </Modal>
       )}
 
-      {/* Templates */}
+      {/* PART FORM MODAL */}
+      {showForm && (
+        <Modal title={editIdx !== null ? t.editPart : t.addPart} onClose={() => setShowForm(false)} wide>
+          <div className="space-y-4">
+            <div>
+              <label className={`block text-sm font-bold mb-1 ${th.textSub}`}>{t.titleLabel}</label>
+              <input className={`w-full rounded-xl px-3 py-2 border ${th.input}`} value={form.title} onChange={e => setForm({...form, title:e.target.value})} placeholder={t.titleLabel} />
+            </div>
+            <div>
+              <label className={`block text-sm font-bold mb-1 ${th.textSub}`}>{t.durationLabel}</label>
+              <input type="number" min="5" className={`w-full rounded-xl px-3 py-2 border ${th.input}`} value={form.duration} onChange={e => setForm({...form, duration:parseInt(e.target.value)||60})} />
+            </div>
+            <div>
+              <label className={`block text-sm font-bold mb-1 ${th.textSub}`}>{t.introLabel}</label>
+              <textarea rows={2} className={`w-full rounded-xl px-3 py-2 border ${th.input}`} value={form.introText} onChange={e => setForm({...form, introText:e.target.value})} />
+            </div>
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label className={`block text-sm font-bold mb-1 ${th.textSub}`}>{t.preAnnounceLabel}</label>
+                <input type="number" min="0" className={`w-full rounded-xl px-3 py-2 border ${th.input}`} value={form.preAnnounceSec} onChange={e => setForm({...form, preAnnounceSec:parseInt(e.target.value)||0})} />
+              </div>
+              <div className="flex-1">
+                <label className={`block text-sm font-bold mb-1 ${th.textSub}`}>{t.preAnnounceText}</label>
+                <input className={`w-full rounded-xl px-3 py-2 border ${th.input}`} value={form.announceNextText} onChange={e => setForm({...form, announceNextText:e.target.value})} />
+              </div>
+            </div>
+            <div>
+              <label className={`block text-sm font-bold mb-1 ${th.textSub}`}>{t.notesLabel}</label>
+              <textarea rows={2} className={`w-full rounded-xl px-3 py-2 border ${th.input}`} value={form.notes} onChange={e => setForm({...form, notes:e.target.value})} />
+            </div>
+            <div>
+              <label className={`block text-sm font-bold mb-1 ${th.textSub}`}>{t.musicUrl}</label>
+              <input className={`w-full rounded-xl px-3 py-2 border ${th.input}`} value={form.musicUrl} onChange={e => setForm({...form, musicUrl:e.target.value})} placeholder="https://..." />
+            </div>
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label className={`block text-sm font-bold mb-1 ${th.textSub}`}>{t.vol}</label>
+                <input type="range" min="0" max="1" step="0.1" value={form.musicVolume} onChange={e => setForm({...form, musicVolume:parseFloat(e.target.value)})} className="w-full" />
+              </div>
+              <div className="flex-1">
+                <label className={`block text-sm font-bold mb-1 ${th.textSub}`}>{t.fadeIn}</label>
+                <input type="range" min="0" max="10" step="0.5" value={form.musicFadeIn} onChange={e => setForm({...form, musicFadeIn:parseFloat(e.target.value)})} className="w-full" />
+              </div>
+              <div className="flex-1">
+                <label className={`block text-sm font-bold mb-1 ${th.textSub}`}>{t.fadeOut}</label>
+                <input type="range" min="0" max="10" step="0.5" value={form.musicFadeOut} onChange={e => setForm({...form, musicFadeOut:parseFloat(e.target.value)})} className="w-full" />
+              </div>
+            </div>
+            <div>
+              <label className={`block text-sm font-bold mb-1 ${th.textSub}`}>{t.partColor}</label>
+              <div className="flex gap-2 flex-wrap">
+                {PART_COLORS.map(c => (
+                  <button key={c} onClick={() => setForm({...form, color:c})}
+                    className={`w-7 h-7 rounded-full border-2 ${anim} ${form.color===c ? 'border-white scale-110' : 'border-transparent'}`}
+                    style={{background:c}} />
+                ))}
+              </div>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button onClick={saveForm} className={`flex-1 py-2.5 rounded-xl font-bold text-white ${th.accent}`}>{t.saveBtn}</button>
+              <button onClick={() => setShowForm(false)} className="flex-1 py-2.5 rounded-xl font-bold bg-gray-500 text-white">{t.cancelBtn}</button>
+              {form.introText && <button onClick={() => AudioEngine.speak(form.introText, t.speechLang, ttsRate, ttsPitch, ttsVoiceURI||null)} className={`px-4 py-2.5 rounded-xl font-bold ${th.badgeBg} ${th.badgeText}`}>{t.testBtn}</button>}
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {/* SAVE MODAL */}
+      {showSaveMenu && (
+        <Modal title={t.saveShowTitle} onClose={() => setShowSaveMenu(false)}>
+          <div className="space-y-3">
+            <input className={`w-full rounded-xl px-3 py-2 border ${th.input}`} placeholder={t.showName} value={saveName} onChange={e => setSaveName(e.target.value)} />
+            <button onClick={() => saveName.trim() && saveShow(saveName.trim())} className={`w-full py-2.5 rounded-xl font-bold text-white ${th.accent}`}>{t.saveBtn}</button>
+            {savedShows.length > 0 && (
+              <div>
+                <div className={`text-xs font-bold mb-2 ${th.textSub}`}>{t.overwrite}</div>
+                {savedShows.map(s => (
+                  <button key={s.id} onClick={() => saveShow(s.name)} className={`w-full text-left px-3 py-2 rounded-xl mb-1 ${th.badgeBg} ${th.badgeText} text-sm font-medium`}>{s.name}</button>
+                ))}
+              </div>
+            )}
+          </div>
+        </Modal>
+      )}
+
+      {/* LOAD MODAL */}
+      {showLoadMenu && (
+        <Modal title={t.loadShowTitle} onClose={() => setShowLoadMenu(false)}>
+          {savedShows.length === 0
+            ? <p className={`text-sm ${th.textSub}`}>{t.noSaved}</p>
+            : savedShows.map(s => (
+              <div key={s.id} className={`flex items-center justify-between p-3 rounded-xl mb-2 ${th.badgeBg}`}>
+                <div>
+                  <div className={`font-bold ${th.text}`}>{s.name}</div>
+                  <div className={`text-xs ${th.textSub}`}>{new Date(s.savedAt).toLocaleString()} • {s.parts.length} Teile</div>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={() => loadShow(s)} className={`px-3 py-1.5 rounded-xl font-bold text-sm ${th.accent} text-white`}>📂</button>
+                  <button onClick={() => deleteShow(s.id)} className="px-3 py-1.5 rounded-xl font-bold text-sm bg-red-500/20 text-red-500">🗑</button>
+                </div>
+              </div>
+            ))
+          }
+        </Modal>
+      )}
+
+      {/* TEMPLATES MODAL */}
       {showTemplates && (
-        <Modal title="📋 Templates" onClose={() => setShowTemplates(false)}>
+        <Modal title="🎨 Templates" onClose={() => setShowTemplates(false)}>
           <div className="space-y-3">
             {Object.entries(TEMPLATES).map(([key, tpl]) => (
-              <div key={key} className={`border ${th.border} rounded-xl p-3`}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-bold">{tpl.name}</div>
-                    <div className={`text-xs ${th.textSub}`}>{tpl.parts.length} Teile • {fmt(tpl.parts.reduce((s,p)=>s+p.duration,0))}</div>
-                  </div>
-                  <button onClick={() => { setParts(tpl.parts.map(p=>({...p,id:Date.now()+Math.random()}))); setShowTemplates(false); showToast(`📋 ${tpl.name} geladen`); }}
-                    className={`px-3 py-2 rounded-xl text-sm font-bold ${th.accent} text-white`}>
-                    Laden
-                  </button>
+              <div key={key} className={`p-4 rounded-2xl border ${th.border} ${th.planCard}`}>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="font-black text-base">{tpl.name}</div>
+                  <div className={`text-xs ${th.textSub}`}>{tpl.parts.length} Teile • {fmt(tpl.parts.reduce((s,p)=>s+p.duration,0))}</div>
                 </div>
+                <button onClick={() => { setParts(tpl.parts.map(p=>({...p, id:Date.now()+Math.random()}))); setShowTemplates(false); showToast(`🎨 Template "${tpl.name}" geladen`); }}
+                  className={`w-full py-2 rounded-xl font-bold text-sm text-white ${th.accent}`}>
+                  Laden
+                </button>
               </div>
             ))}
           </div>
         </Modal>
       )}
 
-      {/* Stats */}
+      {/* STATS MODAL */}
       {showStats && (
         <Modal title={t.statsTitle} onClose={() => setShowStats(false)}>
-          {showHistory.length === 0 ? (
-            <div className={`text-center py-8 ${th.textSub}`}>{t.noStats}</div>
-          ) : (
-            <div className="space-y-3">
-              <div className="grid grid-cols-3 gap-3">
-                <div className={`${th.planCard} rounded-xl p-3 text-center`}>
-                  <div className="text-2xl font-black">{showHistory.length}</div>
-                  <div className={`text-xs ${th.textSub}`}>{t.shows}</div>
+          {showHistory.length === 0
+            ? <p className={`text-sm ${th.textSub}`}>{t.noStats}</p>
+            : (
+              <div className="space-y-3">
+                <div className="flex gap-4 flex-wrap">
+                  <div className={`${th.badgeBg} rounded-xl p-3 flex-1 text-center`}>
+                    <div className={`text-2xl font-black ${th.badgeText}`}>{showHistory.length}</div>
+                    <div className={`text-xs ${th.textSub}`}>{t.shows}</div>
+                  </div>
+                  <div className={`${th.badgeBg} rounded-xl p-3 flex-1 text-center`}>
+                    <div className={`text-2xl font-black ${th.badgeText}`}>{fmt(showHistory.reduce((s,h)=>s+h.duration,0))}</div>
+                    <div className={`text-xs ${th.textSub}`}>{t.totalTimeLabel}</div>
+                  </div>
+                  <div className={`${th.badgeBg} rounded-xl p-3 flex-1 text-center`}>
+                    <div className={`text-2xl font-black ${th.badgeText}`}>{Math.round(showHistory.reduce((s,h)=>s+h.parts,0)/showHistory.length)}</div>
+                    <div className={`text-xs ${th.textSub}`}>{t.avgParts}</div>
+                  </div>
                 </div>
-                <div className={`${th.planCard} rounded-xl p-3 text-center`}>
-                  <div className="text-2xl font-black">{fmt(showHistory.reduce((s,h)=>s+h.duration,0))}</div>
-                  <div className={`text-xs ${th.textSub}`}>{t.totalTimeLabel}</div>
-                </div>
-                <div className={`${th.planCard} rounded-xl p-3 text-center`}>
-                  <div className="text-2xl font-black">{Math.round(showHistory.reduce((s,h)=>s+h.parts,0)/showHistory.length)}</div>
-                  <div className={`text-xs ${th.textSub}`}>{t.avgParts}</div>
-                </div>
-              </div>
-              <div className="space-y-1 max-h-48 overflow-y-auto">
-                {[...showHistory].reverse().map((h,i) => (
-                  <div key={i} className={`text-xs ${th.textSub} flex justify-between border-b ${th.border} py-1`}>
-                    <span>{new Date(h.date).toLocaleString()}</span>
-                    <span>{h.parts} {t.parts} • {fmt(h.duration)}</span>
+                {showHistory.slice().reverse().map((h,i) => (
+                  <div key={i} className={`p-3 rounded-xl ${th.badgeBg} text-sm`}>
+                    <div className={`font-bold ${th.badgeText}`}>{new Date(h.date).toLocaleString()}</div>
+                    <div className={th.textSub}>{h.parts} Teile • {fmt(h.duration)}</div>
                   </div>
                 ))}
+                <button onClick={() => { setShowHistory([]); showToast(t.deletedHistory); }} className="w-full py-2 rounded-xl font-bold text-sm bg-red-500/20 text-red-500">{t.clearHistory}</button>
               </div>
-              <button onClick={() => { setShowHistory([]); localStorage.removeItem('ms_showHistory'); showToast(t.deletedHistory); }}
-                className="w-full py-2 rounded-xl bg-red-500 text-white font-bold text-sm">{t.clearHistory}</button>
-            </div>
-          )}
+            )
+          }
         </Modal>
       )}
 
-      {/* Stage Plan */}
+      {/* STAGE PLAN MODAL */}
       {showStageplan && (
         <Modal title={t.stageTitle} onClose={() => setShowStageplan(false)} wide>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               {['audience','backstage'].map(side => (
-                <div key={side} className={`border ${th.border} rounded-xl p-3`}>
-                  <div className="font-bold mb-2 capitalize">{side === 'audience' ? t.audience : t.backstage}</div>
-                  <div className="space-y-1 min-h-16">
-                    {stageItems.filter(i=>i.side===side).map((item,idx) => (
-                      <div key={idx} className={`flex items-center gap-2 text-sm ${th.planCard} px-2 py-1 rounded-lg`}>
-                        <span>{item.icon}</span><span className="flex-1">{item.name}</span>
-                        <button onClick={() => setStageItems(prev=>prev.filter((_,i)=>i!==stageItems.indexOf(item)))} className="text-red-400 text-xs">✕</button>
-                      </div>
-                    ))}
-                  </div>
+                <div key={side} className={`rounded-2xl p-3 border ${th.border} min-h-32`}>
+                  <div className={`font-bold text-sm mb-2 ${th.textSub}`}>{side==='audience' ? t.audience : t.backstage}</div>
+                  {stageItems.filter(it=>it.side===side).map((it,i) => (
+                    <div key={i} className={`flex items-center gap-2 mb-1 p-2 rounded-xl ${th.badgeBg}`}>
+                      <span>{it.icon}</span>
+                      <span className={`text-sm font-medium ${th.text}`}>{it.name}</span>
+                      <button onClick={() => { setEditStageIdx(stageItems.indexOf(it)); setStageForm({...it}); }} className="ml-auto text-xs opacity-60 hover:opacity-100">✏️</button>
+                      <button onClick={() => setStageItems(stageItems.filter((_,idx)=>idx!==stageItems.indexOf(it)))} className="text-xs text-red-500 opacity-60 hover:opacity-100">🗑</button>
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
-            <div className={`border ${th.border} rounded-xl p-3 flex gap-2 flex-wrap`}>
-              <input className={`flex-1 px-3 py-1.5 rounded-xl border ${th.input} ${th.border} text-sm`} placeholder={t.itemName}
-                value={stageForm.name} onChange={e=>setStageForm({...stageForm,name:e.target.value})} />
-              <input className={`w-16 px-3 py-1.5 rounded-xl border ${th.input} ${th.border} text-sm text-center`} placeholder={t.itemIcon}
-                value={stageForm.icon} onChange={e=>setStageForm({...stageForm,icon:e.target.value})} />
-              <select className={`px-2 py-1.5 rounded-xl border ${th.input} ${th.border} text-sm`}
-                value={stageForm.side} onChange={e=>setStageForm({...stageForm,side:e.target.value})}>
-                <option value="audience">{t.audience}</option>
-                <option value="backstage">{t.backstage}</option>
-              </select>
-              <button onClick={() => { if(stageForm.name.trim()) { setStageItems(prev=>[...prev,{...stageForm}]); setStageForm({name:'',icon:'🎭',side:'audience'}); } }}
-                className={`px-3 py-1.5 rounded-xl text-sm font-bold ${th.accent} text-white`}>{t.addItem}</button>
+            <div className={`p-3 rounded-2xl border ${th.border} space-y-2`}>
+              <div className="flex gap-2">
+                <input className={`flex-1 rounded-xl px-3 py-2 border text-sm ${th.input}`} placeholder={t.itemName} value={stageForm.name} onChange={e=>setStageForm({...stageForm,name:e.target.value})} />
+                <input className={`w-16 rounded-xl px-3 py-2 border text-sm ${th.input}`} placeholder={t.itemIcon} value={stageForm.icon} onChange={e=>setStageForm({...stageForm,icon:e.target.value})} />
+              </div>
+              <div className="flex gap-2">
+                <select className={`flex-1 rounded-xl px-3 py-2 border text-sm ${th.input}`} value={stageForm.side} onChange={e=>setStageForm({...stageForm,side:e.target.value})}>
+                  <option value="audience">{t.audience}</option>
+                  <option value="backstage">{t.backstage}</option>
+                </select>
+                <button onClick={() => {
+                  if (!stageForm.name.trim()) return;
+                  if (editStageIdx !== null) {
+                    const u=[...stageItems]; u[editStageIdx]={...stageForm}; setStageItems(u); setEditStageIdx(null);
+                  } else {
+                    setStageItems([...stageItems, {...stageForm}]);
+                  }
+                  setStageForm({name:'',icon:'🎭',side:'audience'});
+                }} className={`px-4 py-2 rounded-xl font-bold text-sm text-white ${th.accent}`}>
+                  {editStageIdx !== null ? t.updateItem : t.addItem}
+                </button>
+                {editStageIdx !== null && <button onClick={() => { setEditStageIdx(null); setStageForm({name:'',icon:'🎭',side:'audience'}); }} className="px-3 py-2 rounded-xl font-bold text-sm bg-gray-500 text-white">{t.cancelItem}</button>}
+              </div>
             </div>
           </div>
         </Modal>
       )}
 
-      {/* QR */}
-      {showQR && (
-        <Modal title={t.shareQR} onClose={() => setShowQR(false)}>
-          <div className="text-center">
-            <img src={qrData} alt="QR Code" className="mx-auto rounded-xl" />
-            <div className={`text-xs mt-2 ${th.textSub}`}>Show-Ablauf als QR-Code</div>
-          </div>
-        </Modal>
-      )}
-
-      {/* Tutorial */}
+      {/* TUTORIAL MODAL */}
       {showTutorial && (
-        <Modal title={t.tutorialTitle} onClose={() => setShowTutorial(false)}>
+        <Modal title={t.tutorialTitle} onClose={() => { setShowTutorial(false); setTutorialTopic(null); }} wide>
           {!tutorialTopic ? (
             <div className="space-y-2">
+              <p className={`text-sm ${th.textSub} mb-3`}>{t.tutorialIntro}</p>
               {[
                 { key:'basics', title:t.tutoBasicsTitle, desc:t.tutoBasicsDesc },
                 { key:'perform', title:t.tutoPerformTitle, desc:t.tutoPerformDesc },
@@ -1385,7 +1635,7 @@ export default function ShowRunner() {
                 { key:'themes', title:t.tutoThemesTitle, desc:t.tutoThemesDesc },
               ].map(topic => (
                 <button key={topic.key} onClick={() => setTutorialTopic(topic.key)}
-                  className={`w-full text-left px-4 py-3 rounded-xl border ${th.border} ${th.planCard} hover:bg-black/10`}>
+                  className={`w-full text-left px-4 py-3 rounded-2xl border ${th.border} ${th.planCard} hover:opacity-80 ${anim}`}>
                   <div className="font-bold">{topic.title}</div>
                   <div className={`text-xs ${th.textSub}`}>{topic.desc}</div>
                 </button>
@@ -1393,29 +1643,75 @@ export default function ShowRunner() {
             </div>
           ) : (
             <div>
-              <button onClick={() => setTutorialTopic(null)} className={`mb-3 text-xs ${th.textSub} underline`}>← Zurück</button>
-              {tutorialTopic === 'basics' && <div className="space-y-2 text-sm"><p>1. Klicke <b>➕ Neuer Teil</b> um einen Teil hinzuzufügen.</p><p>2. Gib Titel, Dauer, Ansagetext und Notizen ein.</p><p>3. Nutze 📁 Gruppe für Abschnitte.</p><p>4. Sortiere per Drag & Drop oder ↑↓-Pfeile.</p></div>}
-              {tutorialTopic === 'perform' && <div className="space-y-2 text-sm"><p>1. Klicke <b>🎭 Show starten</b>.</p><p>2. Der Timer zählt automatisch, TTS-Ansagen werden ausgelöst.</p><p>3. Swipe links/rechts auf dem Handy zum Navigieren.</p><p>4. ⏸ Pause / ▶ Weiter zum Pausieren.</p></div>}
-              {tutorialTopic === 'save' && <div className="space-y-2 text-sm"><p>1. <b>💾 Speichern</b> sichert die aktuelle Show mit einem Namen.</p><p>2. <b>📥 Backup</b> lädt eine JSON-Datei herunter.</p><p>3. <b>📤 Import</b> lädt ein Backup wieder ein.</p><p>4. Regelmäßige Backups empfohlen!</p></div>}
-              {tutorialTopic === 'themes' && <div className="space-y-2 text-sm"><p>1. In ⚙️ Einstellungen → 🎨 Design kannst du das Theme wählen.</p><p>2. Perform-Theme gilt nur im Bühnen-Modus.</p><p>3. Auto erkennt das System-Theme automatisch.</p><p>4. Schriftgröße und -art sind anpassbar.</p></div>}
+              <button onClick={() => setTutorialTopic(null)} className={`mb-4 text-sm ${th.textSub} hover:opacity-80`}>← Zurück</button>
+              {tutorialTopic === 'basics' && (
+                <div className={`space-y-3 text-sm ${th.text}`}>
+                  <h3 className="font-black text-base">{t.tutoBasicsTitle}</h3>
+                  <p>1. Klicke auf <strong>„➕ Neuer Teil"</strong> um einen Act hinzuzufügen.</p>
+                  <p>2. Gib Titel, Dauer, Intro-Ansage und Notizen ein.</p>
+                  <p>3. Mit <strong>„📁 Gruppe"</strong> kannst du Teile gruppieren.</p>
+                  <p>4. Halte <strong>☰</strong> gedrückt um Teile umzusortieren (Drag & Drop).</p>
+                  <p>5. Mit <strong>↩️ / ↪️</strong> kannst du Aktionen rückgängig machen.</p>
+                </div>
+              )}
+              {tutorialTopic === 'perform' && (
+                <div className={`space-y-3 text-sm ${th.text}`}>
+                  <h3 className="font-black text-base">{t.tutoPerformTitle}</h3>
+                  <p>1. Klicke <strong>„🎭 Show starten"</strong> – der Timer startet automatisch.</p>
+                  <p>2. TTS-Ansagen werden am Anfang jedes Teils gesprochen.</p>
+                  <p>3. Vorankündigungen ertönen X Sekunden vor Ende des Teils.</p>
+                  <p>4. <strong>Swipe links/rechts</strong> um zwischen Teilen zu wechseln.</p>
+                  <p>5. Mit <strong>⏸ Pause</strong> kannst du den Timer anhalten.</p>
+                </div>
+              )}
+              {tutorialTopic === 'save' && (
+                <div className={`space-y-3 text-sm ${th.text}`}>
+                  <h3 className="font-black text-base">{t.tutoSaveTitle}</h3>
+                  <p>1. <strong>Autosave</strong> speichert automatisch bei jeder Änderung.</p>
+                  <p>2. Mit <strong>„💾 Speichern"</strong> legst du eine benannte Show an.</p>
+                  <p>3. <strong>„📥 Backup"</strong> exportiert alles als JSON-Datei.</p>
+                  <p>4. Mit <strong>„📤 Import"</strong> lädst du ein Backup wieder ein.</p>
+                  <p>5. CSV und PDF-Export für Ausdrucke verfügbar.</p>
+                </div>
+              )}
+              {tutorialTopic === 'themes' && (
+                <div className={`space-y-3 text-sm ${th.text}`}>
+                  <h3 className="font-black text-base">{t.tutoThemesTitle}</h3>
+                  <p>1. In <strong>Einstellungen → Design</strong> wählst du Planungs- und Perform-Theme.</p>
+                  <p>2. <strong>Auto</strong> folgt den System-Einstellungen (hell/dunkel).</p>
+                  <p>3. Schriftart und Größe im Tab <strong>„🔤 Schrift"</strong> anpassen.</p>
+                  <p>4. Mit <strong>⛶ Vollbild</strong> nutzt du den vollen Bildschirm.</p>
+                  <p>5. Stimme, Geschwindigkeit und Tonhöhe im Tab <strong>„🗣️ Stimme"</strong>.</p>
+                </div>
+              )}
             </div>
           )}
         </Modal>
       )}
 
-      {/* About */}
+      {/* ABOUT MODAL */}
       {showAbout && (
         <Modal title={t.aboutTitle} onClose={() => setShowAbout(false)}>
-          <div className="text-center space-y-3">
+          <div className="text-center space-y-4">
             <div className="text-5xl">🎩✨</div>
-            <div className="font-black text-xl">{t.appTitle}</div>
-            <div className={`text-sm ${th.textSub}`}>v1.7</div>
-            <div className={`text-sm ${th.textSub}`}>{t.appSub}</div>
-            <div className="border-t border-gray-300 pt-3">
-              <div className="font-bold">{t.developer}</div>
-              <div className={`text-sm ${th.textSub}`}>{t.devRole}</div>
+            <div className={`font-black text-xl ${th.headText}`}>{t.appTitle}</div>
+            <div className={`text-sm ${th.textSub}`}>{t.appVersion} • Magic Showrunner</div>
+            <div className={`text-xs ${th.textSub} leading-relaxed`}>{t.appSub}</div>
+            <div className={`p-3 rounded-2xl ${th.badgeBg} text-sm`}>
+              <div className={`font-bold ${th.badgeText}`}>{t.developer}</div>
+              <div className={th.textSub}>{t.devRole}</div>
             </div>
             <div className={`text-xs ${th.textSub}`}>{t.rights}</div>
+          </div>
+        </Modal>
+      )}
+
+      {/* QR MODAL */}
+      {showQR && (
+        <Modal title={t.shareQR} onClose={() => setShowQR(false)}>
+          <div className="text-center space-y-4">
+            <img src={qrData} alt="QR Code" className="mx-auto rounded-2xl shadow-lg" style={{width:200,height:200}} />
+            <p className={`text-sm ${th.textSub}`}>Scanne den QR-Code um die Show-Liste zu teilen.</p>
           </div>
         </Modal>
       )}
