@@ -4,8 +4,8 @@ var uid = function() { return Math.random().toString(36).slice(2, 9); };
 var fmt = function(s) { var m = Math.floor(s / 60); var sec = s % 60; return m + ":" + String(sec).padStart(2, "0"); };
 
 var T = {
-  de: { title: "Magic Showrunner", ver: "v4.3", save: "Speichern", load: "Laden", newPart: "Neuer Teil", start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen", planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration", volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel", durL: "Dauer (Sek)", introL: "Intro-Ansage", preAnnL: "Vorankündigung (Sek)", preAnnTxt: "Vorankündigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern", cancel: "Abbrechen", showName: "Show-Name", overwrite: "Überschreiben", noSaved: "Keine Shows.", pause: "Pause", resume: "Weiter", prev: "Zurück", next: "Weiter", partOf: "Teil", of: "/", dup: "Duplizieren", del: "Löschen", edit: "Bearbeiten", sek: "Sek", csv: "CSV", fontSize: "Größe", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo", ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen", stop: "Stop", setlist: "Setlist" },
-  en: { title: "Magic Showrunner", ver: "v4.3", save: "Save", load: "Load", newPart: "New Part", start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings", planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration", volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title", durL: "Duration (sec)", introL: "Intro (TTS)", preAnnL: "Pre-announce (sec)", preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save", cancel: "Cancel", showName: "Show Name", overwrite: "Overwrite", noSaved: "No saved shows.", pause: "Pause", resume: "Resume", prev: "Back", next: "Next", partOf: "Part", of: "/", dup: "Duplicate", del: "Delete", edit: "Edit", sek: "sec", csv: "CSV", fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed", ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes", stop: "Stop", setlist: "Setlist" }
+  de: { title: "Magic Showrunner", ver: "v4.6", save: "Speichern", load: "Laden", newPart: "Neuer Teil", start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen", planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration", volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel", durL: "Dauer (Sek)", introL: "Intro-Ansage", preAnnL: "Vorankündigung (Sek)", preAnnTxt: "Vorankündigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern", cancel: "Abbrechen", showName: "Show-Name", overwrite: "Überschreiben", noSaved: "Keine Shows.", pause: "Pause", resume: "Weiter", prev: "Zurück", next: "Weiter", partOf: "Teil", of: "/", dup: "Duplizieren", del: "Löschen", edit: "Bearbeiten", sek: "Sek", csv: "CSV", fontSize: "Größe", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo", ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen", stop: "Stop", setlist: "Setlist" },
+  en: { title: "Magic Showrunner", ver: "v4.6", save: "Save", load: "Load", newPart: "New Part", start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings", planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration", volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title", durL: "Duration (sec)", introL: "Intro (TTS)", preAnnL: "Pre-announce (sec)", preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save", cancel: "Cancel", showName: "Show Name", overwrite: "Overwrite", noSaved: "No saved shows.", pause: "Pause", resume: "Resume", prev: "Back", next: "Next", partOf: "Part", of: "/", dup: "Duplicate", del: "Delete", edit: "Edit", sek: "sec", csv: "CSV", fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed", ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes", stop: "Stop", setlist: "Setlist" }
 };
 
 var TH = {
@@ -258,6 +258,7 @@ function PerformMode(props) {
   var _pa = useState(""); var preAnnMsg = _pa[0]; var setPreAnnMsg = _pa[1];
   var _sz = useState(cfg.performSize || "XL"); var perfSize = _sz[0]; var setPerfSize = _sz[1];
   var _sl = useState(false); var showSetlist = _sl[0]; var setShowSetlist = _sl[1];
+  var _cs = useState(false); var confirmStop = _cs[0]; var setConfirmStop = _cs[1];
   var sizeMap = { XXL: { timer: 240, title: 36 }, XL: { timer: 120, title: 22 }, M: { timer: 72, title: 18 }, S: { timer: 44, title: 15 } };
   var wakeLockRef = useRef(null);
   var isDragging = useRef(false);
@@ -430,8 +431,19 @@ function PerformMode(props) {
       React.createElement("button", { onClick: function() { setShowNotes(function(p) { return !p; }); }, style: Object.assign({}, bs, { background: showNotes ? "#7c3aed" : "#8b5cf6" }) }, t.notesL),
       React.createElement("button", { onClick: function() { setShowSetlist(function(p) { return !p; }); }, style: Object.assign({}, bs, { background: showSetlist ? "#0369a1" : "#0ea5e9" }) }, t.setlist),
       React.createElement("button", { onClick: function() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } else { document.exitFullscreen && document.exitFullscreen(); } }, style: Object.assign({}, bs, { background: "#0ea5e9", fontSize: 18 }) }, "\u26f6"),
-      React.createElement("button", { onClick: onExit, style: Object.assign({}, bs, { background: "#ef4444" }) }, t.stop)
+      React.createElement("button", { onClick: function() { setConfirmStop(true); }, style: Object.assign({}, bs, { background: "#ef4444" }) }, t.stop)
     ),
+    confirmStop ? React.createElement("div", { style: { position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 900 } },
+      React.createElement("div", { style: { background: pt.bg === "#000000" ? "#1a1a1a" : pt.bg, color: pt.text, borderRadius: 16, padding: 28, maxWidth: 320, width: "90%", textAlign: "center", boxShadow: "0 8px 40px rgba(0,0,0,0.6)", border: "1px solid rgba(255,255,255,0.1)" } },
+        React.createElement("div", { style: { fontSize: 36, marginBottom: 12 } }, "\u23F9"),
+        React.createElement("div", { style: { fontWeight: 700, fontSize: 18, marginBottom: 8 } }, cfg.lang === "de" ? "Show beenden?" : "End show?"),
+        React.createElement("div", { style: { fontSize: 13, opacity: 0.7, marginBottom: 20 } }, cfg.lang === "de" ? "Der Timer wird gestoppt und du kehrst zur Planung zurück." : "The timer will stop and you'll return to the plan."),
+        React.createElement("div", { style: { display: "flex", gap: 10, justifyContent: "center" } },
+          React.createElement("button", { onClick: function() { setConfirmStop(false); }, style: { flex: 1, padding: "10px 0", borderRadius: 10, border: "1px solid rgba(255,255,255,0.2)", background: "transparent", color: pt.text, fontWeight: 600, cursor: "pointer", fontSize: 14 } }, cfg.lang === "de" ? "Weiter" : "Continue"),
+          React.createElement("button", { onClick: function() { setConfirmStop(false); onExit(); }, style: { flex: 1, padding: "10px 0", borderRadius: 10, border: "none", background: "#ef4444", color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 14 } }, cfg.lang === "de" ? "Beenden" : "End")
+        )
+      )
+    ) : null,
     parts[safeIdx + 1] ? React.createElement("div", { style: { marginTop: 12, fontSize: 14, opacity: 0.55, fontStyle: "italic" } }, "\u23ed " + (cfg.lang === "de" ? "N\u00e4chster Teil" : "Next") + ": " + parts[safeIdx + 1].title) : null,
     React.createElement("div", { style: { marginTop: 8, fontSize: 12, opacity: 0.6 } }, t.total + ": " + fmt(totalElapsed) + " / " + fmt(totalDur)),
     setlistPanel
@@ -551,9 +563,14 @@ export default function App() {
 
   return React.createElement("div", { style: { minHeight: "100dvh", background: th.bg, color: th.text, fontFamily: ff, fontSize: cfg.fontSize, transition: cfg.animations ? "background 0.3s" : "none", overflowX: "hidden" } },
     React.createElement("div", { style: { maxWidth: 600, margin: "0 auto", padding: "16px 16px 24px 16px" } },
-      React.createElement("div", { style: { textAlign: "center", marginBottom: 20 } },
+      React.createElement("div", { style: { textAlign: "center", marginBottom: 20, position: "relative" } },
         React.createElement("h1", { style: { margin: 0, fontSize: 24 } }, "Magic Showrunner"),
-        React.createElement("div", { style: { fontSize: 11, color: th.sub } }, t.ver)
+        React.createElement("div", { style: { fontSize: 11, color: th.sub } }, t.ver),
+        React.createElement("button", {
+          onClick: function() { setCfg(function(c) { if (c.theme === "light") { return Object.assign({}, c, { theme: c._prevTheme || "dark" }); } return Object.assign({}, c, { _prevTheme: c.theme, theme: "light" }); }); },
+          title: cfg.theme === "light" ? "Dark Mode" : "Light Mode",
+          style: { position: "absolute", top: 4, right: 0, background: "none", border: "none", fontSize: 22, cursor: "pointer", padding: "4px 6px", borderRadius: 8, lineHeight: 1 }
+        }, cfg.theme === "light" ? "\uD83C\uDF19" : "\u2600\uFE0F")
       ),
       React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8, alignItems: "center", marginBottom: 20 } },
         React.createElement("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center" } },
