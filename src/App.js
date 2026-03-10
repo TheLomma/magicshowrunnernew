@@ -4,8 +4,8 @@ var uid = function() { return Math.random().toString(36).slice(2, 9); };
 var fmt = function(s) { var m = Math.floor(s / 60); var sec = s % 60; return m + ":" + String(sec).padStart(2, "0"); };
 
 var T = {
-  de: { title: "Magic Showrunner", ver: "v3.4", save: "Speichern", load: "Laden", newPart: "Neuer Teil", start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen", planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration", volume: "Lautstaerke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel", durL: "Dauer (Sek)", introL: "Intro-Ansage", preAnnL: "Vorankuendigung (Sek)", preAnnTxt: "Vorankuendigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern", cancel: "Abbrechen", showName: "Show-Name", overwrite: "Ueberschreiben", noSaved: "Keine Shows.", pause: "Pause", resume: "Weiter", prev: "Zurueck", next: "Weiter", partOf: "Teil", of: "/", dup: "Duplizieren", del: "Löschen", edit: "Bearbeiten", sek: "Sek", csv: "CSV", fontSize: "Größe", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo", ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen", stop: "Stop" },
-  en: { title: "Magic Showrunner", ver: "v3.4", save: "Save", load: "Load", newPart: "New Part", start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings", planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration", volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title", durL: "Duration (sec)", introL: "Intro (TTS)", preAnnL: "Pre-announce (sec)", preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save", cancel: "Cancel", showName: "Show Name", overwrite: "Overwrite", noSaved: "No saved shows.", pause: "Pause", resume: "Resume", prev: "Back", next: "Next", partOf: "Part", of: "/", dup: "Duplicate", del: "Delete", edit: "Edit", sek: "sec", csv: "CSV", fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed", ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes", stop: "Stop" }
+  de: { title: "Magic Showrunner", ver: "v3.6", save: "Speichern", load: "Laden", newPart: "Neuer Teil", start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen", planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration", volume: "Lautstaerke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel", durL: "Dauer (Sek)", introL: "Intro-Ansage", preAnnL: "Vorankuendigung (Sek)", preAnnTxt: "Vorankuendigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern", cancel: "Abbrechen", showName: "Show-Name", overwrite: "Ueberschreiben", noSaved: "Keine Shows.", pause: "Pause", resume: "Weiter", prev: "Zurueck", next: "Weiter", partOf: "Teil", of: "/", dup: "Duplizieren", del: "Löschen", edit: "Bearbeiten", sek: "Sek", csv: "CSV", fontSize: "Größe", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo", ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen", stop: "Stop" },
+  en: { title: "Magic Showrunner", ver: "v3.6", save: "Save", load: "Load", newPart: "New Part", start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings", planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration", volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title", durL: "Duration (sec)", introL: "Intro (TTS)", preAnnL: "Pre-announce (sec)", preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save", cancel: "Cancel", showName: "Show Name", overwrite: "Overwrite", noSaved: "No saved shows.", pause: "Pause", resume: "Resume", prev: "Back", next: "Next", partOf: "Part", of: "/", dup: "Duplicate", del: "Delete", edit: "Edit", sek: "sec", csv: "CSV", fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed", ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes", stop: "Stop" }
 };
 
 var TH = {
@@ -24,7 +24,7 @@ var PTH = {
 var COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6", "#06b6d4", "#f97316"];
 
 var DEMO = [
-  { id: uid(), title: "Begruessung", duration: 60, intro: "Willkommen!", preAnn: 10, preAnnText: "Gleich weiter", notes: "Publikum begruessen", color: COLORS[0] },
+  { id: uid(), title: "Begrüßung", duration: 60, intro: "Willkommen!", preAnn: 10, preAnnText: "Gleich weiter", notes: "Publikum begrüßen", color: COLORS[0] },
   { id: uid(), title: "Kartentrick", duration: 180, intro: "Ein Kartentrick", preAnn: 15, preAnnText: "Naechster Trick", notes: "Pik-Ass", color: COLORS[1] },
   { id: uid(), title: "Mentalmagie", duration: 240, intro: "Mysterioes", preAnn: 20, preAnnText: "Finale naht", notes: "Umschlag", color: COLORS[5] },
   { id: uid(), title: "Finale", duration: 120, intro: "Das Finale!", preAnn: 10, preAnnText: "", notes: "Konfetti", color: COLORS[3] }
@@ -220,6 +220,12 @@ function SettingsModal(props) {
     );
   } else if (tab === "font") {
     content = React.createElement("div", null,
+      React.createElement("label", { style: { fontSize: 12, color: th.sub } }, cfg.lang === "de" ? "Anzeigegröße im Perform-Modus" : "Display size in Perform Mode"),
+      React.createElement("div", { style: { display: "flex", gap: 6, marginBottom: 12 } },
+        ["XXL", "XL", "M", "S"].map(function(sz) {
+          return React.createElement("button", { key: sz, onClick: function() { upCfg("performSize", sz); }, style: { flex: 1, padding: "8px 0", borderRadius: 8, border: cfg.performSize === sz ? "2px solid " + th.acc : "2px solid transparent", background: cfg.performSize === sz ? th.acc + "22" : th.inp, color: th.text, cursor: "pointer", fontWeight: cfg.performSize === sz ? 700 : 400, fontSize: 14 } }, sz);
+        })
+      ),
       React.createElement("label", { style: { fontSize: 12, color: th.sub } }, t.fontSize),
       React.createElement("input", { type: "range", min: 12, max: 24, value: cfg.fontSize, onChange: function(e) { upCfg("fontSize", +e.target.value); }, style: { width: "100%" } }),
       React.createElement("span", { style: { fontSize: 11, color: th.sub } }, cfg.fontSize + "px"),
@@ -258,6 +264,9 @@ function PerformMode(props) {
   var _ps = useState(0); var pauseSecs = _ps[0]; var setPauseSecs = _ps[1];
   var pauseRef = useRef(null);
   var _pa = useState(""); var preAnnMsg = _pa[0]; var setPreAnnMsg = _pa[1];
+  var _sz = useState(cfg.performSize || "XL"); var perfSize = _sz[0]; var setPerfSize = _sz[1];
+  var sizeMap = { XXL: { timer: 240, title: 36 }, XL: { timer: 120, title: 22 }, M: { timer: 72, title: 18 }, S: { timer: 44, title: 15 } };
+  var szCfg = sizeMap[perfSize] || sizeMap["XL"];
 
   useEffect(function() {
     if (cfg.countdown > 0) { setCdVal(cfg.countdown); setCdRunning(true); } else { setCdRunning(false); }
@@ -358,12 +367,17 @@ function PerformMode(props) {
     );
   }
 
-  return React.createElement("div", { style: { position: "fixed", inset: 0, background: pt.bg, color: pt.text, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: cfg.fontFamily === "System" ? "-apple-system,sans-serif" : cfg.fontFamily, zIndex: 500 } },
+  return React.createElement("div", { style: { position: "fixed", inset: 0, background: pt.bg, color: pt.text, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: cfg.fontFamily === "System" ? "-apple-system,sans-serif" : cfg.fontFamily, zIndex: 500, overflowY: "auto", padding: "env(safe-area-inset-top, 12px) env(safe-area-inset-right, 12px) env(safe-area-inset-bottom, 12px) env(safe-area-inset-left, 12px)", boxSizing: "border-box" } },
     React.createElement("div", { style: { position: "absolute", top: 16, left: 16, fontSize: 13, opacity: 0.7 } }, t.partOf + " " + (idx + 1) + t.of + parts.length),
     
-    cfg.testMode ? React.createElement("div", { style: { position: "absolute", top: 16, right: 16, background: "#f59e0b", color: "#000", padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700 } }, "TEST") : null,
-    React.createElement("div", { style: { fontSize: 18, fontWeight: 600, marginBottom: 8, opacity: 0.8 } }, part ? part.title : ""),
-    React.createElement("div", { style: { fontSize: Math.min(120, cfg.fontSize * 5), fontWeight: 800, fontVariantNumeric: "tabular-nums", color: remaining <= 10 && remaining > 0 ? "#ef4444" : pt.timer, transition: "color 0.3s" } }, fmt(remaining)),
+    cfg.testMode ? React.createElement("div", { style: { position: "absolute", top: 16, right: cfg.testMode ? 120 : 16, background: "#f59e0b", color: "#000", padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700 } }, "TEST") : null,
+    React.createElement("div", { style: { display: "flex", gap: 6, position: "absolute", top: 16, right: 16 } },
+      ["XXL", "XL", "M", "S"].map(function(sz) {
+        return React.createElement("button", { key: sz, onClick: function() { setPerfSize(sz); }, style: { padding: "4px 10px", borderRadius: 8, border: perfSize === sz ? "2px solid " + pt.bar : "2px solid transparent", background: perfSize === sz ? pt.bar + "44" : "rgba(255,255,255,0.1)", color: pt.text, cursor: "pointer", fontSize: 12, fontWeight: perfSize === sz ? 700 : 400 } }, sz);
+      })
+    ),
+    React.createElement("div", { style: { fontSize: szCfg.title, fontWeight: 600, marginBottom: 8, opacity: 0.8 } }, part ? part.title : ""),
+    React.createElement("div", { style: { fontSize: szCfg.timer, fontWeight: 800, fontVariantNumeric: "tabular-nums", color: remaining <= 10 && remaining > 0 ? "#ef4444" : pt.timer, transition: "color 0.3s" } }, fmt(remaining)),
     React.createElement("div", { style: { width: "80%", maxWidth: 400, marginBottom: 6 } },
       React.createElement("div", { style: { fontSize: 11, opacity: 0.5, marginBottom: 3, textAlign: "center" } }, cfg.lang === "de" ? "Gesamt-Fortschritt" : "Overall Progress"),
       React.createElement("div", { style: { width: "100%", height: 5, borderRadius: 3, background: pt.barBg, overflow: "hidden" } },
@@ -466,7 +480,7 @@ export default function App() {
   var canRedo = histIdx < history.length - 1;
   var doUndo = function() { if (canUndo) setHistIdx(function(i) { return i - 1; }); };
   var doRedo = function() { if (canRedo) setHistIdx(function(i) { return i + 1; }); };
-  var _c = useState({ lang: "de", theme: (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'), perfTheme: "dark", beeps: true, vibrate: true, volume: 0.5, ttsVoice: "", ttsRate: 1, ttsPitch: 1, fontSize: 15, fontFamily: "System", animations: true, testMode: false, testDur: 5, countdown: 3 });
+  var _c = useState({ lang: "de", theme: (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'), perfTheme: "dark", beeps: true, vibrate: true, volume: 0.5, ttsVoice: "", ttsRate: 1, ttsPitch: 1, fontSize: 15, fontFamily: "System", animations: true, testMode: false, testDur: 5, countdown: 3, performSize: "XL" });
   var cfg = _c[0]; var setCfg = _c[1];
   var _ep = useState(null); var editPart = _ep[0]; var setEditPart = _ep[1];
   var _eo = useState(false); var editOpen = _eo[0]; var setEditOpen = _eo[1];
@@ -477,7 +491,6 @@ export default function App() {
   var _to = useState(""); var toast = _to[0]; var setToast = _to[1];
   var _di = useState(null); var dragIdx = _di[0]; var setDragIdx = _di[1];
   var _ex = useState(false); var exportOpen = _ex[0]; var setExportOpen = _ex[1];
-  var _ir = useState(false); var importOpen = _ir[0]; var setImportOpen = _ir[1];
   var csvInputRef = useRef(null);
 
   var t = T[cfg.lang] || T.de;
@@ -509,29 +522,33 @@ export default function App() {
 
   var bs = { padding: "8px 16px", borderRadius: 10, border: "none", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 13 };
 
-  return React.createElement("div", { style: { minHeight: "100vh", background: th.bg, color: th.text, fontFamily: ff, fontSize: cfg.fontSize, transition: cfg.animations ? "background 0.3s" : "none" } },
-    React.createElement("div", { style: { maxWidth: 600, margin: "0 auto", padding: "20px 16px" } },
+  return React.createElement("div", { style: { minHeight: "100dvh", background: th.bg, color: th.text, fontFamily: ff, fontSize: cfg.fontSize, transition: cfg.animations ? "background 0.3s" : "none", overflowX: "hidden" } },
+    React.createElement("div", { style: { maxWidth: 600, margin: "0 auto", padding: "max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom)) 16px" } },
       React.createElement("div", { style: { textAlign: "center", marginBottom: 20 } },
         React.createElement("h1", { style: { margin: 0, fontSize: 24 } }, "Magic Showrunner"),
         React.createElement("div", { style: { fontSize: 11, color: th.sub } }, t.ver)
       ),
-      React.createElement("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center", marginBottom: 20 } },
-        React.createElement("button", { onClick: function() { setSaveOpen(true); }, style: Object.assign({}, bs, { background: th.acc }) }, t.save),
-        React.createElement("button", { onClick: function() { setLoadOpen(true); }, style: Object.assign({}, bs, { background: th.acc }) }, t.load),
-        React.createElement("button", { onClick: function() { setSettOpen(true); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, t.settings),
-        React.createElement("button", { onClick: function() { setEditPart(null); setEditOpen(true); }, style: Object.assign({}, bs, { background: "#22c55e" }) }, t.newPart),
-        React.createElement("button", { onClick: doUndo, disabled: !canUndo, title: "Undo", style: Object.assign({}, bs, { background: canUndo ? "#6b7280" : "#3f3f5c", opacity: canUndo ? 1 : 0.4, cursor: canUndo ? "pointer" : "not-allowed" }) }, "↩️"),
-        React.createElement("button", { onClick: doRedo, disabled: !canRedo, title: "Redo", style: Object.assign({}, bs, { background: canRedo ? "#6b7280" : "#3f3f5c", opacity: canRedo ? 1 : 0.4, cursor: canRedo ? "pointer" : "not-allowed" }) }, "↪️"),
-        React.createElement("div", { style: { position: "relative" } },
-          React.createElement("button", { onClick: function() { setExportOpen(function(o) { return !o; }); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, "Export ▾"),
-          exportOpen ? React.createElement("div", { style: { position: "absolute", top: "110%", left: 0, background: th.card, border: "1px solid " + th.brd, borderRadius: 10, boxShadow: "0 4px 16px rgba(0,0,0,0.3)", zIndex: 200, minWidth: 130, overflow: "hidden" } },
-            React.createElement("button", { onClick: function() { exportCSV(parts, t); setExportOpen(false); }, style: { display: "block", width: "100%", padding: "10px 16px", border: "none", background: "transparent", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 13 } }, "📄 CSV"),
-            React.createElement("button", { onClick: function() { exportPDF(parts, t); setExportOpen(false); }, style: { display: "block", width: "100%", padding: "10px 16px", border: "none", background: "transparent", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 13 } }, "📋 PDF / TXT"),
-            React.createElement("hr", { style: { margin: "2px 0", border: "none", borderTop: "1px solid " + th.brd } }),
-            React.createElement("button", { onClick: function() { setExportOpen(false); csvInputRef.current && csvInputRef.current.click(); }, style: { display: "block", width: "100%", padding: "10px 16px", border: "none", background: "transparent", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 13 } }, "📥 CSV Import"),
-            React.createElement("hr", { style: { margin: "2px 0", border: "none", borderTop: "1px solid " + th.brd } }),
-            React.createElement("button", { onClick: function() { printSetlist(parts, t); setExportOpen(false); }, style: { display: "block", width: "100%", padding: "10px 16px", border: "none", background: "transparent", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 13 } }, "🖨️ Drucken")
-          ) : null
+      React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8, alignItems: "center", marginBottom: 20 } },
+        React.createElement("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center" } },
+          React.createElement("button", { onClick: function() { setSaveOpen(true); }, style: Object.assign({}, bs, { background: th.acc }) }, t.save),
+          React.createElement("button", { onClick: function() { setLoadOpen(true); }, style: Object.assign({}, bs, { background: th.acc }) }, t.load),
+          React.createElement("button", { onClick: function() { setSettOpen(true); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, t.settings),
+          React.createElement("div", { style: { position: "relative" } },
+            React.createElement("button", { onClick: function() { setExportOpen(function(o) { return !o; }); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, "Export \u25be"),
+            exportOpen ? React.createElement("div", { style: { position: "absolute", top: "110%", left: 0, background: th.card, border: "1px solid " + th.brd, borderRadius: 10, boxShadow: "0 4px 16px rgba(0,0,0,0.3)", zIndex: 200, minWidth: 130, overflow: "hidden" } },
+              React.createElement("button", { onClick: function() { exportCSV(parts, t); setExportOpen(false); }, style: { display: "block", width: "100%", padding: "10px 16px", border: "none", background: "transparent", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 13 } }, "\ud83d\udcc4 CSV"),
+              React.createElement("button", { onClick: function() { exportPDF(parts, t); setExportOpen(false); }, style: { display: "block", width: "100%", padding: "10px 16px", border: "none", background: "transparent", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 13 } }, "\ud83d\udccb PDF / TXT"),
+              React.createElement("hr", { style: { margin: "2px 0", border: "none", borderTop: "1px solid " + th.brd } }),
+              React.createElement("button", { onClick: function() { setExportOpen(false); csvInputRef.current && csvInputRef.current.click(); }, style: { display: "block", width: "100%", padding: "10px 16px", border: "none", background: "transparent", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 13 } }, "\ud83d\udce5 CSV Import"),
+              React.createElement("hr", { style: { margin: "2px 0", border: "none", borderTop: "1px solid " + th.brd } }),
+              React.createElement("button", { onClick: function() { printSetlist(parts, t); setExportOpen(false); }, style: { display: "block", width: "100%", padding: "10px 16px", border: "none", background: "transparent", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 13 } }, "\ud83d\udda8\ufe0f Drucken")
+            ) : null
+          )
+        ),
+        React.createElement("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center" } },
+          React.createElement("button", { onClick: function() { setEditPart(null); setEditOpen(true); }, style: Object.assign({}, bs, { background: "#22c55e" }) }, t.newPart),
+          React.createElement("button", { onClick: doUndo, disabled: !canUndo, title: "Undo", style: Object.assign({}, bs, { background: canUndo ? "#6b7280" : "#3f3f5c", opacity: canUndo ? 1 : 0.4, cursor: canUndo ? "pointer" : "not-allowed" }) }, "\u21a9\ufe0f"),
+          React.createElement("button", { onClick: doRedo, disabled: !canRedo, title: "Redo", style: Object.assign({}, bs, { background: canRedo ? "#6b7280" : "#3f3f5c", opacity: canRedo ? 1 : 0.4, cursor: canRedo ? "pointer" : "not-allowed" }) }, "\u21aa\ufe0f")
         )
       ),
       React.createElement("div", { style: { textAlign: "center", marginBottom: 16, fontSize: 13, color: th.sub } }, parts.length + " " + t.parts + " | " + t.total + ": " + fmt(totalSec)),
@@ -548,25 +565,24 @@ export default function App() {
           onDrop: function(e) { e.preventDefault(); onDragEnd(); },
           style: { background: th.card, border: "1px solid " + th.brd, borderRadius: 14, padding: "14px 16px", marginBottom: 10, display: "flex", alignItems: "center", gap: 12, borderLeft: "4px solid " + (p.color || th.acc), opacity: dragIdx === i ? 0.5 : 1, transition: cfg.animations ? "opacity 0.2s" : "none" }
         },
-          React.createElement("div", { draggable: true, onDragStart: function(e) { onDragStart(e, i); }, onDragEnd: onDragEnd, style: { fontSize: 18, color: th.sub, cursor: "grab", userSelect: "none", padding: "4px 6px", borderRadius: 6 } }, "⋮⋮"),
+          React.createElement("div", { draggable: true, onDragStart: function(e) { onDragStart(e, i); }, onDragEnd: onDragEnd, style: { fontSize: 18, color: th.sub, cursor: "grab", userSelect: "none", padding: "4px 6px", borderRadius: 6 } }, "\u22ee\u22ee"),
           React.createElement("div", { style: { flex: 1 } },
             React.createElement("div", { style: { fontWeight: 700, fontSize: 15 } }, p.title),
             React.createElement("div", { style: { fontSize: 12, color: th.sub } }, fmt(p.duration))
           ),
           React.createElement("div", { style: { display: "flex", gap: 4 } },
-            React.createElement("button", { onClick: function() { setEditPart(p); setEditOpen(true); }, style: { padding: "6px 10px", borderRadius: 8, border: "none", background: th.acc + "33", color: th.acc, cursor: "pointer", fontSize: 12 } }, t.edit),
-            React.createElement("button", { onClick: function() { dupPart(p); }, style: { padding: "6px 10px", borderRadius: 8, border: "none", background: "#8b5cf622", color: "#8b5cf6", cursor: "pointer", fontSize: 12 } }, t.dup),
-            React.createElement("button", { onClick: function() { delPart(p.id); }, style: { padding: "6px 10px", borderRadius: 8, border: "none", background: "#ef444422", color: "#ef4444", cursor: "pointer", fontSize: 12 } }, t.del)
+            React.createElement("button", { onClick: function() { setEditPart(p); setEditOpen(true); }, title: t.edit, style: { padding: "6px 10px", borderRadius: 8, border: "none", background: th.acc + "33", color: th.acc, cursor: "pointer", fontSize: 16 } }, "✏️"),
+            React.createElement("button", { onClick: function() { dupPart(p); }, title: t.dup, style: { padding: "6px 10px", borderRadius: 8, border: "none", background: "#8b5cf622", color: "#8b5cf6", cursor: "pointer", fontSize: 16 } }, "📋"),
+            React.createElement("button", { onClick: function() { delPart(p.id); }, title: t.del, style: { padding: "6px 10px", borderRadius: 8, border: "none", background: "#ef444422", color: "#ef4444", cursor: "pointer", fontSize: 16 } }, "🗑️")
           )
         );
       }),
       parts.length > 0 ? React.createElement("div", { style: { marginTop: 12 } },
         React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 10 } },
-          React.createElement("span", { style: { fontSize: 12, color: th.sub } }, cfg.lang === "de" ? "⏱ Countdown:" : "⏱ Countdown:"),
-          [0, 3, 5, 10].map(function(v) {
+          React.createElement("span", { style: { fontSize: 12, color: th.sub } }, cfg.lang === "de" ? "\u23f1 Countdown:" : "\u23f1 Countdown:"),
+          [0, 3, 5, 10, 60].map(function(v) {
             return React.createElement("button", { key: v, onClick: function() { setCfg(function(c) { return Object.assign({}, c, { countdown: v }); }); }, style: { padding: "5px 10px", borderRadius: 8, border: cfg.countdown === v ? "2px solid " + th.acc : "2px solid transparent", background: cfg.countdown === v ? th.acc + "22" : th.inp, color: th.text, cursor: "pointer", fontSize: 12, fontWeight: cfg.countdown === v ? 700 : 400 } }, v === 0 ? (cfg.lang === "de" ? "Aus" : "Off") : v + "s");
-          }),
-          React.createElement("input", { type: "number", min: 1, max: 999, placeholder: "...", onChange: function(e) { var v = parseInt(e.target.value); if (!isNaN(v) && v > 0) setCfg(function(c) { return Object.assign({}, c, { countdown: v }); }); }, style: { width: 54, padding: "5px 6px", borderRadius: 8, border: "2px solid transparent", background: th.inp, color: th.text, fontSize: 12, textAlign: "center" } })
+          })
         ),
         React.createElement("button", { onClick: function() { setPerforming(true); }, style: { width: "100%", padding: 16, borderRadius: 14, border: "none", background: "linear-gradient(135deg," + th.acc + ",#8b5cf6)", color: "#fff", fontWeight: 800, fontSize: 18, cursor: "pointer", marginTop: 12, boxShadow: "0 4px 20px " + th.acc + "44" } }, t.start + (cfg.testMode ? " (Test)" : ""))
       ) : null
