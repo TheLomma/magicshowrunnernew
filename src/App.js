@@ -4,8 +4,8 @@ var uid = function() { return Math.random().toString(36).slice(2, 9); };
 var fmt = function(s) { var m = Math.floor(s / 60); var sec = s % 60; return m + ":" + String(sec).padStart(2, "0"); };
 
 var T = {
-  de: { title: "Magic Showrunner", ver: "v3.0", save: "Speichern", load: "Laden", newPart: "Neuer Teil", start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen", planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltoene", vibration: "Vibration", volume: "Lautstaerke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel", durL: "Dauer (Sek)", introL: "Intro-Ansage", preAnnL: "Vorankuendigung (Sek)", preAnnTxt: "Vorankuendigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern", cancel: "Abbrechen", showName: "Show-Name", overwrite: "Ueberschreiben", noSaved: "Keine Shows.", pause: "Pause", resume: "Weiter", prev: "Zurueck", next: "Weiter", partOf: "Teil", of: "/", dup: "Duplizieren", del: "Loeschen", edit: "Bearbeiten", sek: "Sek", csv: "CSV", fontSize: "Groesse", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo", ttsPitch: "Tonhoehe", ttsPreview: "Vorschau", animations: "Animationen" },
-  en: { title: "Magic Showrunner", ver: "v3.0", save: "Save", load: "Load", newPart: "New Part", start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings", planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration", volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title", durL: "Duration (sec)", introL: "Intro (TTS)", preAnnL: "Pre-announce (sec)", preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save", cancel: "Cancel", showName: "Show Name", overwrite: "Overwrite", noSaved: "No saved shows.", pause: "Pause", resume: "Resume", prev: "Back", next: "Next", partOf: "Part", of: "/", dup: "Duplicate", del: "Delete", edit: "Edit", sek: "sec", csv: "CSV", fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed", ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations" }
+  de: { title: "Magic Showrunner", ver: "v3.1", save: "Speichern", load: "Laden", newPart: "Neuer Teil", start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen", planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration", volume: "Lautstaerke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel", durL: "Dauer (Sek)", introL: "Intro-Ansage", preAnnL: "Vorankuendigung (Sek)", preAnnTxt: "Vorankuendigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern", cancel: "Abbrechen", showName: "Show-Name", overwrite: "Ueberschreiben", noSaved: "Keine Shows.", pause: "Pause", resume: "Weiter", prev: "Zurueck", next: "Weiter", partOf: "Teil", of: "/", dup: "Duplizieren", del: "Löschen", edit: "Bearbeiten", sek: "Sek", csv: "CSV", fontSize: "Größe", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo", ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen", stop: "Stop" },
+  en: { title: "Magic Showrunner", ver: "v3.1", save: "Save", load: "Load", newPart: "New Part", start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings", planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration", volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title", durL: "Duration (sec)", introL: "Intro (TTS)", preAnnL: "Pre-announce (sec)", preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save", cancel: "Cancel", showName: "Show Name", overwrite: "Overwrite", noSaved: "No saved shows.", pause: "Pause", resume: "Resume", prev: "Back", next: "Next", partOf: "Part", of: "/", dup: "Duplicate", del: "Delete", edit: "Edit", sek: "sec", csv: "CSV", fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed", ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes", stop: "Stop" }
 };
 
 var TH = {
@@ -150,7 +150,7 @@ function LoadModal(props) {
           React.createElement("div", { style: { fontWeight: 600, fontSize: 14 } }, s.name),
           React.createElement("div", { style: { fontSize: 11, color: th.sub } }, s.parts.length + " " + t.parts)
         ),
-        React.createElement("button", { onClick: function() { onLoad(s.parts); onClose(); }, style: { padding: "6px 14px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", cursor: "pointer", fontWeight: 600 } }, "Load")
+        React.createElement("button", { onClick: function() { onLoad(s.parts); onClose(); }, style: { padding: "6px 14px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", cursor: "pointer", fontWeight: 600 } }, t.load)
       );
     })
   );
@@ -169,7 +169,13 @@ function SettingsModal(props) {
   var is = { width: "100%", padding: 8, borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginBottom: 8, boxSizing: "border-box" };
   if (!open) return null;
   var tabs = ["design", "audio", "voice", "font", "lang"];
-  var icons = { design: "Design", audio: "Audio", voice: "Voice", font: "Font", lang: "Lang" };
+  var icons = {
+    design: cfg.lang === "de" ? "Design" : "Design",
+    audio: cfg.lang === "de" ? "Audio" : "Audio",
+    voice: cfg.lang === "de" ? "Stimme" : "Voice",
+    font: cfg.lang === "de" ? "Schrift" : "Font",
+    lang: cfg.lang === "de" ? "Sprache" : "Language"
+  };
   var upCfg = function(k, v) { setCfg(function(c) { return Object.assign({}, c, (function() { var o = {}; o[k] = v; return o; })()); }); };
 
   var content = null;
@@ -196,10 +202,7 @@ function SettingsModal(props) {
       React.createElement("label", { style: { fontSize: 12, color: th.sub } }, t.volume),
       React.createElement("input", { type: "range", min: 0, max: 1, step: 0.1, value: cfg.volume, onChange: function(e) { upCfg("volume", +e.target.value); }, style: { width: "100%", marginBottom: 8 } }),
       React.createElement("button", { onClick: function() { doBeep(cfg.volume); }, style: { padding: "8px 16px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", cursor: "pointer" } }, t.testTone),
-      React.createElement("div", { style: { marginTop: 12 } },
-        React.createElement("label", { style: { fontSize: 12, color: th.sub } }, t.testDur + " (" + t.sek + ")"),
-        React.createElement("input", { type: "number", min: 3, max: 30, value: cfg.testDur, onChange: function(e) { upCfg("testDur", +e.target.value); }, style: is })
-      )
+      
     );
   } else if (tab === "voice") {
     content = React.createElement("div", null,
@@ -314,8 +317,8 @@ function PerformMode(props) {
       React.createElement("button", { onClick: function() { if (idx > 0) setIdx(function(i) { return i - 1; }); else setElapsed(0); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, t.prev),
       React.createElement("button", { onClick: function() { setPaused(function(p) { return !p; }); }, style: Object.assign({}, bs, { background: paused ? "#22c55e" : "#eab308" }) }, paused ? t.resume : t.pause),
       React.createElement("button", { onClick: function() { if (idx < parts.length - 1) setIdx(function(i) { return i + 1; }); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, t.next),
-      React.createElement("button", { onClick: function() { setShowNotes(function(p) { return !p; }); }, style: Object.assign({}, bs, { background: "#8b5cf6" }) }, "Notes"),
-      React.createElement("button", { onClick: onExit, style: Object.assign({}, bs, { background: "#ef4444" }) }, "Stop")
+      React.createElement("button", { onClick: function() { setShowNotes(function(p) { return !p; }); }, style: Object.assign({}, bs, { background: "#8b5cf6" }) }, t.notesL),
+      React.createElement("button", { onClick: onExit, style: Object.assign({}, bs, { background: "#ef4444" }) }, t.total === t.total ? "Stop" : "Stop")
     ),
     React.createElement("div", { style: { marginTop: 20, fontSize: 12, opacity: 0.6 } }, t.total + ": " + fmt(totalElapsed) + " / " + fmt(totalDur))
   );
@@ -332,6 +335,26 @@ function exportCSV(parts, t) {
   a.click();
 }
 
+function exportPDF(parts, t) {
+  var lines = [];
+  lines.push("MAGIC SHOWRUNNER - Export");
+  lines.push("");
+  parts.forEach(function(p, i) {
+    lines.push((i+1) + ". " + p.title + " (" + fmt(p.duration) + ")");
+    if (p.intro) lines.push("   Intro: " + p.intro);
+    if (p.notes) lines.push("   " + t.notesL + ": " + p.notes);
+    lines.push("");
+  });
+  var total = parts.reduce(function(a,p){return a+p.duration;},0);
+  lines.push("Gesamt: " + fmt(total));
+  var content = lines.join("\n");
+  var blob = new Blob([content], { type: "text/plain" });
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "showrunner.txt";
+  a.click();
+}
+
 export default function App() {
   var _p = useState(DEMO); var parts = _p[0]; var setParts = _p[1];
   var _c = useState({ lang: "de", theme: "dark", perfTheme: "dark", beeps: true, vibrate: true, volume: 0.5, ttsVoice: "", ttsRate: 1, ttsPitch: 1, fontSize: 15, fontFamily: "System", animations: true, testMode: false, testDur: 5 });
@@ -344,6 +367,7 @@ export default function App() {
   var _pf = useState(false); var performing = _pf[0]; var setPerforming = _pf[1];
   var _to = useState(""); var toast = _to[0]; var setToast = _to[1];
   var _di = useState(null); var dragIdx = _di[0]; var setDragIdx = _di[1];
+  var _ex = useState(false); var exportOpen = _ex[0]; var setExportOpen = _ex[1];
 
   var t = T[cfg.lang] || T.de;
   var th = TH[cfg.theme] || TH.dark;
@@ -383,9 +407,15 @@ export default function App() {
       React.createElement("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center", marginBottom: 20 } },
         React.createElement("button", { onClick: function() { setSaveOpen(true); }, style: Object.assign({}, bs, { background: th.acc }) }, t.save),
         React.createElement("button", { onClick: function() { setLoadOpen(true); }, style: Object.assign({}, bs, { background: th.acc }) }, t.load),
-        React.createElement("button", { onClick: function() { setSettOpen(true); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, "Settings"),
-        React.createElement("button", { onClick: function() { setEditPart(null); setEditOpen(true); }, style: Object.assign({}, bs, { background: "#22c55e" }) }, "+"),
-        React.createElement("button", { onClick: function() { exportCSV(parts, t); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, t.csv)
+        React.createElement("button", { onClick: function() { setSettOpen(true); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, t.settings),
+        React.createElement("button", { onClick: function() { setEditPart(null); setEditOpen(true); }, style: Object.assign({}, bs, { background: "#22c55e" }) }, t.newPart),
+        React.createElement("div", { style: { position: "relative" } },
+          React.createElement("button", { onClick: function() { setExportOpen(function(o) { return !o; }); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, "Export ▾"),
+          exportOpen ? React.createElement("div", { style: { position: "absolute", top: "110%", left: 0, background: th.card, border: "1px solid " + th.brd, borderRadius: 10, boxShadow: "0 4px 16px rgba(0,0,0,0.3)", zIndex: 200, minWidth: 130, overflow: "hidden" } },
+            React.createElement("button", { onClick: function() { exportCSV(parts, t); setExportOpen(false); }, style: { display: "block", width: "100%", padding: "10px 16px", border: "none", background: "transparent", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 13 } }, "📄 CSV"),
+            React.createElement("button", { onClick: function() { exportPDF(parts, t); setExportOpen(false); }, style: { display: "block", width: "100%", padding: "10px 16px", border: "none", background: "transparent", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 13 } }, "📋 PDF / TXT")
+          ) : null
+        )
       ),
       React.createElement("div", { style: { textAlign: "center", marginBottom: 16, fontSize: 13, color: th.sub } }, parts.length + " " + t.parts + " | " + t.total + ": " + fmt(totalSec)),
       React.createElement("div", { style: { display: "flex", justifyContent: "center", gap: 8, marginBottom: 16 } },
@@ -408,9 +438,9 @@ export default function App() {
             React.createElement("div", { style: { fontSize: 12, color: th.sub } }, fmt(p.duration))
           ),
           React.createElement("div", { style: { display: "flex", gap: 4 } },
-            React.createElement("button", { onClick: function() { setEditPart(p); setEditOpen(true); }, style: { padding: "6px 10px", borderRadius: 8, border: "none", background: th.acc + "33", color: th.acc, cursor: "pointer", fontSize: 12 } }, "Edit"),
-            React.createElement("button", { onClick: function() { dupPart(p); }, style: { padding: "6px 10px", borderRadius: 8, border: "none", background: "#8b5cf622", color: "#8b5cf6", cursor: "pointer", fontSize: 12 } }, "Dup"),
-            React.createElement("button", { onClick: function() { delPart(p.id); }, style: { padding: "6px 10px", borderRadius: 8, border: "none", background: "#ef444422", color: "#ef4444", cursor: "pointer", fontSize: 12 } }, "Del")
+            React.createElement("button", { onClick: function() { setEditPart(p); setEditOpen(true); }, style: { padding: "6px 10px", borderRadius: 8, border: "none", background: th.acc + "33", color: th.acc, cursor: "pointer", fontSize: 12 } }, t.edit),
+            React.createElement("button", { onClick: function() { dupPart(p); }, style: { padding: "6px 10px", borderRadius: 8, border: "none", background: "#8b5cf622", color: "#8b5cf6", cursor: "pointer", fontSize: 12 } }, t.dup),
+            React.createElement("button", { onClick: function() { delPart(p.id); }, style: { padding: "6px 10px", borderRadius: 8, border: "none", background: "#ef444422", color: "#ef4444", cursor: "pointer", fontSize: 12 } }, t.del)
           )
         );
       }),
