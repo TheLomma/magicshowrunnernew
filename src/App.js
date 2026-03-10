@@ -1,5 +1,62 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 
+// ─── IndexedDB Helper (Option C: IDB-Redundanz für ms_autosave) ───
+const IDB_NAME = 'ShowRunnerDB';
+const IDB_STORE = 'backups';
+const IDB_VERSION = 1;
+
+function openIDB() {
+  return new Promise((resolve, reject) => {
+    if (!window.indexedDB) return reject('No IDB');
+    const req = window.indexedDB.open(IDB_NAME, IDB_VERSION);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(IDB_STORE)) {
+        db.createObjectStore(IDB_STORE, { keyPath: 'key' });
+      }
+    };
+    req.onsuccess = (e) => resolve(e.target.result);
+    req.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function idbWrite(key, value) {
+  try {
+    const db = await openIDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, 'readwrite');
+      tx.objectStore(IDB_STORE).put({ key, value, savedAt: new Date().toISOString() });
+      tx.oncomplete = resolve;
+      tx.onerror = reject;
+    });
+  } catch(e) {}
+}
+
+async function idbRead(key) {
+  try {
+    const db = await openIDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(IDB_STORE, 'readonly');
+      const req = tx.objectStore(IDB_STORE).get(key);
+      req.onsuccess = (e) => resolve(e.target.result?.value ?? null);
+      req.onerror = reject;
+    });
+  } catch(e) { return null; }
+}
+
+async function ensurePersistentStorage() {
+  try {
+    if (navigator.storage?.persisted) {
+      const already = await navigator.storage.persisted();
+      if (!already && navigator.storage.persist) {
+        await navigator.storage.persist();
+      }
+      return await navigator.storage.persisted();
+    }
+  } catch(e) {}
+  return false;
+}
+
 // ─── Audio Engine ───
 const AudioEngine = {
   ctx: null,
@@ -38,8 +95,15 @@ const vibrate = (p = [200]) => { try { if ('vibrate' in navigator) navigator.vib
 const TRANSLATIONS = {
   de: {
     appTitle: '🎩✨ Magic Showrunner',
-    appVersion: 'v1.1',
+    appVersion: 'v1.3',
     appSub: 'Dein professioneller Bühnen-Assistent',
+    backupReminder: '💾 Kein Backup seit {days} Tagen – jetzt sichern?',
+    backupReminderBtn: '📥 Jetzt Backup erstellen',
+    backupReminderDismiss: 'Später',
+    storagePersistent: '🛡️ Speicher gesichert (persistent)',
+    storageNotPersistent: '⚠️ Speicher nicht persistent – regelmäßig Backup erstellen!',
+    idbSaved: '🗄️ IDB-Backup gespeichert',
+    idbRestored: '🗄️ Daten aus IDB-Backup wiederhergestellt',
     save: '💾 Speichern', load: '📂 Laden', backup: '📥 Backup', tutorial: '📖 Tutorial',
     about: 'ℹ️ Über', importBtn: '📤 Import', settings: '⚙️ Einstellungen',
     fullscreen: '⛶ Vollbild', exitFullscreen: '⛶ Fenster', stage: '🎪 Bühne', stats: '📊 Stats',
@@ -89,7 +153,14 @@ const TRANSLATIONS = {
   },
   en: {
     appTitle: '🎩✨ Magic Showrunner',
-    appVersion: 'v1.1', appSub: 'Your professional stage assistant',
+    appVersion: 'v1.3', appSub: 'Your professional stage assistant',
+    backupReminder: '💾 No backup for {days} days – save now?',
+    backupReminderBtn: '📥 Create Backup now',
+    backupReminderDismiss: 'Later',
+    storagePersistent: '🛡️ Storage secured (persistent)',
+    storageNotPersistent: '⚠️ Storage not persistent – create backups regularly!',
+    idbSaved: '🗄️ IDB backup saved',
+    idbRestored: '🗄️ Data restored from IDB backup',
     save: '💾 Save', load: '📂 Load', backup: '📥 Backup', tutorial: '📖 Tutorial',
     about: 'ℹ️ About', importBtn: '📤 Import', settings: '⚙️ Settings',
     fullscreen: '⛶ Fullscreen', exitFullscreen: '⛶ Window', stage: '🎪 Stage', stats: '📊 Stats',
@@ -206,6 +277,10 @@ export default function ShowRunner() {
   const [ttsVoiceURI, setTtsVoiceURI] = useState(() => localStorage.getItem('ms_ttsVoice') || '');
   const [availableVoices, setAvailableVoices] = useState([]);
   const [autosaveTime, setAutosaveTime] = useState(null);
+  const [storagePersistent, setStoragePersistent] = useState(null);
+  const [showBackupReminder, setShowBackupReminder] = useState(false);
+  const [backupReminderDays, setBackupReminderDays] = useState(0);
+  const BACKUP_REMINDER_DAYS = 5;
   const [wakeLockActive, setWakeLockActive] = useState(false);
   const wakeLockRef = useRef(null);
   const touchStartX = useRef(null);
@@ -389,6 +464,8 @@ export default function ShowRunner() {
   const deleteShow = (id) => { const u = savedShows.filter(s => s.id !== id); setSavedShows(u); localStorage.setItem('ms_shows', JSON.stringify(u)); showToast('🗑 Show gelöscht'); };
 
   const exportBackup = () => {
+    localStorage.setItem('ms_last_backup', new Date().toISOString());
+    setShowBackupReminder(false);
     const data = { version: 3, exportedAt: new Date().toISOString(), shows: savedShows, currentShow: parts, settings: { themeMode, performTheme, beepEnabled, vibrationEnabled, volume, testSpeed, fontSize, fontFamily, ttsRate, ttsPitch, ttsVoiceURI } };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -613,6 +690,32 @@ export default function ShowRunner() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
+      {/* ─── Backup Reminder Banner (Option C) ─── */}
+      {showBackupReminder && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-sm mx-4">
+          <div className="bg-amber-500 text-black rounded-2xl shadow-2xl p-4 flex flex-col gap-3">
+            <div className="flex items-start gap-2">
+              <span className="text-2xl">💾</span>
+              <p className="text-sm font-bold leading-snug">
+                {(t.backupReminder || '').replace('{days}', backupReminderDays)}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => { exportBackup(); }}
+                className="flex-1 bg-black text-white text-xs font-bold px-3 py-2 rounded-xl hover:bg-gray-900">
+                {t.backupReminderBtn}
+              </button>
+              <button
+                onClick={() => setShowBackupReminder(false)}
+                className="px-3 py-2 rounded-xl text-xs font-bold bg-black/20 hover:bg-black/30">
+                {t.backupReminderDismiss}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl shadow-xl text-white bg-gray-900 text-sm font-medium ${animationsEnabled ? 'animate-bounce' : ''}`}>
@@ -743,12 +846,18 @@ export default function ShowRunner() {
               <div>
                 <h1 className={`font-black text-xl ${th.headText} flex items-baseline gap-2`}>
                   {t.appTitle}
-                  <span className={`text-xs font-normal opacity-40 ${th.textSub}`}>v1.1</span>
+                  <span className={`text-xs font-normal opacity-40 ${th.textSub}`}>v1.3</span>
                 </h1>
                 <p className={`text-xs ${th.textSub}`}>{t.appSub}</p>
               </div>
               <div className="flex items-center gap-2 flex-wrap">
-                {/* Autosave indicator */}
+                {/* Storage-Status + Autosave indicator */}
+                {storagePersistent === true && (
+                  <span className="text-xs text-green-500 flex items-center gap-1" title={t.storagePersistent}>🛡️</span>
+                )}
+                {storagePersistent === false && (
+                  <span className="text-xs text-amber-400 flex items-center gap-1" title={t.storageNotPersistent}>⚠️</span>
+                )}
                 {autosaveTime && (
                   <span className="text-xs text-green-500 flex items-center gap-1">
                     ✅ {autosaveTime.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}
