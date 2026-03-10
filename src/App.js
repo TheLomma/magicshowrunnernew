@@ -697,6 +697,7 @@ function PartEditor({ state, dispatch, th }) {
 // PERFORM VIEW
 // ============================================================
 function PerformView({ state, dispatch, pth, sendNotification, wakeLockRef }) {
+  const [timerSize, setTimerSize] = React.useState('large'); // 'large' | 'medium' | 'small'
   const T = TRANSLATIONS[state.lang] || TRANSLATIONS.de;
   const { parts, currentPartIndex, partElapsed, totalElapsed, isRunning, isPaused, testMode, testDuration, showEnded, preAnnounced, beepsEnabled, vibrationEnabled, volume, countdownAnimation, ttsRate, ttsPitch, ttsVoiceURI } = state;
   const intervalRef = useRef(null);
@@ -786,8 +787,31 @@ function PerformView({ state, dispatch, pth, sendNotification, wakeLockRef }) {
         <div className="w-4 h-4 rounded-full" style={{ background: part.color }} />
         <h1 className="text-3xl font-bold text-center">{part.title}</h1>
         {/* Timer */}
-        <div className={`text-8xl font-mono font-bold ${isWarning ? pth.warnTimer : pth.timerText} ${isWarning ? 'animate-pulse' : ''}`}>
+        <div
+          className={`font-mono font-bold leading-none tabular-nums ${isWarning ? pth.warnTimer : pth.timerText} ${isWarning ? 'animate-pulse' : ''}`}
+          style={{
+            fontSize: timerSize === 'large'
+              ? 'clamp(5rem, 28vw, 20rem)'
+              : timerSize === 'medium'
+                ? 'clamp(2.5rem, 14vw, 10rem)'
+                : 'clamp(1.25rem, 7vw, 5rem)'
+          }}
+        >
           {fmt(remaining)}
+        </div>
+        {/* Timer size switcher */}
+        <div className="flex gap-2">
+          {[['large','XL'],['medium','M'],['small','S']].map(([size, label]) => (
+            <button
+              key={size}
+              onClick={() => setTimerSize(size)}
+              className={`px-3 py-1 rounded-full text-xs font-bold border transition-all ${
+                timerSize === size
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'bg-transparent border-gray-500 opacity-50 hover:opacity-80'
+              }`}
+            >{label}</button>
+          ))}
         </div>
         <div className="text-sm opacity-60">{T.perform_total}: {fmt(totalRemaining)}</div>
         {/* Notes */}
