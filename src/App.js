@@ -422,7 +422,13 @@ function PerformMode(props) {
       React.createElement("div", { style: { position: "absolute", left: "calc(" + pct + "% - 7px)", top: 2, width: 14, height: 14, borderRadius: "50%", background: remaining <= 10 ? "#ef4444" : remaining <= 30 ? "#f59e0b" : (part && part.color ? part.color : pt.bar), border: "2px solid " + pt.text, boxShadow: "0 2px 6px rgba(0,0,0,0.3)", transition: cfg.animations ? "left 1s linear" : "none", pointerEvents: "none" } })
     ),
     preAnnMsg ? React.createElement("div", { style: { position: "fixed", top: 32, left: "50%", transform: "translateX(-50%)", background: "#f59e0b", color: "#000", padding: "14px 28px", borderRadius: 16, fontWeight: 800, fontSize: 18, zIndex: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.4)", textAlign: "center", maxWidth: 360 } }, "\u26a1 " + preAnnMsg) : null,
-    showNotes && part && part.notes ? React.createElement("div", { style: { background: "rgba(0,0,0,0.2)", padding: "12px 20px", borderRadius: 12, marginBottom: 16, maxWidth: 400, fontSize: 14, textAlign: "center", whiteSpace: "pre-wrap" } }, part.notes) : null,
+    showNotes && part && part.notes ? React.createElement("div", { style: { position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 700, background: "rgba(0,0,0,0.75)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", padding: "16px 20px 24px 20px", borderTop: "1px solid rgba(255,255,255,0.15)", maxHeight: "35vh", overflowY: "auto" } },
+        React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 } },
+          React.createElement("span", { style: { fontWeight: 700, fontSize: 14, opacity: 0.7 } }, t.notesL),
+          React.createElement("button", { onClick: function() { setShowNotes(false); }, style: { background: "rgba(255,255,255,0.15)", border: "none", color: pt.text, fontSize: 18, cursor: "pointer", borderRadius: 8, padding: "4px 10px", lineHeight: 1 } }, "\u2715")
+        ),
+        React.createElement("div", { style: { fontSize: 16, whiteSpace: "pre-wrap", lineHeight: 1.5, color: pt.text } }, part.notes)
+      ) : null,
     React.createElement("div", { style: { display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" } },
       React.createElement("button", { onClick: function() { if (idx > 0) setIdx(function(i) { return i - 1; }); else setElapsed(0); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, t.prev),
       React.createElement("button", { onClick: function() { setPaused(function(p) { return !p; }); }, style: Object.assign({}, bs, { background: paused ? "#22c55e" : "#eab308", minWidth: 110 }) }, paused ? ("\u25b6 " + fmt(pauseSecs)) : t.pause),
