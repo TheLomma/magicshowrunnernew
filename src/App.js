@@ -14,8 +14,8 @@ var SOUNDS = {
 };
 
 var T = {
-  de: { title: "Magic Showrunner", ver: "v5.0", save: "Speichern", load: "Laden", newPart: "Neuer Teil", start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen", planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration", volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel", durL: "Dauer (Sek)", introL: "Intro-Ansage", preAnnL: "Vorankündigung (Sek)", preAnnTxt: "Vorankündigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern", cancel: "Abbrechen", showName: "Show-Name", overwrite: "Überschreiben", noSaved: "Keine Shows.", pause: "Pause", resume: "Weiter", prev: "Zurück", next: "Weiter", partOf: "Teil", of: "/", dup: "Duplizieren", del: "Löschen", edit: "Bearbeiten", sek: "Sek", csv: "CSV", fontSize: "Größe", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo", ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen", stop: "Stop", setlist: "Setlist", elapsed: "Vergangen", remaining: "Verbleibend", soundLabel: "Signalton" },
-  en: { title: "Magic Showrunner", ver: "v5.0", save: "Save", load: "Load", newPart: "New Part", start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings", planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration", volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title", durL: "Duration (sec)", introL: "Intro (TTS)", preAnnL: "Pre-announce (sec)", preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save", cancel: "Cancel", showName: "Show Name", overwrite: "Overwrite", noSaved: "No saved shows.", pause: "Pause", resume: "Resume", prev: "Back", next: "Next", partOf: "Part", of: "/", dup: "Duplicate", del: "Delete", edit: "Edit", sek: "sec", csv: "CSV", fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed", ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes", stop: "Stop", setlist: "Setlist", elapsed: "Elapsed", remaining: "Remaining", soundLabel: "Alert Sound" }
+  de: { title: "Magic Showrunner", ver: "v5.1", save: "Speichern", load: "Laden", newPart: "Neuer Teil", start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen", planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration", volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel", durL: "Dauer (Sek)", introL: "Intro-Ansage", preAnnL: "Vorankündigung (Sek)", preAnnTxt: "Vorankündigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern", cancel: "Abbrechen", showName: "Show-Name", overwrite: "Überschreiben", noSaved: "Keine Shows.", pause: "Pause", resume: "Weiter", prev: "Zurück", next: "Weiter", partOf: "Teil", of: "/", dup: "Duplizieren", del: "Löschen", edit: "Bearbeiten", sek: "Sek", csv: "CSV", fontSize: "Größe", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo", ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen", stop: "Stop", setlist: "Setlist", elapsed: "Vergangen", remaining: "Verbleibend", soundLabel: "Signalton" },
+  en: { title: "Magic Showrunner", ver: "v5.1", save: "Save", load: "Load", newPart: "New Part", start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings", planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration", volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title", durL: "Duration (sec)", introL: "Intro (TTS)", preAnnL: "Pre-announce (sec)", preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save", cancel: "Cancel", showName: "Show Name", overwrite: "Overwrite", noSaved: "No saved shows.", pause: "Pause", resume: "Resume", prev: "Back", next: "Next", partOf: "Part", of: "/", dup: "Duplicate", del: "Delete", edit: "Edit", sek: "sec", csv: "CSV", fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed", ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes", stop: "Stop", setlist: "Setlist", elapsed: "Elapsed", remaining: "Remaining", soundLabel: "Alert Sound" }
 };
 
 var TH = {
@@ -475,7 +475,7 @@ function PerformMode(props) {
       </div>
 
       <div style={{ width: "80%", maxWidth: 400, position: "relative", cursor: "pointer", padding: "8px 0", marginTop: 4, marginBottom: 24, userSelect: "none" }} onMouseDown={handleBarMouseDown} onTouchStart={handleBarTouchStart}>
-        <style>{"\n@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }\n"}</style>
+        <style>{"@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }"}</style>
         <div style={{ width: "100%", height: 10, borderRadius: 5, background: pt.barBg, overflow: "hidden", boxShadow: remaining <= 10 && remaining > 0 ? "0 0 12px #ef444488" : "none" }}>
           <div style={{ height: "100%", borderRadius: 4, background: remaining <= 10 && remaining > 0 ? "#ef4444" : remaining <= 30 && remaining > 0 ? "#f59e0b" : (part && part.color ? part.color : pt.bar), width: pct + "%", transition: cfg.animations ? "width 1s linear" : "none", animation: remaining <= 10 && remaining > 0 ? "pulse 0.8s ease-in-out infinite" : "none" }} />
         </div>
@@ -666,14 +666,14 @@ export default function App() {
             </div>
           )}
           <div style={{ display: "flex", gap: 6 }}>
-            <button onClick={doUndo} disabled={!canUndo} style={Object.assign({}, bs, { background: canUndo ? "#6b7280" : "#374151", opacity: canUndo ? 1 : 0.4 })}>↩</button>
-            <button onClick={doRedo} disabled={!canRedo} style={Object.assign({}, bs, { background: canRedo ? "#6b7280" : "#374151", opacity: canRedo ? 1 : 0.4 })}>↪</button>
+            <button onClick={doUndo} disabled={!canUndo} style={Object.assign({}, bs, { background: canUndo ? "#6b7280" : "#374151", opacity: canUndo ? 1 : 0.4 })}>{"↩"}</button>
+            <button onClick={doRedo} disabled={!canRedo} style={Object.assign({}, bs, { background: canRedo ? "#6b7280" : "#374151", opacity: canRedo ? 1 : 0.4 })}>{"↪"}</button>
           </div>
         </div>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-          <span style={{ fontWeight: 600, fontSize: 15 }}>{parts.length} {t.parts} · {fmt(totalSec)} {t.total}</span>
-          <button onClick={function() { setEditPart(null); setEditOpen(true); }} style={Object.assign({}, bs, { background: "#22c55e" })}>+ {t.newPart}</button>
+          <span style={{ fontWeight: 600, fontSize: 15 }}>{parts.length} {t.parts} {"\u00B7"} {fmt(totalSec)} {t.total}</span>
+          <button onClick={function() { setEditPart(null); setEditOpen(true); }} style={Object.assign({}, bs, { background: "#22c55e" })}>{"+ " + t.newPart}</button>
         </div>
 
         {parts.map(function(p, i) {
@@ -683,18 +683,23 @@ export default function App() {
               <div style={{ width: 6, height: 32, borderRadius: 3, background: p.color || th.acc, flexShrink: 0 }} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 600, fontSize: 14, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{(i + 1) + ". " + p.title}</div>
-                <div style={{ fontSize: 12, color: th.sub }}>{fmt(p.duration)} · {p.intro || "–"}</div>
+                <div style={{ fontSize: 12, color: th.sub }}>{fmt(p.duration)} {"\u00B7"} {p.intro || "\u2013"}</div>
               </div>
-              <button onClick={function() { setEditPart(p); setEditOpen(true); }} style={{ background: "none", border: "none", color: th.acc, cursor: "pointer", fontSize: 16 }}>✎</button>
-              <button onClick={function() { dupPart(p); }} style={{ background: "none", border: "none", color: th.sub, cursor: "pointer", fontSize: 14 }}>⧉</button>
-              <button onClick={function() { delPart(p.id); }} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 16 }}>✕</button>
+              <button onClick={function() { setEditPart(p); setEditOpen(true); }} style={{ background: "none", border: "none", color: th.acc, cursor: "pointer", fontSize: 16 }}>{"\u270E"}</button>
+              <button onClick={function() { dupPart(p); }} style={{ background: "none", border: "none", color: th.sub, cursor: "pointer", fontSize: 14 }}>{"\u2398"}</button>
+              <button onClick={function() { delPart(p.id); }} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 16 }}>{"\u2715"}</button>
             </div>
           );
         })}
 
-        <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
-          <button onClick={function() { setCfg(function(c) { return Object.assign({}, c, { testMode: false }); }); setPerforming(true); }} style={{ width: "100%", maxWidth: 400, padding: 14, borderRadius: 12, border: "none", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff", fontWeight: 800, fontSize: 17, cursor: "pointer", boxShadow: "0 4px 16px rgba(99,102,241,0.4)" }}>{"\uD83C\uDFAD " + t.start}</button>
-          <button onClick={function() { setCfg(function(c) { return Object.assign({}, c, { testMode: true }); }); setPerforming(true); }} style={{ width: "100%", maxWidth: 400, padding: 10, borderRadius: 10, border: "1px solid " + th.brd, background: "transparent", color: th.text, fontSize: 14, cursor: "pointer" }}>{"\u23F1 " + t.test + " (" + cfg.testDur + t.sek + "/" + t.parts + ")"}</button>
+        <div style={{ display: "flex", gap: 8, marginTop: 16, justifyContent: "center", flexWrap: "wrap" }}>
+          <button onClick={function() { setCfg(function(c) { return Object.assign({}, c, { testMode: false }); }); setPerforming(true); }} style={Object.assign({}, bs, { background: "#22c55e", padding: "12px 24px", fontSize: 15 })}>{"\u25B6 " + t.start}</button>
+          <button onClick={function() { setCfg(function(c) { return Object.assign({}, c, { testMode: true }); }); setPerforming(true); }} style={Object.assign({}, bs, { background: "#f59e0b", padding: "12px 24px", fontSize: 15 })}>{"\uD83E\uDDEA " + t.test}</button>
+        </div>
+
+        <div style={{ textAlign: "center", marginTop: 16, fontSize: 11, color: th.sub }}>
+          {t.testDur}: {cfg.testDur}s
+          <input type="range" min={3} max={30} value={cfg.testDur} onChange={function(e) { setCfg(function(c) { return Object.assign({}, c, { testDur: +e.target.value }); }); }} style={{ width: 120, marginLeft: 8, verticalAlign: "middle" }} />
         </div>
       </div>
 
