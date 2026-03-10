@@ -307,8 +307,9 @@ function PerformMode(props) {
     React.createElement("div", { style: { fontSize: 18, fontWeight: 600, marginBottom: 8, opacity: 0.8 } }, part ? part.title : ""),
     React.createElement("div", { style: { fontSize: Math.min(120, cfg.fontSize * 5), fontWeight: 800, fontVariantNumeric: "tabular-nums", color: remaining <= 10 && remaining > 0 ? "#ef4444" : pt.timer, transition: "color 0.3s" } }, fmt(remaining)),
     React.createElement("div", { style: { width: "80%", maxWidth: 400, position: "relative", cursor: "pointer", padding: "8px 0", marginTop: 16, marginBottom: 24 }, onClick: handleBarClick },
-      React.createElement("div", { style: { width: "100%", height: 8, borderRadius: 4, background: pt.barBg, overflow: "hidden" } },
-        React.createElement("div", { style: { height: "100%", borderRadius: 4, background: remaining <= 10 ? "#ef4444" : pt.bar, width: pct + "%", transition: cfg.animations ? "width 1s linear" : "none" } })
+      React.createElement("style", null, "@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }"),
+      React.createElement("div", { style: { width: "100%", height: 10, borderRadius: 5, background: pt.barBg, overflow: "hidden", boxShadow: remaining <= 10 && remaining > 0 ? "0 0 12px #ef444488" : "none", transition: "box-shadow 0.3s" } },
+        React.createElement("div", { style: { height: "100%", borderRadius: 4, background: remaining <= 10 && remaining > 0 ? "#ef4444" : pt.bar, width: pct + "%", transition: cfg.animations ? "width 1s linear" : "none", animation: remaining <= 10 && remaining > 0 ? "pulse 0.8s ease-in-out infinite" : "none" } })
       ),
       React.createElement("div", { style: { position: "absolute", left: "calc(" + pct + "% - 7px)", top: 2, width: 14, height: 14, borderRadius: "50%", background: remaining <= 10 ? "#ef4444" : pt.bar, border: "2px solid " + pt.text, boxShadow: "0 2px 6px rgba(0,0,0,0.3)", transition: cfg.animations ? "left 1s linear" : "none", pointerEvents: "none" } })
     ),
@@ -318,6 +319,7 @@ function PerformMode(props) {
       React.createElement("button", { onClick: function() { setPaused(function(p) { return !p; }); }, style: Object.assign({}, bs, { background: paused ? "#22c55e" : "#eab308" }) }, paused ? t.resume : t.pause),
       React.createElement("button", { onClick: function() { if (idx < parts.length - 1) setIdx(function(i) { return i + 1; }); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, t.next),
       React.createElement("button", { onClick: function() { setShowNotes(function(p) { return !p; }); }, style: Object.assign({}, bs, { background: "#8b5cf6" }) }, t.notesL),
+      React.createElement("button", { onClick: function() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } else { document.exitFullscreen && document.exitFullscreen(); } }, style: Object.assign({}, bs, { background: "#0ea5e9", fontSize: 18 }) }, "⛶"),
       React.createElement("button", { onClick: onExit, style: Object.assign({}, bs, { background: "#ef4444" }) }, t.total === t.total ? "Stop" : "Stop")
     ),
     React.createElement("div", { style: { marginTop: 20, fontSize: 12, opacity: 0.6 } }, t.total + ": " + fmt(totalElapsed) + " / " + fmt(totalDur))
@@ -432,7 +434,7 @@ export default function App() {
           onDragEnd: onDragEnd,
           style: { background: th.card, border: "1px solid " + th.brd, borderRadius: 14, padding: "14px 16px", marginBottom: 10, display: "flex", alignItems: "center", gap: 12, cursor: "grab", borderLeft: "4px solid " + (p.color || th.acc), opacity: dragIdx === i ? 0.5 : 1, transition: cfg.animations ? "opacity 0.2s" : "none" }
         },
-          React.createElement("div", { style: { fontSize: 18, color: th.sub, cursor: "grab", userSelect: "none" } }, "="),
+          React.createElement("div", { style: { fontSize: 18, color: th.sub, cursor: "grab", userSelect: "none" } }, "⋮⋮"),
           React.createElement("div", { style: { flex: 1 } },
             React.createElement("div", { style: { fontWeight: 700, fontSize: 15 } }, p.title),
             React.createElement("div", { style: { fontSize: 12, color: th.sub } }, fmt(p.duration))
