@@ -4,8 +4,8 @@ var uid = function() { return Math.random().toString(36).slice(2, 9); };
 var fmt = function(s) { var m = Math.floor(s / 60); var sec = s % 60; return m + ":" + String(sec).padStart(2, "0"); };
 
 var T = {
-  de: { title: "Magic Showrunner", ver: "v3.3", save: "Speichern", load: "Laden", newPart: "Neuer Teil", start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen", planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration", volume: "Lautstaerke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel", durL: "Dauer (Sek)", introL: "Intro-Ansage", preAnnL: "Vorankuendigung (Sek)", preAnnTxt: "Vorankuendigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern", cancel: "Abbrechen", showName: "Show-Name", overwrite: "Ueberschreiben", noSaved: "Keine Shows.", pause: "Pause", resume: "Weiter", prev: "Zurueck", next: "Weiter", partOf: "Teil", of: "/", dup: "Duplizieren", del: "Löschen", edit: "Bearbeiten", sek: "Sek", csv: "CSV", fontSize: "Größe", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo", ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen", stop: "Stop" },
-  en: { title: "Magic Showrunner", ver: "v3.3", save: "Save", load: "Load", newPart: "New Part", start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings", planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration", volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title", durL: "Duration (sec)", introL: "Intro (TTS)", preAnnL: "Pre-announce (sec)", preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save", cancel: "Cancel", showName: "Show Name", overwrite: "Overwrite", noSaved: "No saved shows.", pause: "Pause", resume: "Resume", prev: "Back", next: "Next", partOf: "Part", of: "/", dup: "Duplicate", del: "Delete", edit: "Edit", sek: "sec", csv: "CSV", fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed", ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes", stop: "Stop" }
+  de: { title: "Magic Showrunner", ver: "v3.4", save: "Speichern", load: "Laden", newPart: "Neuer Teil", start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen", planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration", volume: "Lautstaerke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel", durL: "Dauer (Sek)", introL: "Intro-Ansage", preAnnL: "Vorankuendigung (Sek)", preAnnTxt: "Vorankuendigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern", cancel: "Abbrechen", showName: "Show-Name", overwrite: "Ueberschreiben", noSaved: "Keine Shows.", pause: "Pause", resume: "Weiter", prev: "Zurueck", next: "Weiter", partOf: "Teil", of: "/", dup: "Duplizieren", del: "Löschen", edit: "Bearbeiten", sek: "Sek", csv: "CSV", fontSize: "Größe", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo", ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen", stop: "Stop" },
+  en: { title: "Magic Showrunner", ver: "v3.4", save: "Save", load: "Load", newPart: "New Part", start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings", planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration", volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title", durL: "Duration (sec)", introL: "Intro (TTS)", preAnnL: "Pre-announce (sec)", preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save", cancel: "Cancel", showName: "Show Name", overwrite: "Overwrite", noSaved: "No saved shows.", pause: "Pause", resume: "Resume", prev: "Back", next: "Next", partOf: "Part", of: "/", dup: "Duplicate", del: "Delete", edit: "Edit", sek: "sec", csv: "CSV", fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed", ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes", stop: "Stop" }
 };
 
 var TH = {
@@ -255,6 +255,8 @@ function PerformMode(props) {
   var _p = useState(false); var paused = _p[0]; var setPaused = _p[1];
   var _n = useState(false); var showNotes = _n[0]; var setShowNotes = _n[1];
   var _a = useState(false); var preAnnDone = _a[0]; var setPreAnnDone = _a[1];
+  var _ps = useState(0); var pauseSecs = _ps[0]; var setPauseSecs = _ps[1];
+  var pauseRef = useRef(null);
   var _pa = useState(""); var preAnnMsg = _pa[0]; var setPreAnnMsg = _pa[1];
 
   useEffect(function() {
@@ -284,9 +286,15 @@ function PerformMode(props) {
 
   useEffect(function() {
     clearInterval(timerRef.current);
-    if (paused || cdRunning) return;
-    timerRef.current = setInterval(function() { setElapsed(function(p) { return p + 1; }); }, 1000);
-    return function() { clearInterval(timerRef.current); };
+    clearInterval(pauseRef.current);
+    if (cdRunning) return;
+    if (paused) {
+      pauseRef.current = setInterval(function() { setPauseSecs(function(s) { return s + 1; }); }, 1000);
+    } else {
+      setPauseSecs(0);
+      timerRef.current = setInterval(function() { setElapsed(function(p) { return p + 1; }); }, 1000);
+    }
+    return function() { clearInterval(timerRef.current); clearInterval(pauseRef.current); };
   }, [paused, idx, cdRunning]);
 
   useEffect(function() {
@@ -352,6 +360,7 @@ function PerformMode(props) {
 
   return React.createElement("div", { style: { position: "fixed", inset: 0, background: pt.bg, color: pt.text, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: cfg.fontFamily === "System" ? "-apple-system,sans-serif" : cfg.fontFamily, zIndex: 500 } },
     React.createElement("div", { style: { position: "absolute", top: 16, left: 16, fontSize: 13, opacity: 0.7 } }, t.partOf + " " + (idx + 1) + t.of + parts.length),
+    
     cfg.testMode ? React.createElement("div", { style: { position: "absolute", top: 16, right: 16, background: "#f59e0b", color: "#000", padding: "4px 12px", borderRadius: 20, fontSize: 12, fontWeight: 700 } }, "TEST") : null,
     React.createElement("div", { style: { fontSize: 18, fontWeight: 600, marginBottom: 8, opacity: 0.8 } }, part ? part.title : ""),
     React.createElement("div", { style: { fontSize: Math.min(120, cfg.fontSize * 5), fontWeight: 800, fontVariantNumeric: "tabular-nums", color: remaining <= 10 && remaining > 0 ? "#ef4444" : pt.timer, transition: "color 0.3s" } }, fmt(remaining)),
@@ -364,9 +373,9 @@ function PerformMode(props) {
     React.createElement("div", { style: { width: "80%", maxWidth: 400, position: "relative", cursor: "pointer", padding: "8px 0", marginTop: 4, marginBottom: 24, userSelect: "none" }, onMouseDown: handleBarMouseDown, onTouchStart: handleBarTouchStart },
       React.createElement("style", null, "@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }"),
       React.createElement("div", { style: { width: "100%", height: 10, borderRadius: 5, background: pt.barBg, overflow: "hidden", boxShadow: remaining <= 10 && remaining > 0 ? "0 0 12px #ef444488" : "none", transition: "box-shadow 0.3s" } },
-        React.createElement("div", { style: { height: "100%", borderRadius: 4, background: remaining <= 10 && remaining > 0 ? "#ef4444" : pt.bar, width: pct + "%", transition: cfg.animations ? "width 1s linear" : "none", animation: remaining <= 10 && remaining > 0 ? "pulse 0.8s ease-in-out infinite" : "none" } })
+        React.createElement("div", { style: { height: "100%", borderRadius: 4, background: remaining <= 10 && remaining > 0 ? "#ef4444" : (part && part.color ? part.color : pt.bar), width: pct + "%", transition: cfg.animations ? "width 1s linear" : "none", animation: remaining <= 10 && remaining > 0 ? "pulse 0.8s ease-in-out infinite" : "none" } })
       ),
-      React.createElement("div", { style: { position: "absolute", left: "calc(" + pct + "% - 7px)", top: 2, width: 14, height: 14, borderRadius: "50%", background: remaining <= 10 ? "#ef4444" : pt.bar, border: "2px solid " + pt.text, boxShadow: "0 2px 6px rgba(0,0,0,0.3)", transition: cfg.animations ? "left 1s linear" : "none", pointerEvents: "none" } })
+      React.createElement("div", { style: { position: "absolute", left: "calc(" + pct + "% - 7px)", top: 2, width: 14, height: 14, borderRadius: "50%", background: remaining <= 10 ? "#ef4444" : (part && part.color ? part.color : pt.bar), border: "2px solid " + pt.text, boxShadow: "0 2px 6px rgba(0,0,0,0.3)", transition: cfg.animations ? "left 1s linear" : "none", pointerEvents: "none" } })
     ),
     preAnnMsg ? React.createElement("div", { style: { position: "fixed", top: 32, left: "50%", transform: "translateX(-50%)", background: "#f59e0b", color: "#000", padding: "14px 28px", borderRadius: 16, fontWeight: 800, fontSize: 18, zIndex: 600, boxShadow: "0 4px 24px rgba(0,0,0,0.4)", textAlign: "center", maxWidth: 360, animation: "fadeInDown 0.4s ease" } },
       React.createElement("style", null, "@keyframes fadeInDown { from { opacity:0; transform:translateX(-50%) translateY(-20px);} to { opacity:1; transform:translateX(-50%) translateY(0);} }"),
@@ -375,7 +384,7 @@ function PerformMode(props) {
     showNotes && part && part.notes ? React.createElement("div", { style: { background: "rgba(0,0,0,0.2)", padding: "12px 20px", borderRadius: 12, marginBottom: 16, maxWidth: 400, fontSize: 14, textAlign: "center" } }, part.notes) : null,
     React.createElement("div", { style: { display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" } },
       React.createElement("button", { onClick: function() { if (idx > 0) setIdx(function(i) { return i - 1; }); else setElapsed(0); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, t.prev),
-      React.createElement("button", { onClick: function() { setPaused(function(p) { return !p; }); }, style: Object.assign({}, bs, { background: paused ? "#22c55e" : "#eab308" }) }, paused ? t.resume : t.pause),
+      React.createElement("button", { onClick: function() { setPaused(function(p) { return !p; }); }, style: Object.assign({}, bs, { background: paused ? "#22c55e" : "#eab308", minWidth: 110 }) }, paused ? ("▶ " + fmt(pauseSecs)) : t.pause),
       React.createElement("button", { onClick: function() { if (idx < parts.length - 1) setIdx(function(i) { return i + 1; }); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, t.next),
       React.createElement("button", { onClick: function() { setShowNotes(function(p) { return !p; }); }, style: Object.assign({}, bs, { background: "#8b5cf6" }) }, t.notesL),
       React.createElement("button", { onClick: function() { if (!document.fullscreenElement) { document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); } else { document.exitFullscreen && document.exitFullscreen(); } }, style: Object.assign({}, bs, { background: "#0ea5e9", fontSize: 18 }) }, "⛶"),
@@ -384,6 +393,18 @@ function PerformMode(props) {
     parts[idx + 1] ? React.createElement("div", { style: { marginTop: 12, fontSize: 14, opacity: 0.55, fontStyle: "italic" } }, "⏭ " + (cfg.lang === "de" ? "Nächster Teil" : "Next") + ": " + parts[idx + 1].title) : null,
     React.createElement("div", { style: { marginTop: 8, fontSize: 12, opacity: 0.6 } }, t.total + ": " + fmt(totalElapsed) + " / " + fmt(totalDur))
   );
+}
+
+function importCSV(text, onDone) {
+  var clean = text.trim().split("").map(function(c){return c==="\r"?"":c;}).join("");
+  var lines = clean.split("\n");
+  if (lines.length < 2) return;
+  var rows = lines.slice(1);
+  var imported = rows.map(function(row) {
+    var cols = row.split(";");
+    return { id: uid(), title: cols[0] || "?", duration: parseInt(cols[1]) || 60, intro: cols[2] || "", notes: cols[3] || "", preAnn: 10, preAnnText: "", color: COLORS[Math.floor(Math.random() * COLORS.length)] };
+  }).filter(function(p) { return p.title && p.title !== "?"; });
+  if (imported.length > 0) onDone(imported);
 }
 
 function exportCSV(parts, t) {
@@ -395,6 +416,16 @@ function exportCSV(parts, t) {
   a.href = URL.createObjectURL(blob);
   a.download = "showrunner.csv";
   a.click();
+}
+
+function printSetlist(parts, t) {
+  var total = parts.reduce(function(a, p) { return a + p.duration; }, 0);
+  var rows = parts.map(function(p, i) {
+    return '<tr><td>' + (i+1) + '</td><td>' + p.title + '</td><td>' + fmt(p.duration) + '</td><td>' + (p.notes||'') + '</td></tr>';
+  }).join('');
+  var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Setlist</title><style>body{font-family:Arial,sans-serif;padding:32px}table{width:100%;border-collapse:collapse;margin-top:16px}th,td{padding:8px 12px;border-bottom:1px solid #ddd;text-align:left}th{background:#f0f0f0}tfoot td{font-weight:700;border-top:2px solid #333}@media print{button{display:none}}</style></head><body><h1>Magic Showrunner</h1><table><thead><tr><th>#</th><th>Titel</th><th>Dauer</th><th>Notizen</th></tr></thead><tbody>' + rows + '</tbody><tfoot><tr><td colspan="2">Gesamt</td><td>' + fmt(total) + '</td><td></td></tr></tfoot></table><br><button onclick="window.print()">Drucken</button></body></html>';
+  var w = window.open('', '_blank');
+  if (w) { w.document.write(html); w.document.close(); }
 }
 
 function exportPDF(parts, t) {
@@ -418,7 +449,23 @@ function exportPDF(parts, t) {
 }
 
 export default function App() {
-  var _p = useState(DEMO); var parts = _p[0]; var setParts = _p[1];
+  var _hist = useState([DEMO]); var history = _hist[0]; var setHistory = _hist[1];
+  var _hidx = useState(0); var histIdx = _hidx[0]; var setHistIdx = _hidx[1];
+  var parts = history[histIdx];
+  var setParts = function(updater) {
+    setHistory(function(h) {
+      var cur = h[histIdx];
+      var next = typeof updater === "function" ? updater(cur) : updater;
+      var newH = h.slice(0, histIdx + 1).concat([next]);
+      if (newH.length > 50) newH = newH.slice(newH.length - 50);
+      return newH;
+    });
+    setHistIdx(function(i) { return Math.min(i + 1, 49); });
+  };
+  var canUndo = histIdx > 0;
+  var canRedo = histIdx < history.length - 1;
+  var doUndo = function() { if (canUndo) setHistIdx(function(i) { return i - 1; }); };
+  var doRedo = function() { if (canRedo) setHistIdx(function(i) { return i + 1; }); };
   var _c = useState({ lang: "de", theme: (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'), perfTheme: "dark", beeps: true, vibrate: true, volume: 0.5, ttsVoice: "", ttsRate: 1, ttsPitch: 1, fontSize: 15, fontFamily: "System", animations: true, testMode: false, testDur: 5, countdown: 3 });
   var cfg = _c[0]; var setCfg = _c[1];
   var _ep = useState(null); var editPart = _ep[0]; var setEditPart = _ep[1];
@@ -430,6 +477,8 @@ export default function App() {
   var _to = useState(""); var toast = _to[0]; var setToast = _to[1];
   var _di = useState(null); var dragIdx = _di[0]; var setDragIdx = _di[1];
   var _ex = useState(false); var exportOpen = _ex[0]; var setExportOpen = _ex[1];
+  var _ir = useState(false); var importOpen = _ir[0]; var setImportOpen = _ir[1];
+  var csvInputRef = useRef(null);
 
   var t = T[cfg.lang] || T.de;
   var th = TH[cfg.theme] || TH.dark;
@@ -471,11 +520,17 @@ export default function App() {
         React.createElement("button", { onClick: function() { setLoadOpen(true); }, style: Object.assign({}, bs, { background: th.acc }) }, t.load),
         React.createElement("button", { onClick: function() { setSettOpen(true); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, t.settings),
         React.createElement("button", { onClick: function() { setEditPart(null); setEditOpen(true); }, style: Object.assign({}, bs, { background: "#22c55e" }) }, t.newPart),
+        React.createElement("button", { onClick: doUndo, disabled: !canUndo, title: "Undo", style: Object.assign({}, bs, { background: canUndo ? "#6b7280" : "#3f3f5c", opacity: canUndo ? 1 : 0.4, cursor: canUndo ? "pointer" : "not-allowed" }) }, "↩️"),
+        React.createElement("button", { onClick: doRedo, disabled: !canRedo, title: "Redo", style: Object.assign({}, bs, { background: canRedo ? "#6b7280" : "#3f3f5c", opacity: canRedo ? 1 : 0.4, cursor: canRedo ? "pointer" : "not-allowed" }) }, "↪️"),
         React.createElement("div", { style: { position: "relative" } },
           React.createElement("button", { onClick: function() { setExportOpen(function(o) { return !o; }); }, style: Object.assign({}, bs, { background: "#6b7280" }) }, "Export ▾"),
           exportOpen ? React.createElement("div", { style: { position: "absolute", top: "110%", left: 0, background: th.card, border: "1px solid " + th.brd, borderRadius: 10, boxShadow: "0 4px 16px rgba(0,0,0,0.3)", zIndex: 200, minWidth: 130, overflow: "hidden" } },
             React.createElement("button", { onClick: function() { exportCSV(parts, t); setExportOpen(false); }, style: { display: "block", width: "100%", padding: "10px 16px", border: "none", background: "transparent", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 13 } }, "📄 CSV"),
-            React.createElement("button", { onClick: function() { exportPDF(parts, t); setExportOpen(false); }, style: { display: "block", width: "100%", padding: "10px 16px", border: "none", background: "transparent", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 13 } }, "📋 PDF / TXT")
+            React.createElement("button", { onClick: function() { exportPDF(parts, t); setExportOpen(false); }, style: { display: "block", width: "100%", padding: "10px 16px", border: "none", background: "transparent", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 13 } }, "📋 PDF / TXT"),
+            React.createElement("hr", { style: { margin: "2px 0", border: "none", borderTop: "1px solid " + th.brd } }),
+            React.createElement("button", { onClick: function() { setExportOpen(false); csvInputRef.current && csvInputRef.current.click(); }, style: { display: "block", width: "100%", padding: "10px 16px", border: "none", background: "transparent", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 13 } }, "📥 CSV Import"),
+            React.createElement("hr", { style: { margin: "2px 0", border: "none", borderTop: "1px solid " + th.brd } }),
+            React.createElement("button", { onClick: function() { printSetlist(parts, t); setExportOpen(false); }, style: { display: "block", width: "100%", padding: "10px 16px", border: "none", background: "transparent", color: th.text, cursor: "pointer", textAlign: "left", fontSize: 13 } }, "🖨️ Drucken")
           ) : null
         )
       ),
@@ -488,13 +543,12 @@ export default function App() {
       ),
       parts.map(function(p, i) {
         return React.createElement("div", {
-          key: p.id, draggable: true,
-          onDragStart: function(e) { onDragStart(e, i); },
-          onDragOver: function(e) { onDragOver(e, i); },
-          onDragEnd: onDragEnd,
-          style: { background: th.card, border: "1px solid " + th.brd, borderRadius: 14, padding: "14px 16px", marginBottom: 10, display: "flex", alignItems: "center", gap: 12, cursor: "grab", borderLeft: "4px solid " + (p.color || th.acc), opacity: dragIdx === i ? 0.5 : 1, transition: cfg.animations ? "opacity 0.2s" : "none" }
+          key: p.id,
+          onDragOver: function(e) { e.preventDefault(); onDragOver(e, i); },
+          onDrop: function(e) { e.preventDefault(); onDragEnd(); },
+          style: { background: th.card, border: "1px solid " + th.brd, borderRadius: 14, padding: "14px 16px", marginBottom: 10, display: "flex", alignItems: "center", gap: 12, borderLeft: "4px solid " + (p.color || th.acc), opacity: dragIdx === i ? 0.5 : 1, transition: cfg.animations ? "opacity 0.2s" : "none" }
         },
-          React.createElement("div", { style: { fontSize: 18, color: th.sub, cursor: "grab", userSelect: "none" } }, "⋮⋮"),
+          React.createElement("div", { draggable: true, onDragStart: function(e) { onDragStart(e, i); }, onDragEnd: onDragEnd, style: { fontSize: 18, color: th.sub, cursor: "grab", userSelect: "none", padding: "4px 6px", borderRadius: 6 } }, "⋮⋮"),
           React.createElement("div", { style: { flex: 1 } },
             React.createElement("div", { style: { fontWeight: 700, fontSize: 15 } }, p.title),
             React.createElement("div", { style: { fontSize: 12, color: th.sub } }, fmt(p.duration))
@@ -511,7 +565,8 @@ export default function App() {
           React.createElement("span", { style: { fontSize: 12, color: th.sub } }, cfg.lang === "de" ? "⏱ Countdown:" : "⏱ Countdown:"),
           [0, 3, 5, 10].map(function(v) {
             return React.createElement("button", { key: v, onClick: function() { setCfg(function(c) { return Object.assign({}, c, { countdown: v }); }); }, style: { padding: "5px 10px", borderRadius: 8, border: cfg.countdown === v ? "2px solid " + th.acc : "2px solid transparent", background: cfg.countdown === v ? th.acc + "22" : th.inp, color: th.text, cursor: "pointer", fontSize: 12, fontWeight: cfg.countdown === v ? 700 : 400 } }, v === 0 ? (cfg.lang === "de" ? "Aus" : "Off") : v + "s");
-          })
+          }),
+          React.createElement("input", { type: "number", min: 1, max: 999, placeholder: "...", onChange: function(e) { var v = parseInt(e.target.value); if (!isNaN(v) && v > 0) setCfg(function(c) { return Object.assign({}, c, { countdown: v }); }); }, style: { width: 54, padding: "5px 6px", borderRadius: 8, border: "2px solid transparent", background: th.inp, color: th.text, fontSize: 12, textAlign: "center" } })
         ),
         React.createElement("button", { onClick: function() { setPerforming(true); }, style: { width: "100%", padding: 16, borderRadius: 14, border: "none", background: "linear-gradient(135deg," + th.acc + ",#8b5cf6)", color: "#fff", fontWeight: 800, fontSize: 18, cursor: "pointer", marginTop: 12, boxShadow: "0 4px 20px " + th.acc + "44" } }, t.start + (cfg.testMode ? " (Test)" : ""))
       ) : null
@@ -520,6 +575,19 @@ export default function App() {
     React.createElement(SaveModal, { open: saveOpen, onClose: function() { setSaveOpen(false); }, parts: parts, t: t, th: th, onToast: setToast }),
     React.createElement(LoadModal, { open: loadOpen, onClose: function() { setLoadOpen(false); }, onLoad: function(p) { setParts(p); setToast(t.load + " OK"); }, t: t, th: th }),
     React.createElement(SettingsModal, { open: settOpen, onClose: function() { setSettOpen(false); }, cfg: cfg, setCfg: setCfg, t: t, th: th }),
+    React.createElement("input", { ref: csvInputRef, type: "file", accept: ".csv", style: { display: "none" }, onChange: function(e) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function(ev) {
+        importCSV(ev.target.result, function(imported) {
+          setParts(function(prev) { return prev.concat(imported); });
+          setToast((cfg.lang === "de" ? imported.length + " Teile importiert" : imported.length + " parts imported"));
+        });
+      };
+      reader.readAsText(file);
+      e.target.value = "";
+    } }),
     toast ? React.createElement(Toast, { msg: toast, onDone: function() { setToast(""); } }) : null
   );
 }
