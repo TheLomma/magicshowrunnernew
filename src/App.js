@@ -1,6 +1,6 @@
 
 
-// v7.0
+// v7.1
 import React, { useState, useEffect, useRef } from "react";
 
 var uid = function () { return Math.random().toString(36).slice(2, 9); };
@@ -18,9 +18,15 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v7.0", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v7.1", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
-    planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
+    planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration", vibSettings: "Vibrations-Einstellungen",
+    vibOnPartChange: "Bei Teilwechsel", vibOnPreAnn: "Bei Vorankündigung",
+    vibOnWarning1: "Erste Warnung", vibOnWarning2: "Zweite Warnung",
+    vibOnCountdown: "Countdown (jede Sek)",
+    vibWarning1Sec: "Erste Warnung (Sek vor Ende)", vibWarning2Sec: "Zweite Warnung (Sek vor Ende)",
+    vibCountdownStart: "Countdown ab (Sek vor Ende)", vibPattern: "Muster",
+    vibTest: "Test", vibOff: "Aus",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
     durL: "Dauer (Sek)", introL: "Intro-Ansage", preAnnL: "Vorankündigung (Sek)",
     preAnnTxt: "Vorankündigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern",
@@ -46,9 +52,15 @@ var T = {
     circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil"
   },
   en: {
-    title: "Magic Showrunner", ver: "v7.0", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v7.1", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
-    planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
+    planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration", vibSettings: "Vibration Settings",
+    vibOnPartChange: "On Part Change", vibOnPreAnn: "On Pre-Announce",
+    vibOnWarning1: "First Warning", vibOnWarning2: "Second Warning",
+    vibOnCountdown: "Countdown (every sec)",
+    vibWarning1Sec: "First Warning (sec before end)", vibWarning2Sec: "Second Warning (sec before end)",
+    vibCountdownStart: "Countdown from (sec before end)", vibPattern: "Pattern",
+    vibTest: "Test", vibOff: "Off",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
     durL: "Duration (sec)", introL: "Intro (TTS)", preAnnL: "Pre-announce (sec)",
     preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save",
@@ -147,7 +159,36 @@ function doBeep(vol, freq, ms, soundKey) {
   } catch (e) {}
 }
 
+var VIB_PATTERNS = {
+  shortOnce: { label: { de: "Kurz 1×", en: "Short 1×" }, pattern: [100] },
+  shortTwice: { label: { de: "Kurz 2×", en: "Short 2×" }, pattern: [100, 80, 100] },
+  longOnce: { label: { de: "Lang 1×", en: "Long 1×" }, pattern: [400] },
+  longTwice: { label: { de: "Lang 2×", en: "Long 2×" }, pattern: [400, 150, 400] },
+  strong: { label: { de: "Stark", en: "Strong" }, pattern: [600, 100, 600] },
+  pulse: { label: { de: "Puls", en: "Pulse" }, pattern: [100, 50, 100, 50, 100] }
+};
+
+var DEFAULT_VIB_CFG = {
+  enabled: true,
+  onPartChange: "strong",
+  onPreAnnounce: "shortOnce",
+  onWarning1: "shortOnce",
+  onWarning2: "shortOnce",
+  onCountdown: "shortOnce",
+  warning1Sec: 30,
+  warning2Sec: 15,
+  countdownStartSec: 5
+};
+
 function doVibrate(ms) { try { if (navigator.vibrate) navigator.vibrate(ms || 200); } catch (e) {} }
+
+function doVibratePattern(patternKey) {
+  try {
+    if (!navigator.vibrate) return;
+    var p = VIB_PATTERNS[patternKey];
+    if (p && p.pattern) { navigator.vibrate(p.pattern); } else { navigator.vibrate(200); }
+  } catch (e) {}
+}
 
 function doSpeak(text, rate, pitch, uri) {
   if (!text || !window.speechSynthesis) return;
@@ -398,8 +439,8 @@ function SettingsModal(props) {
   var is = { width: "100%", padding: 8, borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginBottom: 8, boxSizing: "border-box" };
   if (!open) return null;
   var upCfg = function (k, v) { setCfg(function (c) { var o = {}; o[k] = v; return Object.assign({}, c, o); }); };
-  var tabs = ["design", "audio", "voice", "font", "lang", "tutorial"];
-  var icons = { design: "Design", audio: "Audio", voice: cfg.lang === "de" ? "Stimme" : "Voice", font: cfg.lang === "de" ? "Schrift" : "Font", lang: cfg.lang === "de" ? "Sprache" : "Language", tutorial: cfg.lang === "de" ? "Anleitung" : "Tutorial" };
+  var tabs = ["design", "audio", "vibration", "voice", "font", "lang", "tutorial"];
+  var icons = { design: "Design", audio: "Audio", vibration: cfg.lang === "de" ? "Vibration" : "Vibration", voice: cfg.lang === "de" ? "Stimme" : "Voice", font: cfg.lang === "de" ? "Schrift" : "Font", lang: cfg.lang === "de" ? "Sprache" : "Language", tutorial: cfg.lang === "de" ? "Anleitung" : "Tutorial" };
   var content = null;
 
   if (tab === "design") {
@@ -450,6 +491,54 @@ function SettingsModal(props) {
           })}
         </div>
         <button onClick={function () { doBeep(cfg.volume, null, null, cfg.beepSound); }} style={{ padding: "8px 16px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", cursor: "pointer" }}>{t.testTone}</button>
+      </div>
+    );
+  } else if (tab === "vibration") {
+    var vibCfg = cfg.vibCfg || DEFAULT_VIB_CFG;
+    var upVib = function (k, v) { var nv = Object.assign({}, vibCfg); nv[k] = v; upCfg("vibCfg", nv); };
+    var patternSelect = function (label, key, value) {
+      return (
+        <div style={{ marginBottom: 10, padding: "10px 12px", background: th.inp, borderRadius: 10, border: "1px solid " + th.brd }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+            <span style={{ fontSize: 13, fontWeight: 600 }}>{label}</span>
+            <button onClick={function () { if (value && value !== "off") doVibratePattern(value); }} style={{ padding: "3px 10px", borderRadius: 6, border: "1px solid " + th.brd, background: "transparent", color: th.acc, cursor: "pointer", fontSize: 11 }}>{t.vibTest}</button>
+          </div>
+          <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+            <button onClick={function () { upVib(key, "off"); }} style={{ padding: "5px 10px", borderRadius: 6, border: value === "off" ? "2px solid " + th.acc : "2px solid transparent", background: value === "off" ? th.acc + "22" : th.card, color: th.text, cursor: "pointer", fontSize: 11 }}>{t.vibOff}</button>
+            {Object.keys(VIB_PATTERNS).map(function (pk) {
+              var pl = VIB_PATTERNS[pk].label[cfg.lang] || VIB_PATTERNS[pk].label.de;
+              return <button key={pk} onClick={function () { upVib(key, pk); doVibratePattern(pk); }} style={{ padding: "5px 10px", borderRadius: 6, border: value === pk ? "2px solid " + th.acc : "2px solid transparent", background: value === pk ? th.acc + "22" : th.card, color: th.text, cursor: "pointer", fontSize: 11 }}>{pl}</button>;
+            })}
+          </div>
+        </div>
+      );
+    };
+    content = (
+      <div>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, marginBottom: 12, cursor: "pointer" }}>
+          <input type="checkbox" checked={vibCfg.enabled !== false} onChange={function (e) { upVib("enabled", e.target.checked); }} /> {t.vibration}
+        </label>
+        {vibCfg.enabled !== false && (
+          <div>
+            {patternSelect(t.vibOnPartChange, "onPartChange", vibCfg.onPartChange)}
+            {patternSelect(t.vibOnPreAnn, "onPreAnnounce", vibCfg.onPreAnnounce)}
+            {patternSelect(t.vibOnWarning1, "onWarning1", vibCfg.onWarning1)}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, paddingLeft: 12 }}>
+              <label style={{ fontSize: 12, color: th.sub }}>{t.vibWarning1Sec}</label>
+              <input type="number" min={1} max={300} value={vibCfg.warning1Sec} onChange={function (e) { upVib("warning1Sec", +e.target.value); }} style={{ width: 60, padding: 4, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, textAlign: "center" }} />
+            </div>
+            {patternSelect(t.vibOnWarning2, "onWarning2", vibCfg.onWarning2)}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, paddingLeft: 12 }}>
+              <label style={{ fontSize: 12, color: th.sub }}>{t.vibWarning2Sec}</label>
+              <input type="number" min={1} max={300} value={vibCfg.warning2Sec} onChange={function (e) { upVib("warning2Sec", +e.target.value); }} style={{ width: 60, padding: 4, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, textAlign: "center" }} />
+            </div>
+            {patternSelect(t.vibOnCountdown, "onCountdown", vibCfg.onCountdown)}
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, paddingLeft: 12 }}>
+              <label style={{ fontSize: 12, color: th.sub }}>{t.vibCountdownStart}</label>
+              <input type="number" min={1} max={60} value={vibCfg.countdownStartSec} onChange={function (e) { upVib("countdownStartSec", +e.target.value); }} style={{ width: 60, padding: 4, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, textAlign: "center" }} />
+            </div>
+          </div>
+        )}
       </div>
     );
   } else if (tab === "voice") {
@@ -572,7 +661,7 @@ function SettingsModal(props) {
       <div style={{ display: "flex", gap: 4, marginBottom: 16, overflowX: "auto", paddingBottom: 2 }}>
         {tabs.map(function (k) {
           var active = tab === k;
-          var tiMap2 = { design: "🎨", audio: "🔊", voice: "🗣️", font: "🔤", lang: "🌐", tutorial: "📖" };
+          var tiMap2 = { design: "🎨", audio: "🔊", vibration: "📳", voice: "🗣️", font: "🔤", lang: "🌐", tutorial: "📖" };
           return <button key={k} onClick={function () { setTab(k); }} style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "7px 10px", borderRadius: 10, border: active ? "2px solid " + th.acc : "2px solid transparent", background: active ? th.acc + "22" : th.inp, color: active ? th.acc : th.sub, cursor: "pointer", minWidth: 50 }}>
               <span style={{ fontSize: 18 }}>{tiMap2[k]}</span>
               <span style={{ fontSize: 9, fontWeight: active ? 700 : 400 }}>{icons[k]}</span>
@@ -727,15 +816,27 @@ function PerformMode(props) {
     var iv = setInterval(function () {
       setElapsed(function (e) {
         var ne = e + 1;
+        var vibCfg = cfg.vibCfg || DEFAULT_VIB_CFG;
+        var vibEnabled = vibCfg.enabled !== false;
+        var remSec = dur - ne;
+        if (vibEnabled && vibCfg.onWarning1 !== "off" && remSec === vibCfg.warning1Sec) {
+          doVibratePattern(vibCfg.onWarning1);
+        }
+        if (vibEnabled && vibCfg.onWarning2 !== "off" && remSec === vibCfg.warning2Sec) {
+          doVibratePattern(vibCfg.onWarning2);
+        }
+        if (vibEnabled && vibCfg.onCountdown !== "off" && remSec > 0 && remSec <= vibCfg.countdownStartSec) {
+          doVibratePattern(vibCfg.onCountdown);
+        }
         if (cur && cur.preAnn && ne === dur - cur.preAnn && !preAnnRef.current[idx]) {
           preAnnRef.current[idx] = true;
           if (cur.preAnnText) doSpeak(cur.preAnnText, cfg.ttsRate, cfg.ttsPitch, cfg.ttsVoice);
           if (cfg.beeps) doBeep(cfg.volume, 600, 100, cfg.beepSound);
-          if (cfg.vibrate) doVibrate(200);
+          if (vibEnabled && vibCfg.onPreAnnounce !== "off") doVibratePattern(vibCfg.onPreAnnounce);
         }
         if (ne >= dur) {
           if (cfg.beeps) doBeep(cfg.volume, 880, 200, cfg.beepSound);
-          if (cfg.vibrate) doVibrate(400);
+          if (vibEnabled && vibCfg.onPartChange !== "off") doVibratePattern(vibCfg.onPartChange);
           if (idx < parts.length - 1) {
             setIdx(function (i) { return i + 1; });
             introRef.current = {};
