@@ -17,7 +17,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v6.1", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v6.2", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -25,7 +25,7 @@ var T = {
     preAnnTxt: "Vorankündigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern",
     cancel: "Abbrechen", showName: "Show-Name", overwrite: "Überschreiben", noSaved: "Keine Shows.",
     pause: "Pause", resume: "Weiter", prev: "Zurück", next: "Weiter", partOf: "Teil", of: "/",
-    dup: "Duplizieren", del: "Löschen", edit: "Bearbeiten", sek: "Sek", csv: "CSV",
+    dup: "⧉", del: "Löschen", edit: "✏️", sek: "Sek", csv: "CSV",
     fontSize: "Größe", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo",
     ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen",
     stop: "Stop", setlist: "Setlist", elapsed: "Vergangen", remaining: "Verbleibend",
@@ -46,7 +46,7 @@ var T = {
     circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil"
   },
   en: {
-    title: "Magic Showrunner", ver: "v6.1", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v6.2", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -54,7 +54,7 @@ var T = {
     preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save",
     cancel: "Cancel", showName: "Show Name", overwrite: "Overwrite", noSaved: "No saved shows.",
     pause: "Pause", resume: "Resume", prev: "Back", next: "Next", partOf: "Part", of: "/",
-    dup: "Duplicate", del: "Delete", edit: "Edit", sek: "sec", csv: "CSV",
+    dup: "⧉", del: "Delete", edit: "✏️", sek: "sec", csv: "CSV",
     fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed",
     ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes",
     stop: "Stop", setlist: "Setlist", elapsed: "Elapsed", remaining: "Remaining",
