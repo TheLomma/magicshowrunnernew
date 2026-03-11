@@ -1,6 +1,6 @@
 
 
-// v6.9
+// v7.0
 import React, { useState, useEffect, useRef } from "react";
 
 var uid = function () { return Math.random().toString(36).slice(2, 9); };
@@ -18,7 +18,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v6.9", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v7.0", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -46,7 +46,7 @@ var T = {
     circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil"
   },
   en: {
-    title: "Magic Showrunner", ver: "v6.9", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v7.0", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -172,7 +172,10 @@ function Modal(props) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }} onClick={props.onClose}>
       <div onClick={function (e) { e.stopPropagation(); }} style={{ background: props.th.card, color: props.th.text, borderRadius: 16, padding: 24, minWidth: 300, maxWidth: "90vw", maxHeight: "80vh", overflow: "auto", boxShadow: "0 8px 40px rgba(0,0,0,0.4)" }}>
-        <h3 style={{ marginTop: 0 }}>{props.title}</h3>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <h3 style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>{props.title}</h3>
+          <button onClick={props.onClose} style={{ background: "transparent", border: "none", color: props.th.sub, fontSize: 22, cursor: "pointer", lineHeight: 1, padding: "0 4px" }}>×</button>
+        </div>
         {props.children}
       </div>
     </div>
@@ -566,9 +569,14 @@ function SettingsModal(props) {
 
   return (
     <Modal open={open} onClose={onClose} title={t.settings} th={th}>
-      <div style={{ display: "flex", gap: 4, marginBottom: 16 }}>
+      <div style={{ display: "flex", gap: 4, marginBottom: 16, overflowX: "auto", paddingBottom: 2 }}>
         {tabs.map(function (k) {
-          return <button key={k} onClick={function () { setTab(k); }} style={{ flex: 1, padding: "8px 4px", borderRadius: 8, border: tab === k ? "2px solid " + th.acc : "2px solid transparent", background: tab === k ? th.acc + "22" : "transparent", color: th.text, cursor: "pointer", fontSize: 13 }}>{icons[k]}</button>;
+          var active = tab === k;
+          var tiMap2 = { design: "🎨", audio: "🔊", voice: "🗣️", font: "🔤", lang: "🌐", tutorial: "📖" };
+          return <button key={k} onClick={function () { setTab(k); }} style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "7px 10px", borderRadius: 10, border: active ? "2px solid " + th.acc : "2px solid transparent", background: active ? th.acc + "22" : th.inp, color: active ? th.acc : th.sub, cursor: "pointer", minWidth: 50 }}>
+              <span style={{ fontSize: 18 }}>{tiMap2[k]}</span>
+              <span style={{ fontSize: 9, fontWeight: active ? 700 : 400 }}>{icons[k]}</span>
+            </button>;
         })}
       </div>
       {content}
