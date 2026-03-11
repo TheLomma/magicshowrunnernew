@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect, useRef } from "react";
 
 var uid = function () { return Math.random().toString(36).slice(2, 9); };
@@ -15,7 +17,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v5.9", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v6.1", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -39,10 +41,12 @@ var T = {
     resetCustom: "Zurücksetzen", applyCustom: "Anwenden",
     showModeSize: "Anzeigegröße im Show-Modus", sizeSmall: "Klein", sizeLarge: "Groß",
     targetEnd: "Ziel-Endzeit", onSchedule: "Im Zeitplan", behind: "Überzogen", ahead: "Voraus",
-    targetEndHint: "Gewünschtes Show-Ende (HH:MM)"
+    targetEndHint: "Gewünschtes Show-Ende (HH:MM)",
+    share: "Teilen", shareLink: "Link kopiert!", shareTitle: "Show teilen",
+    circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil"
   },
   en: {
-    title: "Magic Showrunner", ver: "v5.9", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v6.1", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -66,7 +70,9 @@ var T = {
     resetCustom: "Reset", applyCustom: "Apply",
     showModeSize: "Display size in Show Mode", sizeSmall: "Small", sizeLarge: "Large",
     targetEnd: "Target End Time", onSchedule: "On schedule", behind: "Behind", ahead: "Ahead",
-    targetEndHint: "Desired show end (HH:MM)"
+    targetEndHint: "Desired show end (HH:MM)",
+    share: "Share", shareLink: "Link copied!", shareTitle: "Share Show",
+    circleTimer: "Circle Timer", barTimer: "Bar Timer", timerStyle: "Timer Style"
   }
 };
 
@@ -357,6 +363,11 @@ function SettingsModal(props) {
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
           <input type="checkbox" checked={cfg.colorTransitions !== false} onChange={function (e) { upCfg("colorTransitions", e.target.checked); }} /> {t.colorTrans}
         </label>
+        <label style={{ fontSize: 12, color: th.sub, marginTop: 12, display: "block" }}>{t.timerStyle}</label>
+        <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
+          <button onClick={function () { upCfg("timerStyle", "bar"); }} style={{ padding: "8px 14px", borderRadius: 8, border: cfg.timerStyle === "bar" || !cfg.timerStyle ? "2px solid " + th.acc : "2px solid transparent", background: th.inp, color: th.text, cursor: "pointer", fontSize: 12 }}>{t.barTimer}</button>
+          <button onClick={function () { upCfg("timerStyle", "circle"); }} style={{ padding: "8px 14px", borderRadius: 8, border: cfg.timerStyle === "circle" ? "2px solid " + th.acc : "2px solid transparent", background: th.inp, color: th.text, cursor: "pointer", fontSize: 12 }}>{t.circleTimer}</button>
+        </div>
       </div>
     );
   } else if (tab === "audio") {
@@ -405,7 +416,7 @@ function SettingsModal(props) {
         <label style={{ fontSize: 12, color: th.sub, display: "block", marginBottom: 4 }}>{t.showModeSize}</label>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
           <span style={{ fontSize: 11, color: th.sub }}>{t.sizeSmall}</span>
-          <input type="range" min={0.4} max={2.0} step={0.05} value={scale} onChange={function (e) { upCfg("performSizeScale", +e.target.value); }} style={{ flex: 1 }} />
+          <input type="range" min={0.4} max={4.0} step={0.05} value={scale} onChange={function (e) { upCfg("performSizeScale", +e.target.value); }} style={{ flex: 1 }} />
           <span style={{ fontSize: 11, color: th.sub }}>{t.sizeLarge}</span>
         </div>
         <div style={{ fontSize: 11, color: th.sub, marginBottom: 8, textAlign: "center" }}>
@@ -465,38 +476,50 @@ function useClock() {
 function TargetEndIndicator(props) {
   var targetEnd = props.targetEnd, parts = props.parts, idx = props.idx, elapsed = props.elapsed, cfg = props.cfg, pt = props.pt, t = props.t;
   if (!targetEnd) return null;
-
   var now = new Date();
   var tParts = targetEnd.split(":");
   var targetDate = new Date();
   targetDate.setHours(parseInt(tParts[0], 10), parseInt(tParts[1], 10), 0, 0);
   if (targetDate < now) targetDate.setDate(targetDate.getDate() + 1);
-
   var remainingShowSec = 0;
   for (var i = idx; i < parts.length; i++) {
     var partDur = cfg.testMode ? (cfg.testDur || 10) : parts[i].duration;
-    if (i === idx) {
-      remainingShowSec += Math.max(partDur - elapsed, 0);
-    } else {
-      remainingShowSec += partDur;
-    }
+    if (i === idx) { remainingShowSec += Math.max(partDur - elapsed, 0); } else { remainingShowSec += partDur; }
   }
-
   var estimatedEndMs = now.getTime() + remainingShowSec * 1000;
   var estimatedEnd = new Date(estimatedEndMs);
   var diffSec = Math.round((targetDate.getTime() - estimatedEndMs) / 1000);
   var diffMin = Math.round(diffSec / 60);
-
   var estStr = String(estimatedEnd.getHours()).padStart(2, "0") + ":" + String(estimatedEnd.getMinutes()).padStart(2, "0");
-
   var statusColor = diffSec >= 0 ? "#10b981" : "#ef4444";
   var statusText = diffSec >= 0 ? (diffMin > 0 ? diffMin + " min " + t.ahead : t.onSchedule) : (Math.abs(diffMin) + " min " + t.behind);
-
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: pt.text, opacity: 0.8 }}>
       <span>🎯 {targetEnd}</span>
       <span style={{ color: statusColor, fontWeight: 700 }}>{statusText}</span>
       <span style={{ opacity: 0.5 }}>→ ~{estStr}</span>
+    </div>
+  );
+}
+
+function CircleTimer(props) {
+  var pct = props.pct, rem = props.rem, timerVal = props.timerVal, timerLabel = props.timerLabel, pt = props.pt, sz = props.sz, onToggle = props.onToggle;
+  var radius = Math.min(sz.timer * 1.2, 120);
+  var stroke = Math.max(radius * 0.12, 6);
+  var normalizedRadius = radius - stroke / 2;
+  var circumference = 2 * Math.PI * normalizedRadius;
+  var strokeDashoffset = circumference - (pct / 100) * circumference;
+  var barColor = rem <= 10 ? "#ef4444" : pt.bar;
+  return (
+    <div onClick={onToggle} style={{ cursor: "pointer", position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+      <svg width={radius * 2} height={radius * 2} style={{ transform: "rotate(-90deg)" }}>
+        <circle cx={radius} cy={radius} r={normalizedRadius} fill="none" stroke={pt.barBg} strokeWidth={stroke} />
+        <circle cx={radius} cy={radius} r={normalizedRadius} fill="none" stroke={barColor} strokeWidth={stroke} strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.5s ease, stroke 0.3s" }} />
+      </svg>
+      <div style={{ position: "absolute", textAlign: "center" }}>
+        <div style={{ fontSize: Math.round(sz.timer * 0.7), fontWeight: 800, color: rem <= 10 ? "#ef4444" : pt.timer, fontFamily: "monospace" }}>{timerVal}</div>
+        <div style={{ fontSize: 11, color: pt.text, opacity: 0.4 }}>{timerLabel}</div>
+      </div>
     </div>
   );
 }
@@ -520,9 +543,9 @@ function PerformMode(props) {
   var preAnnRef = useRef({}); var introRef = useRef({}); var barRef = useRef(null);
   var cur = parts[idx];
   var dur = cfg.testMode ? (cfg.testDur || 10) : (cur ? cur.duration : 60);
-
   var sizeScale = cfg.performSizeScale != null ? cfg.performSizeScale : 1.0;
   var sz = { timer: Math.round(72 * sizeScale), title: Math.round(28 * sizeScale) };
+  var useCircle = cfg.timerStyle === "circle";
 
   useEffect(function () {
     if (!cdRunning) return;
@@ -556,10 +579,7 @@ function PerformMode(props) {
             introRef.current = {};
             preAnnRef.current = {};
             return 0;
-          } else {
-            setDone(true);
-            return dur;
-          }
+          } else { setDone(true); return dur; }
         }
         return ne;
       });
@@ -576,7 +596,6 @@ function PerformMode(props) {
   }, [idx, cdRunning, done]);
 
   if (!cur) return null;
-
   var pct = Math.min(elapsed / dur * 100, 100);
   var rem = Math.max(dur - elapsed, 0);
   var timerVal = showElapsed ? fmt(elapsed) : fmt(rem);
@@ -650,7 +669,7 @@ function PerformMode(props) {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: "auto" }}>
           <span style={{ fontSize: 10, color: pt.text, opacity: 0.5 }}>A</span>
-          <input type="range" min={0.4} max={2.0} step={0.05} value={sizeScale} onChange={function (e) { if (onSizeChange) onSizeChange(+e.target.value); }} style={{ width: 80, accentColor: pt.bar }} />
+          <input type="range" min={0.4} max={4.0} step={0.05} value={sizeScale} onChange={function (e) { if (onSizeChange) onSizeChange(+e.target.value); }} style={{ width: 80, accentColor: pt.bar }} />
           <span style={{ fontSize: 14, color: pt.text, opacity: 0.5 }}>A</span>
         </div>
         <button onClick={function () { setShowSetlist(!showSetlist); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: showSetlist ? pt.bar : "transparent", color: showSetlist ? "#fff" : pt.text, cursor: "pointer", fontSize: 12 }}>{t.setlist}</button>
@@ -661,14 +680,25 @@ function PerformMode(props) {
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px" }}>
         <div style={{ fontSize: sz.title, fontWeight: 700, color: pt.text, marginBottom: 8, textAlign: "center" }}>{cur.title}</div>
         <div style={{ fontSize: 14, color: pt.text, opacity: 0.5, marginBottom: 16 }}>{t.partOf} {idx + 1} {t.of} {parts.length}</div>
-        <div onClick={function () { setShowElapsed(!showElapsed); }} style={{ cursor: "pointer", textAlign: "center", marginBottom: 8 }}>
-          <div style={{ fontSize: sz.timer, fontWeight: 800, color: rem <= 10 ? "#ef4444" : pt.timer, fontFamily: "monospace", transition: "color 0.3s" }}>{timerVal}</div>
-          <div style={{ fontSize: 12, color: pt.text, opacity: 0.4 }}>{timerLabel}</div>
-        </div>
-        <div ref={barRef} onClick={handleSeek} style={{ width: "100%", maxWidth: 400, height: 12, background: pt.barBg, borderRadius: 6, cursor: "pointer", position: "relative", marginBottom: 16 }}>
-          <div style={{ width: pct + "%", height: "100%", background: rem <= 10 ? "#ef4444" : pt.bar, borderRadius: 6, transition: "width 0.3s" }} />
-          <div style={{ position: "absolute", top: -4, left: "calc(" + pct + "% - 10px)", width: 20, height: 20, borderRadius: "50%", background: rem <= 10 ? "#ef4444" : pt.bar, border: "3px solid " + pt.bg, cursor: "grab", boxShadow: "0 2px 6px rgba(0,0,0,0.3)" }} />
-        </div>
+        {useCircle ? (
+          <CircleTimer pct={pct} rem={rem} timerVal={timerVal} timerLabel={timerLabel} pt={pt} sz={sz} onToggle={function () { setShowElapsed(!showElapsed); }} />
+        ) : (
+          <div onClick={function () { setShowElapsed(!showElapsed); }} style={{ cursor: "pointer", textAlign: "center", marginBottom: 8 }}>
+            <div style={{ fontSize: sz.timer, fontWeight: 800, color: rem <= 10 ? "#ef4444" : pt.timer, fontFamily: "monospace", transition: "color 0.3s" }}>{timerVal}</div>
+            <div style={{ fontSize: 12, color: pt.text, opacity: 0.4 }}>{timerLabel}</div>
+          </div>
+        )}
+        {!useCircle && (
+          <div ref={barRef} onClick={handleSeek} style={{ width: "100%", maxWidth: 400, height: 12, background: pt.barBg, borderRadius: 6, cursor: "pointer", position: "relative", marginBottom: 16 }}>
+            <div style={{ width: pct + "%", height: "100%", background: rem <= 10 ? "#ef4444" : pt.bar, borderRadius: 6, transition: "width 0.3s" }} />
+            <div style={{ position: "absolute", top: -4, left: "calc(" + pct + "% - 10px)", width: 20, height: 20, borderRadius: "50%", background: rem <= 10 ? "#ef4444" : pt.bar, border: "3px solid " + pt.bg, cursor: "grab", boxShadow: "0 2px 6px rgba(0,0,0,0.3)" }} />
+          </div>
+        )}
+        {useCircle && (
+          <div style={{ width: "100%", maxWidth: 400, height: 4, background: pt.barBg, borderRadius: 2, marginBottom: 16, marginTop: 8 }}>
+            <div style={{ width: pct + "%", height: "100%", background: rem <= 10 ? "#ef4444" : pt.bar, borderRadius: 2, transition: "width 0.3s" }} />
+          </div>
+        )}
         <div style={{ display: "flex", gap: 12 }}>
           <button onClick={function () { if (idx > 0) { setIdx(idx - 1); setElapsed(0); preAnnRef.current = {}; introRef.current = {}; } }} disabled={idx === 0} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: pt.barBg, color: pt.text, fontWeight: 600, cursor: idx > 0 ? "pointer" : "default", opacity: idx === 0 ? 0.3 : 1 }}>{t.prev}</button>
           <button onClick={function () { setPaused(!paused); }} style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: pt.bar, color: "#fff", fontWeight: 700, cursor: "pointer", minWidth: 100 }}>{paused ? t.resume : t.pause}</button>
@@ -707,6 +737,33 @@ function exportTXT(parts) {
   var txt = parts.map(function (p, i) { return (i + 1) + ". " + p.title + " (" + fmt(p.duration) + ")"; }).join("\n");
   var blob = new Blob([txt], { type: "text/plain" });
   var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "setlist.txt"; a.click();
+}
+
+function shareShow(parts, onToast, t) {
+  var data = { parts: parts.map(function (p) { return { title: p.title, duration: p.duration, intro: p.intro, preAnn: p.preAnn, preAnnText: p.preAnnText, notes: p.notes, color: p.color }; }) };
+  var json = JSON.stringify(data);
+  var encoded = btoa(unescape(encodeURIComponent(json)));
+  var url = window.location.origin + window.location.pathname + "#show=" + encoded;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(function () { onToast(t.shareLink); });
+  } else {
+    var ta = document.createElement("textarea"); ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
+    onToast(t.shareLink);
+  }
+}
+
+function loadSharedShow() {
+  try {
+    var hash = window.location.hash;
+    if (!hash || hash.indexOf("#show=") !== 0) return null;
+    var encoded = hash.substring(6);
+    var json = decodeURIComponent(escape(atob(encoded)));
+    var data = JSON.parse(json);
+    if (data && data.parts && data.parts.length > 0) {
+      return data.parts.map(function (p) { return Object.assign({}, p, { id: uid() }); });
+    }
+  } catch (e) {}
+  return null;
 }
 
 function Banner(props) {
@@ -749,186 +806,166 @@ export default function App() {
     theme: "dark", perfTheme: "dark", lang: "de", beeps: true, vibrate: true, volume: 0.5,
     beepSound: "beep", ttsVoice: "", ttsRate: 1, ttsPitch: 1, fontSize: 16, fontFamily: "System",
     performSize: "XL", performSizeScale: 1.0, animations: true, colorTransitions: true,
-    testMode: false, testDur: 10, countdown: 0
+    testMode: false, testDur: 10, countdown: 0, timerStyle: "bar"
   });
   var cfg = _cfg[0], setCfg = _cfg[1];
   var _customTh = useState(getCustomTheme()); var customTh = _customTh[0], setCustomTh = _customTh[1];
-  var _parts = useState(function () { return makeDemo("de"); }); var parts = _parts[0], setParts = _parts[1];
+  var _parts = useState(function () {
+    var shared = loadSharedShow();
+    if (shared) { window.location.hash = ""; return shared; }
+    return makeDemo("de");
+  });
+  var parts = _parts[0], setParts = _parts[1];
   var _perf = useState(false); var perf = _perf[0], setPerf = _perf[1];
   var _startBlackout = useState(false); var startBlackout = _startBlackout[0], setStartBlackout = _startBlackout[1];
   var _targetEnd = useState(""); var targetEnd = _targetEnd[0], setTargetEnd = _targetEnd[1];
   var _edit = useState(null); var editPart = _edit[0], setEditPart = _edit[1];
-  var _editorOpen = useState(false); var editorOpen = _editorOpen[0], setEditorOpen = _editorOpen[1];
+  var _showEditor = useState(false); var showEditor = _showEditor[0], setShowEditor = _showEditor[1];
   var _saveOpen = useState(false); var saveOpen = _saveOpen[0], setSaveOpen = _saveOpen[1];
   var _loadOpen = useState(false); var loadOpen = _loadOpen[0], setLoadOpen = _loadOpen[1];
   var _settOpen = useState(false); var settOpen = _settOpen[0], setSettOpen = _settOpen[1];
   var _tplOpen = useState(false); var tplOpen = _tplOpen[0], setTplOpen = _tplOpen[1];
   var _toast = useState(""); var toast = _toast[0], setToast = _toast[1];
-  var _drag = useState(null); var dragIdx = _drag[0], setDragIdx = _drag[1];
-  var th = cfg.theme === "custom" ? customTh : (TH[cfg.theme] || TH.dark);
+  var _dragIdx = useState(null); var dragIdx = _dragIdx[0], setDragIdx = _dragIdx[1];
+  var _dragOver = useState(null); var dragOver = _dragOver[0], setDragOver = _dragOver[1];
+
   var t = T[cfg.lang] || T.de;
-  var csvRef = useRef(null);
-  var totalDur = parts.reduce(function (s, p) { return s + p.duration; }, 0);
+  var th = cfg.theme === "custom" ? customTh : (TH[cfg.theme] || TH.dark);
+  var totalDur = parts.reduce(function (a, p) { return a + p.duration; }, 0);
+  var ff = cfg.fontFamily === "System" ? "-apple-system, BlinkMacSystemFont, sans-serif" : cfg.fontFamily;
 
-  var handleApplyCustom = function (ct) { setCustomTh(ct); setCfg(function (c) { return Object.assign({}, c, { theme: "custom" }); }); };
-
-  var handleLangChange = function (newLang) {
-    setParts(function (ps) {
-      var allDemo = ps.length > 0 && ps.every(function (p) { return p._isDemo; });
-      if (allDemo) return makeDemo(newLang);
-      return ps;
-    });
+  var handleLangChange = function (lang) {
+    var allDemo = parts.every(function (p) { return p._isDemo; });
+    if (allDemo) { setParts(makeDemo(lang)); }
   };
 
-  var handleSizeChange = function (v) {
-    setCfg(function (c) { return Object.assign({}, c, { performSizeScale: v }); });
+  var addPart = function (p) {
+    if (editPart) { setParts(parts.map(function (x) { return x.id === p.id ? p : x; })); }
+    else { setParts(parts.concat([p])); }
   };
-
-  var addPart = function () { setEditPart(null); setEditorOpen(true); };
-  var doEdit = function (p) { setEditPart(p); setEditorOpen(true); };
-  var savePart = function (p) {
-    setParts(function (ps) {
-      var i = ps.findIndex(function (x) { return x.id === p.id; });
-      if (i >= 0) { var n = ps.slice(); n[i] = p; return n; }
-      return ps.concat([p]);
-    });
-  };
-  var delPart = function (id) { setParts(function (ps) { return ps.filter(function (x) { return x.id !== id; }); }); };
-  var dupPart = function (p) { setParts(function (ps) { return ps.concat([Object.assign({}, p, { id: uid(), title: p.title + " (copy)" })]); }); };
-  var useTemplate = function (tpl) { setParts(function (ps) { return ps.concat([Object.assign({}, tpl, { id: uid() })]); }); setToast(tpl.title + " ✓"); };
 
   var handleDragStart = function (i) { setDragIdx(i); };
-  var handleDragOver = function (e, i) {
-    e.preventDefault();
-    if (dragIdx === null || dragIdx === i) return;
-    setParts(function (ps) {
-      var n = ps.slice();
-      var item = n.splice(dragIdx, 1)[0];
-      n.splice(i, 0, item);
-      return n;
-    });
-    setDragIdx(i);
-  };
-  var handleDragEnd = function () { setDragIdx(null); };
-
-  var importCSV = function (e) {
-    var file = e.target.files[0]; if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function (ev) {
-      var lines = ev.target.result.split("\n").filter(function (l) { return l.trim(); });
-      if (lines.length < 2) return;
-      var newParts = [];
-      for (var i = 1; i < lines.length; i++) {
-        var cols = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
-        if (!cols || cols.length < 2) continue;
-        var clean = cols.map(function (c) { return c.replace(/^"|"$/g, "").replace(/""/g, '"'); });
-        newParts.push({ id: uid(), title: clean[0] || "", duration: parseInt(clean[1]) || 120, intro: clean[2] || "", preAnn: parseInt(clean[3]) || 0, preAnnText: clean[4] || "", notes: clean[5] || "", color: clean[6] || COLORS[0] });
-      }
-      if (newParts.length > 0) { setParts(newParts); setToast("CSV ✓ (" + newParts.length + ")"); }
-    };
-    reader.readAsText(file);
+  var handleDragOver = function (e, i) { e.preventDefault(); setDragOver(i); };
+  var handleDragEnd = function () {
+    if (dragIdx !== null && dragOver !== null && dragIdx !== dragOver) {
+      var next = parts.slice();
+      var item = next.splice(dragIdx, 1)[0];
+      next.splice(dragOver, 0, item);
+      setParts(next);
+    }
+    setDragIdx(null); setDragOver(null);
   };
 
   if (perf) {
-    return <PerformMode parts={parts} cfg={cfg} onExit={function () { setPerf(false); }} startInBlackout={startBlackout} onSizeChange={handleSizeChange} targetEnd={targetEnd} />;
+    return (
+      <PerformMode
+        parts={parts} cfg={cfg}
+        onExit={function () { setPerf(false); }}
+        startInBlackout={startBlackout}
+        onSizeChange={function (v) { setCfg(function (c) { return Object.assign({}, c, { performSizeScale: v }); }); }}
+        targetEnd={targetEnd}
+      />
+    );
   }
 
-  var bs = { padding: "8px 14px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 13 };
-
   return (
-    <div style={{ minHeight: "100vh", background: th.bg, color: th.text, fontFamily: cfg.fontFamily === "System" ? "-apple-system, BlinkMacSystemFont, sans-serif" : cfg.fontFamily, fontSize: cfg.fontSize, transition: cfg.animations ? "background 0.5s" : "none" }}>
+    <div style={{ minHeight: "100vh", background: th.bg, color: th.text, fontFamily: ff, fontSize: cfg.fontSize, transition: "background 0.3s" }}>
       <div style={{ maxWidth: 600, margin: "0 auto", padding: 16 }}>
         <Banner th={th} />
-
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12, marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
           <span style={{ fontSize: 11, color: th.sub }}>{t.ver}</span>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            <button onClick={function () { setSaveOpen(true); }} style={Object.assign({}, bs, { background: th.acc, color: "#fff" })}>{t.save}</button>
-            <button onClick={function () { setLoadOpen(true); }} style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd })}>{t.load}</button>
-            <button onClick={function () { setSettOpen(true); }} style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd })}>⚙️</button>
+            <button onClick={function () { setSaveOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>{t.save}</button>
+            <button onClick={function () { setLoadOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>{t.load}</button>
+            <button onClick={function () { shareShow(parts, setToast, t); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>📤 {t.share}</button>
+            <button onClick={function () { exportCSV(parts); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>{t.csv}</button>
+            <button onClick={function () { exportTXT(parts); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>TXT</button>
+            <button onClick={function () { setSettOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>⚙️</button>
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-          <button onClick={addPart} style={Object.assign({}, bs, { background: th.acc, color: "#fff" })}>+ {t.newPart}</button>
-          <button onClick={function () { setTplOpen(true); }} style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd })}>⭐ {t.templates}</button>
-          <button onClick={function () { exportCSV(parts); }} style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd })}>{t.csv} ↓</button>
-          <button onClick={function () { exportTXT(parts); }} style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd })}>TXT ↓</button>
-          <label style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd, display: "inline-flex", alignItems: "center" })}>
-            {t.csv} ↑
-            <input ref={csvRef} type="file" accept=".csv" onChange={importCSV} style={{ display: "none" }} />
-          </label>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+          <div style={{ fontSize: 14, fontWeight: 700 }}>{parts.length} {t.parts} · {fmt(totalDur)} {t.total}</div>
+          <div style={{ display: "flex", gap: 6 }}>
+            <button onClick={function () { setTplOpen(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>⭐ {t.templates}</button>
+            <button onClick={function () { setEditPart(null); setShowEditor(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 12 }}>+ {t.newPart}</button>
+          </div>
         </div>
 
         {parts.map(function (p, i) {
+          var isDragTarget = dragOver === i && dragIdx !== i;
           return (
-            <div key={p.id} draggable onDragStart={function () { handleDragStart(i); }} onDragOver={function (e) { handleDragOver(e, i); }} onDragEnd={handleDragEnd}
-              style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 12, marginBottom: 6, background: th.card, border: dragIdx === i ? "2px solid " + th.acc : "1px solid " + th.brd, cursor: "grab", transition: cfg.animations ? "all 0.2s" : "none" }}>
-              <div style={{ width: 10, height: 10, borderRadius: 5, background: p.color, flexShrink: 0 }} />
+            <div
+              key={p.id}
+              draggable
+              onDragStart={function () { handleDragStart(i); }}
+              onDragOver={function (e) { handleDragOver(e, i); }}
+              onDragEnd={handleDragEnd}
+              style={{
+                display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
+                background: isDragTarget ? th.acc + "22" : th.card, borderRadius: 10,
+                marginBottom: 6, border: "1px solid " + (isDragTarget ? th.acc : th.brd),
+                transition: "background 0.2s, border 0.2s", cursor: "grab"
+              }}
+            >
+              <div style={{ cursor: "grab", color: th.sub, fontSize: 16, userSelect: "none", flexShrink: 0 }}>☰</div>
+              <div style={{ width: 10, height: 10, borderRadius: 5, background: p.color || COLORS[0], flexShrink: 0 }} />
               <div style={{ flex: 1 }}>
                 <div style={{ fontWeight: 600, fontSize: 14 }}>{p.title}</div>
-                <div style={{ fontSize: 11, color: th.sub }}>{fmt(p.duration)}</div>
+                <div style={{ fontSize: 12, color: th.sub }}>{fmt(p.duration)}</div>
               </div>
-              <button onClick={function () { doEdit(p); }} style={{ padding: "4px 10px", borderRadius: 6, border: "none", background: th.inp, color: th.text, cursor: "pointer", fontSize: 11 }}>{t.edit}</button>
-              <button onClick={function () { dupPart(p); }} style={{ padding: "4px 10px", borderRadius: 6, border: "none", background: th.inp, color: th.text, cursor: "pointer", fontSize: 11 }}>{t.dup}</button>
-              <button onClick={function () { delPart(p.id); }} style={{ padding: "4px 10px", borderRadius: 6, border: "none", background: "#ef444422", color: "#ef4444", cursor: "pointer", fontSize: 11 }}>{t.del}</button>
+              <button onClick={function () { setEditPart(p); setShowEditor(true); }} style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 11 }}>{t.edit}</button>
+              <button onClick={function () {
+                var np = Object.assign({}, p, { id: uid(), title: p.title + " (2)" });
+                setParts(parts.slice(0, i + 1).concat([np]).concat(parts.slice(i + 1)));
+              }} style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 11 }}>{t.dup}</button>
+              <button onClick={function () { setParts(parts.filter(function (x) { return x.id !== p.id; })); }} style={{ padding: "4px 10px", borderRadius: 6, border: "none", background: "#ef4444", color: "#fff", cursor: "pointer", fontSize: 11 }}>🗑️</button>
             </div>
           );
         })}
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16, padding: "10px 14px", borderRadius: 12, background: th.card, border: "1px solid " + th.brd }}>
-          <div>
-            <span style={{ fontSize: 12, color: th.sub }}>{t.total}: </span>
-            <span style={{ fontWeight: 700 }}>{fmt(totalDur)}</span>
-            <span style={{ fontSize: 12, color: th.sub, marginLeft: 8 }}>({parts.length} {t.parts})</span>
-          </div>
-        </div>
-
-        <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 12, background: th.card, border: "1px solid " + th.brd }}>
-          <label style={{ fontSize: 12, color: th.sub, display: "block", marginBottom: 4 }}>🎯 {t.targetEnd}</label>
-          <input type="time" value={targetEnd} onChange={function (e) { setTargetEnd(e.target.value); }}
-            style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, fontSize: 14 }} />
-          {targetEnd && (
-            <span style={{ fontSize: 11, color: th.sub, marginLeft: 8 }}>{t.targetEndHint}</span>
-          )}
-        </div>
-
-        <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 12, background: th.card, border: "1px solid " + th.brd }}>
+        <div style={{ marginTop: 16, padding: 12, background: th.card, borderRadius: 10, border: "1px solid " + th.brd }}>
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", marginBottom: 8 }}>
-            <input type="checkbox" checked={cfg.testMode} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testMode: e.target.checked }); }); }} /> {t.testModeLbl}
+            <input type="checkbox" checked={cfg.testMode} onChange={function (e) { setCfg(Object.assign({}, cfg, { testMode: e.target.checked })); }} /> {t.testModeLbl}
           </label>
           {cfg.testMode && (
-            <div>
+            <div style={{ marginBottom: 8 }}>
               <label style={{ fontSize: 12, color: th.sub }}>{t.testDurLbl}</label>
-              <input type="number" min={1} value={cfg.testDur} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testDur: +e.target.value }); }); }}
-                style={{ width: 80, padding: 6, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginLeft: 8 }} />
+              <input type="number" min={1} value={cfg.testDur} onChange={function (e) { setCfg(Object.assign({}, cfg, { testDur: +e.target.value })); }} style={{ width: 80, padding: 6, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginLeft: 8 }} />
             </div>
           )}
-          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", marginBottom: 8, marginTop: 8 }}>
+          <div style={{ marginBottom: 8 }}>
+            <label style={{ fontSize: 12, color: th.sub }}>{t.countdownSek}</label>
+            <select value={cfg.countdown} onChange={function (e) { setCfg(Object.assign({}, cfg, { countdown: +e.target.value })); }} style={{ marginLeft: 8, padding: 6, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text }}>
+              <option value={0}>{t.countdownOff}</option>
+              <option value={3}>3 {t.sek}</option>
+              <option value={5}>5 {t.sek}</option>
+              <option value={10}>10 {t.sek}</option>
+              <option value={60}>60 {t.sek}</option>
+            </select>
+          </div>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", marginBottom: 8 }}>
             <input type="checkbox" checked={startBlackout} onChange={function (e) { setStartBlackout(e.target.checked); }} /> {t.startBlackout}
           </label>
-          <label style={{ fontSize: 12, color: th.sub, display: "block", marginBottom: 4 }}>{t.countdownSek}</label>
-          <div style={{ display: "flex", gap: 6 }}>
-            {[0, 3, 5, 10, 60].map(function (v) {
-              return <button key={v} onClick={function () { setCfg(function (c) { return Object.assign({}, c, { countdown: v }); }); }}
-                style={{ padding: "6px 12px", borderRadius: 8, border: cfg.countdown === v ? "2px solid " + th.acc : "2px solid transparent", background: cfg.countdown === v ? th.acc + "22" : th.inp, color: th.text, cursor: "pointer", fontSize: 12 }}>
-                {v === 0 ? t.countdownOff : v + " " + t.sek}
-              </button>;
-            })}
+          <div style={{ marginBottom: 8 }}>
+            <label style={{ fontSize: 12, color: th.sub }}>{t.targetEnd}</label>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
+              <input type="time" value={targetEnd} onChange={function (e) { setTargetEnd(e.target.value); }} style={{ padding: 6, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text }} />
+              {targetEnd && (
+                <button onClick={function () { setTargetEnd(""); }} style={{ padding: "4px 8px", borderRadius: 6, border: "1px solid " + th.brd, background: "transparent", color: th.sub, cursor: "pointer", fontSize: 12 }}>✕</button>
+              )}
+            </div>
+            <div style={{ fontSize: 11, color: th.sub, marginTop: 2 }}>{t.targetEndHint}</div>
           </div>
+          <button onClick={function () { if (parts.length > 0) setPerf(true); }} style={{ width: "100%", padding: 14, borderRadius: 12, border: "none", background: "linear-gradient(135deg, " + th.acc + ", #8b5cf6)", color: "#fff", fontWeight: 700, fontSize: 16, cursor: "pointer" }}>{cfg.testMode ? "🧪 " + t.test : "🎩 " + t.start}</button>
         </div>
-
-        <button onClick={function () { if (parts.length > 0) setPerf(true); }}
-          style={{ marginTop: 16, width: "100%", padding: 14, borderRadius: 12, border: "none", background: "linear-gradient(135deg, " + th.acc + ", #8b5cf6)", color: "#fff", fontSize: 18, fontWeight: 800, cursor: "pointer", letterSpacing: 1 }}>
-          ▶ {cfg.testMode ? t.test : t.start}
-        </button>
       </div>
 
-      <PartEditor open={editorOpen} part={editPart} onSave={savePart} onClose={function () { setEditorOpen(false); }} t={t} th={th} onToast={setToast} />
+      <PartEditor open={showEditor} part={editPart} onSave={addPart} onClose={function () { setShowEditor(false); setEditPart(null); }} t={t} th={th} onToast={setToast} />
       <SaveModal open={saveOpen} onClose={function () { setSaveOpen(false); }} parts={parts} t={t} th={th} onToast={setToast} />
-      <LoadModal open={loadOpen} onClose={function () { setLoadOpen(false); }} onLoad={setParts} t={t} th={th} />
-      <SettingsModal open={settOpen} onClose={function () { setSettOpen(false); }} cfg={cfg} setCfg={setCfg} t={t} th={th} onApplyCustom={handleApplyCustom} onLangChange={handleLangChange} />
-      <TemplateModal open={tplOpen} onClose={function () { setTplOpen(false); }} onUse={useTemplate} t={t} th={th} />
+      <LoadModal open={loadOpen} onClose={function () { setLoadOpen(false); }} onLoad={function (p) { setParts(p); }} t={t} th={th} />
+      <SettingsModal open={settOpen} onClose={function () { setSettOpen(false); }} cfg={cfg} setCfg={setCfg} t={t} th={th} onApplyCustom={setCustomTh} onLangChange={handleLangChange} />
+      <TemplateModal open={tplOpen} onClose={function () { setTplOpen(false); }} onUse={function (tpl) { setParts(parts.concat([Object.assign({}, tpl, { id: uid() })])); }} t={t} th={th} />
       {toast && <Toast msg={toast} onDone={function () { setToast(""); }} />}
     </div>
   );
