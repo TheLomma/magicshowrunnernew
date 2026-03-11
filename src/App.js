@@ -442,10 +442,27 @@ function SettingsModal(props) {
   );
 }
 
+function useClock() {
+  var _c = useState(function () {
+    var d = new Date();
+    return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") + ":" + String(d.getSeconds()).padStart(2, "0");
+  });
+  var clock = _c[0], setClock = _c[1];
+  useEffect(function () {
+    var iv = setInterval(function () {
+      var d = new Date();
+      setClock(String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0") + ":" + String(d.getSeconds()).padStart(2, "0"));
+    }, 1000);
+    return function () { clearInterval(iv); };
+  }, []);
+  return clock;
+}
+
 function PerformMode(props) {
   var parts = props.parts, cfg = props.cfg, onExit = props.onExit, startInBlackout = props.startInBlackout, onSizeChange = props.onSizeChange;
   var pt = PTH[cfg.perfTheme] || PTH.dark;
   var t = T[cfg.lang] || T.de;
+  var clock = useClock();
   var _cd = useState(cfg.countdown > 0 ? cfg.countdown : 0); var cdVal = _cd[0], setCdVal = _cd[1];
   var _cdr = useState(cfg.countdown > 0); var cdRunning = _cdr[0], setCdRunning = _cdr[1];
   var _idx = useState(0); var idx = _idx[0], setIdx = _idx[1];
@@ -583,8 +600,9 @@ function PerformMode(props) {
 
   return (
     <div style={{ position: "fixed", inset: 0, background: bgStyle, display: "flex", flexDirection: "column", zIndex: 999, transition: useColorTrans ? "background 1.5s ease" : "none" }}>
-      <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", padding: "12px 16px", gap: 8, flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", gap: 8, flexWrap: "wrap" }}>
+        <div style={{ fontSize: 14, fontFamily: "monospace", color: pt.text, opacity: 0.6, fontWeight: 600 }}>{clock}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: "auto" }}>
           <span style={{ fontSize: 10, color: pt.text, opacity: 0.5 }}>A</span>
           <input type="range" min={0.4} max={2.0} step={0.05} value={sizeScale} onChange={function (e) { if (onSizeChange) onSizeChange(+e.target.value); }} style={{ width: 80, accentColor: pt.bar }} />
           <span style={{ fontSize: 14, color: pt.text, opacity: 0.5 }}>A</span>
@@ -757,50 +775,78 @@ export default function App() {
         var cols = line.match(/(".*?"|[^,]+)/g);
         if (!cols || cols.length < 2) return;
         var clean = function (s) { return (s || "").replace(/^"|"$/g, "").replace(/""/g, '"'); };
-        imported.push({ id: uid(), title: clean(cols[0]), duration: parseInt(clean(cols[1])) || 120, intro: clean(cols[2] || ""), preAnn: parseInt(clean(cols[3])) || 10, preAnnText: clean(cols[4] || ""), notes: clean(cols[5] || ""), color: clean(cols[6]) || COLORS[0] });
+        imported.push({ id: uid(), title: clean(cols[0]), duration: parseInt(clean(cols[1])) || 120, intro: clean(cols[2] || ""), preAnn: parseInt(clean(cols[3])) || 0, preAnnText: clean(cols[4] || ""), notes: clean(cols[5] || ""), color: clean(cols[6]) || COLORS[0] });
       });
       if (imported.length > 0) { setParts(imported); setToast("CSV ✓ (" + imported.length + ")"); }
     };
     reader.readAsText(file);
-    e.target.value = "";
   };
 
   if (perf) {
     return <PerformMode parts={parts} cfg={cfg} onExit={function () { setPerf(false); }} startInBlackout={startBlackout} onSizeChange={handleSizeChange} />;
   }
 
-  var bs = { padding: "8px 16px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 13 };
+  var bs = function (extra) {
+    return Object.assign({ padding: "8px 16px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 13 }, extra || {});
+  };
 
   return (
     <div style={{ minHeight: "100vh", background: th.bg, color: th.text, fontFamily: cfg.fontFamily === "System" ? "-apple-system, BlinkMacSystemFont, sans-serif" : cfg.fontFamily, fontSize: cfg.fontSize, transition: cfg.animations ? "background 0.5s, color 0.5s" : "none" }}>
       <div style={{ maxWidth: 600, margin: "0 auto", padding: 16 }}>
-        {/* Banner – full width on top */}
         <Banner th={th} />
-
-        {/* Toolbar below banner */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12, marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8, marginTop: 12, marginBottom: 16 }}>
           <span style={{ fontSize: 11, color: th.sub }}>{t.ver}</span>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            <button onClick={function () { setSaveOpen(true); }} style={Object.assign({}, bs, { background: th.acc, color: "#fff" })}>{t.save}</button>
-            <button onClick={function () { setLoadOpen(true); }} style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd })}>{t.load}</button>
-            <button onClick={function () { setSettOpen(true); }} style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd })}>⚙️</button>
+            <button onClick={function () { setSaveOpen(true); }} style={bs({ background: th.acc, color: "#fff" })}>{t.save}</button>
+            <button onClick={function () { setLoadOpen(true); }} style={bs({ background: th.inp, color: th.text, border: "1px solid " + th.brd })}>{t.load}</button>
+            <button onClick={function () { setSettOpen(true); }} style={bs({ background: th.inp, color: th.text, border: "1px solid " + th.brd })}>⚙️</button>
           </div>
         </div>
 
-        {/* Test mode & countdown */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 12, flexWrap: "wrap", alignItems: "center" }}>
-          <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, cursor: "pointer", color: th.sub }}>
-            <input type="checkbox" checked={cfg.testMode} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testMode: e.target.checked }); }); }} />
-            {t.testModeLbl}
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 16 }}>
+          <button onClick={addPart} style={bs({ background: th.acc, color: "#fff" })}>+ {t.newPart}</button>
+          <button onClick={function () { setTplOpen(true); }} style={bs({ background: th.inp, color: th.text, border: "1px solid " + th.brd })}>⭐ {t.templates}</button>
+          <button onClick={function () { exportCSV(parts); }} style={bs({ background: th.inp, color: th.text, border: "1px solid " + th.brd })}>{t.csv} ↓</button>
+          <button onClick={function () { exportTXT(parts); }} style={bs({ background: th.inp, color: th.text, border: "1px solid " + th.brd })}>TXT ↓</button>
+          <label style={Object.assign({}, bs({ background: th.inp, color: th.text, border: "1px solid " + th.brd, display: "inline-flex", alignItems: "center" }))}>
+            {t.csv} ↑ <input ref={csvRef} type="file" accept=".csv" onChange={handleCSV} style={{ display: "none" }} />
+          </label>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
+          {parts.map(function (p, i) {
+            return (
+              <div key={p.id} draggable onDragStart={function () { handleDragStart(i); }} onDragOver={handleDragOver} onDrop={function () { handleDrop(i); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 12, background: th.card, border: "1px solid " + th.brd, cursor: "grab", transition: cfg.animations ? "transform 0.2s, box-shadow 0.2s" : "none" }}>
+                <div style={{ width: 10, height: 10, borderRadius: 5, background: p.color, flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600, fontSize: 14 }}>{p.title}</div>
+                  <div style={{ fontSize: 12, color: th.sub }}>{fmt(p.duration)}{p.intro ? " • 🎤" : ""}{p.notes ? " • 📝" : ""}</div>
+                </div>
+                <button onClick={function () { doEdit(p); }} style={{ background: "none", border: "none", color: th.sub, cursor: "pointer", fontSize: 16 }} title={t.edit}>✏️</button>
+                <button onClick={function () { dupPart(p); }} style={{ background: "none", border: "none", color: th.sub, cursor: "pointer", fontSize: 16 }} title={t.dup}>📋</button>
+                <button onClick={function () { delPart(p.id); }} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 16 }} title={t.del}>🗑️</button>
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 10, background: th.card, border: "1px solid " + th.brd, marginBottom: 16 }}>
+          <span style={{ fontSize: 13, color: th.sub }}>{parts.length} {t.parts} • {t.total}: {fmt(totalDur)}</span>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: 14, borderRadius: 12, background: th.card, border: "1px solid " + th.brd, marginBottom: 16 }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
+            <input type="checkbox" checked={cfg.testMode} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testMode: e.target.checked }); }); }} /> {t.testModeLbl}
           </label>
           {cfg.testMode && (
-            <span style={{ fontSize: 12, color: th.sub }}>
-              {t.testDurLbl}: <input type="number" min={1} value={cfg.testDur} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testDur: +e.target.value }); }); }} style={{ width: 50, padding: 4, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text }} /> {t.sek}
-            </span>
+            <div>
+              <label style={{ fontSize: 12, color: th.sub }}>{t.testDurLbl}</label>
+              <input type="number" min={1} value={cfg.testDur} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testDur: +e.target.value }); }); }} style={{ width: 80, padding: 6, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginLeft: 8 }} />
+            </div>
           )}
-          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: th.sub }}>
-            {t.countdown}:
-            <select value={cfg.countdown} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { countdown: +e.target.value }); }); }} style={{ padding: 4, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text }}>
+          <div>
+            <label style={{ fontSize: 12, color: th.sub }}>{t.countdownSek}</label>
+            <select value={cfg.countdown} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { countdown: +e.target.value }); }); }} style={{ marginLeft: 8, padding: 6, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text }}>
               <option value={0}>{t.countdownOff}</option>
               <option value={3}>3 {t.sek}</option>
               <option value={5}>5 {t.sek}</option>
@@ -808,54 +854,16 @@ export default function App() {
               <option value={60}>60 {t.sek}</option>
             </select>
           </div>
-          <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, cursor: "pointer", color: th.sub }}>
-            <input type="checkbox" checked={startBlackout} onChange={function (e) { setStartBlackout(e.target.checked); }} />
-            {t.startBlackout}
+          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
+            <input type="checkbox" checked={startBlackout} onChange={function (e) { setStartBlackout(e.target.checked); }} /> {t.startBlackout}
           </label>
         </div>
 
-        {/* Parts list */}
-        <div style={{ marginBottom: 12 }}>
-          {parts.map(function (p, i) {
-            return (
-              <div key={p.id} draggable onDragStart={function () { handleDragStart(i); }} onDragOver={handleDragOver} onDrop={function () { handleDrop(i); }}
-                style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", marginBottom: 6, borderRadius: 10, background: th.card, border: "1px solid " + th.brd, cursor: "grab", transition: cfg.animations ? "transform 0.15s" : "none" }}>
-                <div style={{ width: 10, height: 10, borderRadius: 5, background: p.color || COLORS[0], flexShrink: 0 }} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>{p.title}</div>
-                  <div style={{ fontSize: 11, color: th.sub }}>{fmt(p.duration)}{p.intro ? " · 🎤" : ""}{p.notes ? " · 📝" : ""}</div>
-                </div>
-                <button onClick={function () { doEdit(p); }} style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 11 }}>{t.edit}</button>
-                <button onClick={function () { dupPart(p); }} style={{ padding: "4px 8px", borderRadius: 6, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 11 }}>{t.dup}</button>
-                <button onClick={function () { delPart(p.id); }} style={{ padding: "4px 8px", borderRadius: 6, border: "none", background: "#ef4444", color: "#fff", cursor: "pointer", fontSize: 11 }}>✕</button>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Actions */}
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-          <button onClick={addPart} style={Object.assign({}, bs, { background: th.acc, color: "#fff" })}>+ {t.newPart}</button>
-          <button onClick={function () { setTplOpen(true); }} style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd })}>⭐ {t.templates}</button>
-          <button onClick={function () { exportCSV(parts); }} style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd })}>{t.csv} ↓</button>
-          <button onClick={function () { exportTXT(parts); }} style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd })}>TXT ↓</button>
-          <label style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd, display: "inline-flex", alignItems: "center" })}>
-            {t.csv} ↑
-            <input ref={csvRef} type="file" accept=".csv" onChange={handleCSV} style={{ display: "none" }} />
-          </label>
-        </div>
-
-        {/* Total & Start */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", borderRadius: 12, background: th.card, border: "1px solid " + th.brd }}>
-          <div>
-            <div style={{ fontSize: 12, color: th.sub }}>{t.total}: {parts.length} {t.parts}</div>
-            <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "monospace" }}>{fmt(totalDur)}</div>
-          </div>
-          <button onClick={function () { if (parts.length > 0) setPerf(true); }} style={Object.assign({}, bs, { background: "#10b981", color: "#fff", fontSize: 16, padding: "12px 28px" })}>{cfg.testMode ? "🧪 " + t.test : "▶ " + t.start}</button>
-        </div>
+        <button onClick={function () { if (parts.length > 0) setPerf(true); }} style={{ width: "100%", padding: 14, borderRadius: 12, border: "none", background: "linear-gradient(135deg, " + th.acc + ", #ec4899)", color: "#fff", fontSize: 18, fontWeight: 800, cursor: parts.length > 0 ? "pointer" : "default", opacity: parts.length > 0 ? 1 : 0.5, letterSpacing: 1 }}>
+          ▶ {cfg.testMode ? t.test : t.start}
+        </button>
       </div>
 
-      {/* Modals */}
       <PartEditor open={editorOpen} part={editPart} onSave={savePart} onClose={function () { setEditorOpen(false); }} t={t} th={th} onToast={setToast} />
       <SaveModal open={saveOpen} onClose={function () { setSaveOpen(false); }} parts={parts} t={t} th={th} onToast={setToast} />
       <LoadModal open={loadOpen} onClose={function () { setLoadOpen(false); }} onLoad={setParts} t={t} th={th} />
