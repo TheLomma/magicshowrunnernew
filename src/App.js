@@ -124,7 +124,7 @@ function Modal(props) {
   if (!props.open) return null;
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }} onClick={props.onClose}>
-      <div onClick={function (e) { e.stopPropagation(); }} style={{ background: props.th.card, color: props.th.text, borderRadius: 16, padding: 24, minWidth: 320, maxWidth: 480, maxHeight: "80vh", overflow: "auto", boxShadow: "0 8px 40px rgba(0,0,0,0.4)" }}>
+      <div onClick={function (e) { e.stopPropagation(); }} style={{ background: props.th.card, color: props.th.text, borderRadius: 16, padding: 24, minWidth: 300, maxWidth: "90vw", maxHeight: "80vh", overflow: "auto", boxShadow: "0 8px 40px rgba(0,0,0,0.4)" }}>
         <h3 style={{ marginTop: 0 }}>{props.title}</h3>
         {props.children}
       </div>
@@ -247,12 +247,9 @@ function CustomThemeEditor(props) {
   var th = props.th, t = props.t, onApply = props.onApply;
   var _ct = useState(getCustomTheme()); var ct = _ct[0], setCt = _ct[1];
   var fields = [
-    { key: "bg", label: t.customBg },
-    { key: "card", label: t.customCard },
-    { key: "text", label: t.customText },
-    { key: "sub", label: t.customSub },
-    { key: "acc", label: t.customAcc },
-    { key: "brd", label: t.customBrd },
+    { key: "bg", label: t.customBg }, { key: "card", label: t.customCard },
+    { key: "text", label: t.customText }, { key: "sub", label: t.customSub },
+    { key: "acc", label: t.customAcc }, { key: "brd", label: t.customBrd },
     { key: "inp", label: t.customInp }
   ];
   var upd = function (k, v) { setCt(function (c) { var n = Object.assign({}, c); n[k] = v; return n; }); };
@@ -261,12 +258,10 @@ function CustomThemeEditor(props) {
       <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>{t.customTheme}</div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
         {fields.map(function (f) {
-          return (
-            <div key={f.key} style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <input type="color" value={ct[f.key]} onChange={function (e) { upd(f.key, e.target.value); }} style={{ width: 28, height: 28, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
-              <span style={{ fontSize: 11, color: th.sub }}>{f.label}</span>
-            </div>
-          );
+          return (<div key={f.key} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <input type="color" value={ct[f.key]} onChange={function (e) { upd(f.key, e.target.value); }} style={{ width: 28, height: 28, border: "none", borderRadius: 6, cursor: "pointer", padding: 0 }} />
+            <span style={{ fontSize: 11, color: th.sub }}>{f.label}</span>
+          </div>);
         })}
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, padding: "8px 12px", borderRadius: 8, background: ct.bg, border: "1px solid " + ct.brd }}>
@@ -537,7 +532,7 @@ function exportTXT(parts) {
 function Banner(props) {
   var th = props.th;
   return (
-    <div style={{ position: "relative", background: "transparent", borderRadius: 14, padding: "14px 20px", border: "1px solid " + (th ? th.brd : "#333"), overflow: "hidden", display: "flex", alignItems: "center", gap: 16 }}>
+    <div style={{ position: "relative", background: "transparent", borderRadius: 14, padding: "14px 20px", border: "1px solid " + (th ? th.brd : "#333"), overflow: "hidden", display: "flex", alignItems: "center", gap: 16, width: "100%", boxSizing: "border-box" }}>
       <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 28, overflow: "hidden" }}>
         <svg width="28" height="100%" viewBox="0 0 28 80" preserveAspectRatio="none">
           <path d="M0 0 L20 0 Q12 20 18 40 Q12 60 20 80 L0 80 Z" fill="#8b0000" opacity="0.7" />
@@ -642,19 +637,24 @@ export default function App() {
 
   return (
     <div style={{ minHeight: "100vh", background: th.bg, color: th.text, fontFamily: cfg.fontFamily === "System" ? "-apple-system, BlinkMacSystemFont, sans-serif" : cfg.fontFamily, fontSize: cfg.fontSize, transition: "background 0.3s" }}>
-      <div style={{ maxWidth: 600, margin: "0 auto", padding: 16 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-          <div style={{ flex: 1 }}>
-            <Banner th={th} />
+      <div style={{ maxWidth: 600, margin: "0 auto", padding: "0 16px 16px 16px" }}>
+
+        {/* BANNER – volle Breite, ganz oben */}
+        <div style={{ padding: "16px 0 8px 0" }}>
+          <Banner th={th} />
+          <div style={{ textAlign: "center", marginTop: 4 }}>
             <span style={{ fontSize: 11, color: th.sub }}>{t.ver}</span>
-          </div>
-          <div style={{ display: "flex", gap: 6, marginLeft: 12 }}>
-            <button onClick={function () { setSaveOpen(true); }} style={bs({ background: th.acc, color: "#fff" })}>{t.save}</button>
-            <button onClick={function () { setLoadOpen(true); }} style={bs({ background: th.inp, color: th.text })}>{t.load}</button>
-            <button onClick={function () { setSettOpen(true); }} style={bs({ background: th.inp, color: th.text })}>⚙️</button>
           </div>
         </div>
 
+        {/* Toolbar – Speichern, Laden, Settings darunter */}
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", justifyContent: "center", marginBottom: 16 }}>
+          <button onClick={function () { setSaveOpen(true); }} style={bs({ background: th.acc, color: "#fff" })}>{t.save}</button>
+          <button onClick={function () { setLoadOpen(true); }} style={bs({ background: th.inp, color: th.text })}>{t.load}</button>
+          <button onClick={function () { setSettOpen(true); }} style={bs({ background: th.inp, color: th.text })}>⚙️ {t.settings}</button>
+        </div>
+
+        {/* Teile-Liste */}
         <div style={{ marginBottom: 16 }}>
           {parts.map(function (p, i) {
             return (<div key={p.id} draggable onDragStart={function () { handleDragStart(i); }} onDragOver={function (e) { e.preventDefault(); }} onDrop={function () { handleDrop(i); }}
@@ -668,48 +668,52 @@ export default function App() {
           })}
         </div>
 
-        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-          <button onClick={addPart} style={bs({ background: th.acc, color: "#fff", flex: 1, padding: 12 })}>+ {t.newPart}</button>
-          <button onClick={function () { setTplOpen(true); }} style={bs({ background: th.inp, color: th.text, padding: 12 })}>⭐ {t.templates}</button>
+        {/* Zusammenfassung */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: th.card, borderRadius: 10, marginBottom: 12, border: "1px solid " + th.brd }}>
+          <span style={{ fontSize: 13, color: th.sub }}>{parts.length} {t.parts} · {t.total}: {fmt(totalDur)}</span>
         </div>
 
-        <div style={{ textAlign: "center", marginBottom: 16, fontSize: 13, color: th.sub }}>{parts.length} {t.parts} – {t.total}: {fmt(totalDur)}</div>
+        {/* Aktions-Buttons */}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+          <button onClick={addPart} style={bs({ background: th.acc, color: "#fff", flex: 1 })}>+ {t.newPart}</button>
+          <button onClick={function () { setTplOpen(true); }} style={bs({ background: th.inp, color: th.text })}>⭐ {t.templates}</button>
+        </div>
 
-        <div style={{ display: "flex", gap: 6, marginBottom: 16, justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
-          <button onClick={function () { exportCSV(parts); }} style={bs({ background: th.inp, color: th.text, fontSize: 11 })}>📥 CSV</button>
-          <button onClick={function () { csvRef.current && csvRef.current.click(); }} style={bs({ background: th.inp, color: th.text, fontSize: 11 })}>📤 CSV</button>
-          <button onClick={function () { exportTXT(parts); }} style={bs({ background: th.inp, color: th.text, fontSize: 11 })}>📄 TXT</button>
-          <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, cursor: "pointer", padding: "8px 12px", borderRadius: 10, background: cfg.testMode ? th.acc + "22" : th.inp, color: cfg.testMode ? th.acc : th.text, border: cfg.testMode ? "1px solid " + th.acc : "1px solid transparent", fontWeight: 600 }}>
-            <input type="checkbox" checked={cfg.testMode} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testMode: e.target.checked }); }); }} style={{ margin: 0 }} />
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+          <button onClick={function () { startShow(false); }} style={bs({ background: "#10b981", color: "#fff", flex: 1 })}>▶ {t.start}</button>
+          <button onClick={function () { startShow(true); }} style={bs({ background: "#1f2937", color: "#fff" })}>🌑 {t.startBlackout}</button>
+        </div>
+
+        {/* Countdown */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "8px 14px", background: th.card, borderRadius: 10, border: "1px solid " + th.brd }}>
+          <span style={{ fontSize: 12, color: th.sub }}>{t.countdown}:</span>
+          {[0, 3, 5, 10].map(function (v) {
+            return <button key={v} onClick={function () { setCfg(function (c) { return Object.assign({}, c, { countdown: v }); }); }} style={{ padding: "4px 10px", borderRadius: 6, border: cfg.countdown === v ? "2px solid " + th.acc : "2px solid transparent", background: cfg.countdown === v ? th.acc + "22" : th.inp, color: th.text, cursor: "pointer", fontSize: 12 }}>{v === 0 ? t.countdownOff : v + " " + t.sek}</button>;
+          })}
+        </div>
+
+        {/* Export & Test */}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+          <button onClick={function () { exportCSV(parts); }} style={bs({ background: th.inp, color: th.text })}>{t.csv} ↓</button>
+          <label style={bs({ background: th.inp, color: th.text, display: "inline-flex", alignItems: "center" })}>
+            {t.csv} ↑ <input ref={csvRef} type="file" accept=".csv" onChange={handleCSVImport} style={{ display: "none" }} />
+          </label>
+          <button onClick={function () { exportTXT(parts); }} style={bs({ background: th.inp, color: th.text })}>TXT ↓</button>
+          <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: th.sub, cursor: "pointer", marginLeft: 4 }}>
+            <input type="checkbox" checked={cfg.testMode} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testMode: e.target.checked }); }); }} />
             {t.testModeLbl}
           </label>
-          <input ref={csvRef} type="file" accept=".csv" style={{ display: "none" }} onChange={handleCSVImport} />
         </div>
-
         {cfg.testMode && (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 12, fontSize: 12, color: th.sub }}>
-            <label>{t.testDurLbl}:</label>
-            <input type="number" min={3} max={60} value={cfg.testDur} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testDur: Math.max(3, +e.target.value) }); }); }} style={{ width: 50, padding: 4, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, textAlign: "center" }} />
-            <span>{t.sek}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12, padding: "8px 14px", background: th.card, borderRadius: 10, border: "1px solid " + th.brd }}>
+            <span style={{ fontSize: 12, color: th.sub }}>{t.testDurLbl}:</span>
+            <input type="number" min={1} max={60} value={cfg.testDur} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testDur: +e.target.value }); }); }} style={{ width: 60, padding: 6, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, textAlign: "center" }} />
+            <span style={{ fontSize: 11, color: th.sub }}>{t.sek}</span>
           </div>
         )}
-
-        <div style={{ background: th.card, borderRadius: 12, padding: 16, marginBottom: 12, border: "1px solid " + th.brd }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <label style={{ fontSize: 13, fontWeight: 600 }}>{t.countdownSek}</label>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <input type="number" min={0} max={10} value={cfg.countdown} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { countdown: Math.max(0, Math.min(10, +e.target.value)) }); }); }} style={{ width: 60, padding: 6, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, textAlign: "center" }} />
-              <span style={{ fontSize: 11, color: th.sub }}>{cfg.countdown === 0 ? t.countdownOff : cfg.countdown + " " + t.sek}</span>
-            </div>
-          </div>
-        </div>
-
-        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-          <button onClick={function () { startShow(false); }} disabled={parts.length === 0} style={bs({ background: "#10b981", color: "#fff", flex: 1, padding: 14, fontSize: 16 })}>▶ {t.start}</button>
-          <button onClick={function () { startShow(true); }} disabled={parts.length === 0} style={bs({ background: "#1f2937", color: "#fff", padding: 14, fontSize: 14 })}>🌑 {t.startBlackout}</button>
-        </div>
       </div>
 
+      {/* Modals */}
       <PartEditor open={editorOpen} part={editPart} onSave={savePart} onClose={function () { setEditorOpen(false); }} t={t} th={th} onToast={setToast} />
       <SaveModal open={saveOpen} onClose={function () { setSaveOpen(false); }} parts={parts} t={t} th={th} onToast={setToast} />
       <LoadModal open={loadOpen} onClose={function () { setLoadOpen(false); }} onLoad={setParts} t={t} th={th} />
