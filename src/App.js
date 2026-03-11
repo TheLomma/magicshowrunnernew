@@ -1,6 +1,6 @@
 
 
-// v6.8
+// v6.9
 import React, { useState, useEffect, useRef } from "react";
 
 var uid = function () { return Math.random().toString(36).slice(2, 9); };
@@ -18,7 +18,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v6.8", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v6.9", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -31,7 +31,7 @@ var T = {
     ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen",
     stop: "Stop", setlist: "Setlist", elapsed: "Vergangen", remaining: "Verbleibend",
     soundLabel: "Signalton", colorTrans: "Farb-Übergänge", blackout: "Blackout",
-    startBlackout: "Start im Blackout", countdown: "Countdown", countdownSek: "Countdown (Sek)",
+    startBlackout: "Start mit Countdown", countdown: "Countdown", countdownSek: "Countdown (Sek)",
     countdownOff: "Aus", testModeLbl: "Testmodus", testDurLbl: "Testdauer pro Teil (Sek)",
     confirmStop: "Show wirklich beenden?",
     templates: "Vorlagen", saveAsTemplate: "Als Vorlage speichern", noTemplates: "Keine Vorlagen vorhanden.",
@@ -46,7 +46,7 @@ var T = {
     circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil"
   },
   en: {
-    title: "Magic Showrunner", ver: "v6.8", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v6.9", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -59,7 +59,7 @@ var T = {
     ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes",
     stop: "Stop", setlist: "Setlist", elapsed: "Elapsed", remaining: "Remaining",
     soundLabel: "Alert Sound", colorTrans: "Color Transitions", blackout: "Blackout",
-    startBlackout: "Start in Blackout", countdown: "Countdown", countdownSek: "Countdown (sec)",
+    startBlackout: "Start with Countdown", countdown: "Countdown", countdownSek: "Countdown (sec)",
     countdownOff: "Off", testModeLbl: "Test Mode", testDurLbl: "Test duration per part (sec)",
     confirmStop: "Really stop the show?",
     templates: "Templates", saveAsTemplate: "Save as Template", noTemplates: "No templates available.",
@@ -459,10 +459,10 @@ function SettingsModal(props) {
         </select>
         <label style={{ fontSize: 12, color: th.sub }}>{t.ttsRate}</label>
         <input type="range" min={0.5} max={2} step={0.1} value={cfg.ttsRate} onChange={function (e) { upCfg("ttsRate", +e.target.value); }} style={{ width: "100%" }} />
-        <span style={{ fontSize: 11, color: th.sub }}>{cfg.ttsRate}</span>
+        <div style={{ fontSize: 11, color: th.sub, marginBottom: 8 }}>{cfg.ttsRate.toFixed(1)}</div>
         <label style={{ fontSize: 12, color: th.sub, marginTop: 8, display: "block" }}>{t.ttsPitch}</label>
         <input type="range" min={0.5} max={2} step={0.1} value={cfg.ttsPitch} onChange={function (e) { upCfg("ttsPitch", +e.target.value); }} style={{ width: "100%" }} />
-        <span style={{ fontSize: 11, color: th.sub }}>{cfg.ttsPitch}</span>
+        <div style={{ fontSize: 11, color: th.sub, marginBottom: 8 }}>{cfg.ttsPitch.toFixed(1)}</div>
         <button onClick={function () { doSpeak("Test 1 2 3", cfg.ttsRate, cfg.ttsPitch, cfg.ttsVoice); }} style={{ marginTop: 12, padding: "8px 16px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", cursor: "pointer" }}>{t.ttsPreview}</button>
       </div>
     );
@@ -504,7 +504,7 @@ function SettingsModal(props) {
       { icon: "⏸", title: "Pause", desc: "Im Show-Modus pausiert dieser Button den Timer. Drücke 'Weiter', um fortzufahren." },
       { icon: "🚨", title: "Notfallpause", desc: "Stoppt die Show sofort mit einem Vollbild-Overlay. Zeigt Stoppuhr und Optionen zum Fortsetzen oder Beenden." },
       { icon: "⏭", title: "Vor / Zurück", desc: "Wechsle manuell zum nächsten oder vorherigen Programmteil." },
-      { icon: "🌑", title: "Blackout", desc: "Schaltet den Bildschirm schwarz. Tippe auf den Bildschirm, um den Blackout zu beenden." },
+      { icon: "🌑", title: "Blackout", desc: "Schaltet den Bildschirm schwarz für Bühnenübergänge. Tippe auf den Bildschirm, um ihn zu beenden. Starte die Show mit 'Start mit Countdown' für einen automatischen Countdown vor dem ersten Teil." },
       { icon: "📋", title: "Setlist", desc: "Zeigt alle Teile als Übersicht. Klicke auf einen Teil, um direkt dorthin zu springen." },
       { icon: "📝", title: "Notizen", desc: "Blendet die Notizen des aktuellen Teils im Show-Modus ein." },
       { icon: "💾", title: "Speichern & Laden", desc: "Speichere deine Show unter einem Namen und lade sie später wieder. Es gibt auch einen Autosave." },
@@ -525,7 +525,7 @@ function SettingsModal(props) {
       { icon: "⏸", title: "Pause", desc: "In Show Mode, this button pauses the timer. Press 'Resume' to continue." },
       { icon: "🚨", title: "Emergency Pause", desc: "Stops the show immediately with a fullscreen overlay. Shows a stopwatch and options to resume or end." },
       { icon: "⏭", title: "Prev / Next", desc: "Manually switch to the next or previous program part." },
-      { icon: "🌑", title: "Blackout", desc: "Turns the screen black. Tap the screen to exit blackout." },
+      { icon: "🌑", title: "Blackout", desc: "Turns the screen black for stage transitions. Tap the screen to exit. Use 'Start with Countdown' to begin the show with an automatic countdown before the first part." },
       { icon: "📋", title: "Setlist", desc: "Shows all parts as overview. Click a part to jump directly to it." },
       { icon: "📝", title: "Notes", desc: "Displays the current part's notes in Show Mode." },
       { icon: "💾", title: "Save & Load", desc: "Save your show under a name and reload it later. There is also an autosave." },
