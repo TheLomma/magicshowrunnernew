@@ -1,6 +1,6 @@
 
 
-// v6.5
+// v6.6
 import React, { useState, useEffect, useRef } from "react";
 
 var uid = function () { return Math.random().toString(36).slice(2, 9); };
@@ -18,7 +18,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v6.5", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v6.6", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -46,7 +46,7 @@ var T = {
     circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil"
   },
   en: {
-    title: "Magic Showrunner", ver: "v6.5", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v6.6", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -546,6 +546,29 @@ function CircleTimer(props) {
   );
 }
 
+function useWakeLock() {
+  var lockRef = useRef(null);
+  useEffect(function () {
+    var acquired = false;
+    if (navigator.wakeLock) {
+      navigator.wakeLock.request("screen").then(function (lock) {
+        lockRef.current = lock;
+        acquired = true;
+      }).catch(function () {});
+      var onVis = function () {
+        if (document.visibilityState === "visible" && navigator.wakeLock) {
+          navigator.wakeLock.request("screen").then(function (lock) { lockRef.current = lock; }).catch(function () {});
+        }
+      };
+      document.addEventListener("visibilitychange", onVis);
+    }
+    return function () {
+      if (lockRef.current) { lockRef.current.release().catch(function () {}); lockRef.current = null; }
+      document.removeEventListener("visibilitychange", function () {});
+    };
+  }, []);
+}
+
 function PerformMode(props) {
   var parts = props.parts, cfg = props.cfg, onExit = props.onExit, startInBlackout = props.startInBlackout, onSizeChange = props.onSizeChange, targetEnd = props.targetEnd;
   var pt = PTH[cfg.perfTheme] || PTH.dark;
@@ -570,6 +593,7 @@ function PerformMode(props) {
   var sizeScale = cfg.performSizeScale != null ? cfg.performSizeScale : 1.0;
   var sz = { timer: Math.round(72 * sizeScale), title: Math.round(28 * sizeScale) };
   var useCircle = cfg.timerStyle === "circle";
+  useWakeLock();
 
   useEffect(function () {
     if (!cdRunning) return;
