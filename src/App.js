@@ -788,33 +788,6 @@ function exportJSON(parts) {
 }
 
 function importJSON(onLoad, onToast) {
-  var input = document.createElement("input");
-  input.type = "file"; input.accept = ".json";
-  input.onchange = function (e) {
-    var file = e.target.files[0]; if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function (ev) {
-      try {
-        var data = JSON.parse(ev.target.result);
-        var parts = data.parts || data;
-        if (!Array.isArray(parts)) throw new Error();
-        var imported = parts.map(function (p) { return Object.assign({}, p, { id: uid() }); });
-        onLoad(imported);
-        onToast("✓ Import erfolgreich (" + imported.length + " Teile)");
-      } catch (err) { onToast("⚠️ Ungültige JSON-Datei"); }
-    };
-    reader.readAsText(file);
-  };
-  input.click();
-}
-
-function exportJSON(parts) {
-  var data = { version: "ms3", date: new Date().toISOString(), parts: parts };
-  var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "showrunner_backup.json"; a.click();
-}
-
-function importJSON(onLoad, onToast) {
   var inp = document.createElement("input"); inp.type = "file"; inp.accept = ".json";
   inp.onchange = function (e) {
     var file = e.target.files[0]; if (!file) return;
@@ -829,14 +802,6 @@ function importJSON(onLoad, onToast) {
     reader.readAsText(file);
   };
   inp.click();
-}
-
-function exportPDF(parts) {
-  var lines = parts.map(function (p, i) { return (i + 1) + ". " + p.title + " (" + fmt(p.duration) + ")"; });
-  var content = lines.join("\n");
-  var html = "<html><body><pre style='font-size:14px'>" + content + "</pre></body></html>";
-  var blob = new Blob([html], { type: "text/html" });
-  var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "setlist.pdf"; a.click();
 }
 
 function exportCSV(parts) {
@@ -938,8 +903,6 @@ function Banner(props) {
 }
 
 export default function App() {
-  var _lastSaved = useState(""); var lastSaved = _lastSaved[0], setLastSaved = _lastSaved[1];
-  var _autoSaveMsg = useState(""); var autoSaveMsg = _autoSaveMsg[0], setAutoSaveMsg = _autoSaveMsg[1];
   var _exportOpen = useState(false); var exportOpen = _exportOpen[0], setExportOpen = _exportOpen[1];
   var _cfg = useState({
     theme: "dark", perfTheme: "dark", lang: "de", beeps: true, vibrate: true, volume: 0.5,
@@ -960,18 +923,7 @@ export default function App() {
   });
   var parts = _parts[0], setPartsRaw = _parts[1];
   var setParts = function (np) { var r = typeof np === 'function' ? np(parts) : np; setHistory(function (h) { return h.concat([parts]); }); setRedoStack([]); setPartsRaw(r); };
-  // Auto-Save useEffect
-  useEffect(function () {
-    if (parts && parts.length > 0) {
-      try { localStorage.setItem("ms3_autosave", JSON.stringify(parts)); } catch (e) {}
-      var now = new Date();
-      var ts = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
-      setLastSaved(ts);
-      localStorage.setItem("ms3_last_saved", ts);
-      setAutoSaveMsg("✓ Auto-gespeichert");
-      var tid = setTimeout(function () { setAutoSaveMsg(""); }, 2000);
-    }
-  }, [parts]);
+
 
   var doUndo = function () { if (!history.length) return; var p = history[history.length-1]; setRedoStack(function(rs){return rs.concat([parts]);}); setPartsRaw(p); setHistory(function(h){return h.slice(0,-1);}); };
   var doRedo = function () { if (!redoStack.length) return; var n = redoStack[redoStack.length-1]; setHistory(function(h){return h.concat([parts]);}); setPartsRaw(n); setRedoStack(function(rs){return rs.slice(0,-1);}); };
@@ -989,18 +941,6 @@ export default function App() {
   var _dragOver = useState(null); var dragOver = _dragOver[0], setDragOver = _dragOver[1];
   var _showGroupEditor = useState(false); var showGroupEditor = _showGroupEditor[0], setShowGroupEditor = _showGroupEditor[1];
   var _editGroup = useState(null); var editGroup = _editGroup[0], setEditGroup = _editGroup[1];
-  var _lastSaved = useState(""); var lastSaved = _lastSaved[0], setLastSaved = _lastSaved[1];
-  var _autoSaveMsg = useState(""); var autoSaveMsg = _autoSaveMsg[0], setAutoSaveMsg = _autoSaveMsg[1];
-
-  useEffect(function () {
-    try {
-      var stored = localStorage.getItem("ms3_last_saved");
-      if (stored) {
-        var d = new Date(stored);
-        setLastSaved(d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
-      }
-    } catch (e) {}
-  }, []);
 
   useEffect(function () {
     if (!parts || parts.length === 0) return;
