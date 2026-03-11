@@ -1,5 +1,6 @@
 
 
+// v6.5
 import React, { useState, useEffect, useRef } from "react";
 
 var uid = function () { return Math.random().toString(36).slice(2, 9); };
@@ -17,7 +18,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v6.4", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v6.5", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -42,11 +43,10 @@ var T = {
     showModeSize: "Anzeigegröße im Show-Modus", sizeSmall: "Klein", sizeLarge: "Groß",
     targetEnd: "Ziel-Endzeit", onSchedule: "Im Zeitplan", behind: "Überzogen", ahead: "Voraus",
     targetEndHint: "Gewünschtes Show-Ende (HH:MM)",
-    share: "Teilen", shareLink: "Link kopiert!", shareTitle: "Show teilen",
     circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil"
   },
   en: {
-    title: "Magic Showrunner", ver: "v6.4", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v6.5", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -71,7 +71,6 @@ var T = {
     showModeSize: "Display size in Show Mode", sizeSmall: "Small", sizeLarge: "Large",
     targetEnd: "Target End Time", onSchedule: "On schedule", behind: "Behind", ahead: "Ahead",
     targetEndHint: "Desired show end (HH:MM)",
-    share: "Share", shareLink: "Link copied!", shareTitle: "Share Show",
     circleTimer: "Circle Timer", barTimer: "Bar Timer", timerStyle: "Timer Style"
   }
 };
@@ -138,6 +137,9 @@ function doSpeak(text, rate, pitch, uri) {
   if (uri) { var v = speechSynthesis.getVoices().find(function (x) { return x.voiceURI === uri; }); if (v) u.voice = v; }
   speechSynthesis.speak(u);
 }
+
+function getAutoSave() { try { return JSON.parse(localStorage.getItem("ms3_autosave") || "null"); } catch (e) { return null; } }
+function setAutoSave(parts) { try { localStorage.setItem("ms3_autosave", JSON.stringify(parts)); } catch (e) {} }
 
 function getTemplates() { try { return JSON.parse(localStorage.getItem("ms3_templates") || "[]"); } catch (e) { return []; } }
 function saveTemplates(arr) { localStorage.setItem("ms3_templates", JSON.stringify(arr)); }
@@ -247,6 +249,7 @@ function SaveModal(props) {
     var entry = { name: name, parts: parts, date: new Date().toISOString() };
     if (i >= 0) { s[i] = entry; } else { s.push(entry); }
     localStorage.setItem("ms3_shows", JSON.stringify(s));
+    localStorage.setItem("ms3_last_saved", new Date().toISOString());
     onToast(t.save + " OK"); onClose();
   };
   return (
@@ -735,6 +738,64 @@ function PerformMode(props) {
   );
 }
 
+function exportJSON(parts) {
+  var data = { version: "ms3", date: new Date().toISOString(), parts: parts };
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "showrunner_backup.json"; a.click();
+}
+
+function importJSON(onLoad, onToast) {
+  var input = document.createElement("input");
+  input.type = "file"; input.accept = ".json";
+  input.onchange = function (e) {
+    var file = e.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      try {
+        var data = JSON.parse(ev.target.result);
+        var parts = data.parts || data;
+        if (!Array.isArray(parts)) throw new Error();
+        var imported = parts.map(function (p) { return Object.assign({}, p, { id: uid() }); });
+        onLoad(imported);
+        onToast("✓ Import erfolgreich (" + imported.length + " Teile)");
+      } catch (err) { onToast("⚠️ Ungültige JSON-Datei"); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function exportJSON(parts) {
+  var data = { version: "ms3", date: new Date().toISOString(), parts: parts };
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "showrunner_backup.json"; a.click();
+}
+
+function importJSON(onLoad, onToast) {
+  var inp = document.createElement("input"); inp.type = "file"; inp.accept = ".json";
+  inp.onchange = function (e) {
+    var file = e.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      try {
+        var raw = JSON.parse(ev.target.result);
+        var arr = Array.isArray(raw) ? raw : (raw.parts || []);
+        if (arr.length) { onLoad(arr.map(function (p) { return Object.assign({}, p, { id: uid() }); })); onToast("Import OK"); }
+      } catch (ex) { onToast("Import Fehler"); }
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+function exportPDF(parts) {
+  var lines = parts.map(function (p, i) { return (i + 1) + ". " + p.title + " (" + fmt(p.duration) + ")"; });
+  var content = lines.join("\n");
+  var html = "<html><body><pre style='font-size:14px'>" + content + "</pre></body></html>";
+  var blob = new Blob([html], { type: "text/html" });
+  var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "setlist.pdf"; a.click();
+}
+
 function exportCSV(parts) {
   var header = "Title,Duration,Intro,PreAnn,PreAnnText,Notes,Color\n";
   var rows = parts.map(function (p) {
@@ -744,10 +805,31 @@ function exportCSV(parts) {
   var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "showrunner.csv"; a.click();
 }
 
-function exportTXT(parts) {
-  var txt = parts.map(function (p, i) { return (i + 1) + ". " + p.title + " (" + fmt(p.duration) + ")"; }).join("\n");
-  var blob = new Blob([txt], { type: "text/plain" });
-  var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "setlist.txt"; a.click();
+function exportPDF(parts) {
+  var totalDur = parts.reduce(function (a, p) { return a + p.duration; }, 0);
+  var safe = function (s) { return String(s || "").replace(/[()\\]/g, function (c) { return "\\" + c; }).substring(0, 60); };
+  var y = 750;
+  var contentLines = [];
+  contentLines.push("BT /F1 18 Tf 50 " + y + " Td (Magic Showrunner - Setlist) Tj ET");
+  y -= 30;
+  contentLines.push("BT /F1 11 Tf 50 " + y + " Td (Gesamt: " + fmt(totalDur) + "  |  " + parts.length + " Teile) Tj ET");
+  y -= 20;
+  contentLines.push("50 " + y + " m 545 " + y + " l S");
+  y -= 20;
+  parts.forEach(function (p, i) {
+    contentLines.push("BT /F1 12 Tf 50 " + y + " Td (" + (i + 1) + ". " + safe(p.title) + ") Tj ET");
+    y -= 16;
+    contentLines.push("BT /F1 10 Tf 65 " + y + " Td (Dauer: " + fmt(p.duration) + (p.notes ? "   Notiz: " + safe(p.notes) : "") + ") Tj ET");
+    y -= 22;
+    if (y < 80) y = 750;
+  });
+  var content = contentLines.join("\n");
+  var page = "3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 595 842]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj";
+  var stream = "4 0 obj<</Length " + content.length + ">>\nstream\n" + content + "\nendstream\nendobj";
+  var font = "5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj";
+  var body = "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n" + page + "\n" + stream + "\n" + font;
+  var blob = new Blob([body], { type: "application/pdf" });
+  var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "setlist.pdf"; a.click();
 }
 
 function shareShow(parts, onToast, t) {
@@ -813,6 +895,9 @@ function Banner(props) {
 }
 
 export default function App() {
+  var _lastSaved = useState(""); var lastSaved = _lastSaved[0], setLastSaved = _lastSaved[1];
+  var _autoSaveMsg = useState(""); var autoSaveMsg = _autoSaveMsg[0], setAutoSaveMsg = _autoSaveMsg[1];
+  var _exportOpen = useState(false); var exportOpen = _exportOpen[0], setExportOpen = _exportOpen[1];
   var _cfg = useState({
     theme: "dark", perfTheme: "dark", lang: "de", beeps: true, vibrate: true, volume: 0.5,
     beepSound: "beep", ttsVoice: "", ttsRate: 1, ttsPitch: 1, fontSize: 16, fontFamily: "System",
@@ -821,6 +906,8 @@ export default function App() {
   });
   var cfg = _cfg[0], setCfg = _cfg[1];
   var _customTh = useState(getCustomTheme()); var customTh = _customTh[0], setCustomTh = _customTh[1];
+  var _autoSaveMsg = useState(""); var autoSaveMsg = _autoSaveMsg[0], setAutoSaveMsg = _autoSaveMsg[1];
+  var _lastSaved = useState(function () { try { var ls = localStorage.getItem("ms3_last_saved"); if (ls) { var d = new Date(ls); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); } } catch(e){} return ""; }); var lastSaved = _lastSaved[0], setLastSaved = _lastSaved[1];
   var _history = useState([]); var history = _history[0], setHistory = _history[1];
   var _redoStack = useState([]); var redoStack = _redoStack[0], setRedoStack = _redoStack[1];
   var _parts = useState(function () {
@@ -830,6 +917,19 @@ export default function App() {
   });
   var parts = _parts[0], setPartsRaw = _parts[1];
   var setParts = function (np) { var r = typeof np === 'function' ? np(parts) : np; setHistory(function (h) { return h.concat([parts]); }); setRedoStack([]); setPartsRaw(r); };
+  // Auto-Save useEffect
+  useEffect(function () {
+    if (parts && parts.length > 0) {
+      try { localStorage.setItem("ms3_autosave", JSON.stringify(parts)); } catch (e) {}
+      var now = new Date();
+      var ts = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+      setLastSaved(ts);
+      localStorage.setItem("ms3_last_saved", ts);
+      setAutoSaveMsg("✓ Auto-gespeichert");
+      var tid = setTimeout(function () { setAutoSaveMsg(""); }, 2000);
+    }
+  }, [parts]);
+
   var doUndo = function () { if (!history.length) return; var p = history[history.length-1]; setRedoStack(function(rs){return rs.concat([parts]);}); setPartsRaw(p); setHistory(function(h){return h.slice(0,-1);}); };
   var doRedo = function () { if (!redoStack.length) return; var n = redoStack[redoStack.length-1]; setHistory(function(h){return h.concat([parts]);}); setPartsRaw(n); setRedoStack(function(rs){return rs.slice(0,-1);}); };
   var _perf = useState(false); var perf = _perf[0], setPerf = _perf[1];
@@ -844,6 +944,31 @@ export default function App() {
   var _toast = useState(""); var toast = _toast[0], setToast = _toast[1];
   var _dragIdx = useState(null); var dragIdx = _dragIdx[0], setDragIdx = _dragIdx[1];
   var _dragOver = useState(null); var dragOver = _dragOver[0], setDragOver = _dragOver[1];
+  var _lastSaved = useState(""); var lastSaved = _lastSaved[0], setLastSaved = _lastSaved[1];
+  var _autoSaveMsg = useState(""); var autoSaveMsg = _autoSaveMsg[0], setAutoSaveMsg = _autoSaveMsg[1];
+
+  useEffect(function () {
+    try {
+      var stored = localStorage.getItem("ms3_last_saved");
+      if (stored) {
+        var d = new Date(stored);
+        setLastSaved(d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+      }
+    } catch (e) {}
+  }, []);
+
+  useEffect(function () {
+    if (!parts || parts.length === 0) return;
+    setAutoSave(parts);
+    var now = new Date();
+    var timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    localStorage.setItem("ms3_last_saved", now.toISOString());
+    setLastSaved(timeStr);
+    setAutoSaveMsg("✓");
+    var t2 = setTimeout(function () { setAutoSaveMsg(""); }, 2000);
+    return function () { clearTimeout(t2); };
+  }, [parts]);
+  var _showExport = useState(false); var showExport = _showExport[0], setShowExport = _showExport[1];
 
   var t = T[cfg.lang] || T.de;
   var th = cfg.theme === "custom" ? customTh : (TH[cfg.theme] || TH.dark);
@@ -890,12 +1015,36 @@ export default function App() {
         <Banner th={th} />
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12, marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
           <span style={{ fontSize: 11, color: th.sub }}>{t.ver}</span>
+          {autoSaveMsg && <span style={{ fontSize: 11, color: "#10b981", marginLeft: 8 }}>{autoSaveMsg}</span>}
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            <button onClick={function () { setSaveOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>{t.save}</button>
+            {lastSaved && <span style={{ fontSize: 11, color: th.sub, alignSelf: "center" }}>💾 {lastSaved}</span>}
+            <button onClick={function () { setSaveOpen(true); }} onMouseEnter={function () { var ls = localStorage.getItem("ms3_last_saved"); if (ls) { var d = new Date(ls); setLastSaved(String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")); } }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>{t.save}</button>
             <button onClick={function () { setLoadOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>{t.load}</button>
-            <button onClick={function () { shareShow(parts, setToast, t); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>📤 {t.share}</button>
-            <button onClick={function () { exportCSV(parts); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>{t.csv}</button>
-            <button onClick={function () { exportTXT(parts); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>TXT</button>
+<div style={{ position: "relative" }}>
+              <button onClick={function () { setShowExport(!showExport); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: showExport ? th.acc + "22" : "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>📦 Export ▾</button>
+              {showExport && (
+                <div style={{ position: "absolute", top: "110%", right: 0, background: th.card, border: "1px solid " + th.brd, borderRadius: 10, boxShadow: "0 6px 24px rgba(0,0,0,0.3)", zIndex: 500, minWidth: 170, overflow: "hidden" }}>
+                  {[
+                    { label: "⬇ JSON exportieren", fn: function () { exportJSON(parts); } },
+                    { label: "⬆ JSON importieren", fn: function () { importJSON(setParts, setToast); } },
+                    { label: "📊 CSV exportieren", fn: function () { exportCSV(parts); } },
+                    { label: "📄 PDF exportieren", fn: function () { exportPDF(parts); } }
+                  ].map(function (item, idx) {
+                    return (
+                      <div key={idx} onClick={function () { item.fn(); setShowExport(false); }} style={{ padding: "10px 16px", cursor: "pointer", fontSize: 13, color: th.text, borderBottom: idx < 3 ? "1px solid " + th.brd : "none" }}
+                        onMouseEnter={function (e) { e.currentTarget.style.background = th.inp; }}
+                        onMouseLeave={function (e) { e.currentTarget.style.background = "transparent"; }}>
+                        {item.label}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+            
+            
+            
+            
             <button onClick={function () { setSettOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>⚙️</button>
           </div>
         </div>
@@ -980,7 +1129,7 @@ export default function App() {
       </div>
 
       <PartEditor open={showEditor} part={editPart} onSave={addPart} onClose={function () { setShowEditor(false); setEditPart(null); }} t={t} th={th} onToast={setToast} />
-      <SaveModal open={saveOpen} onClose={function () { setSaveOpen(false); }} parts={parts} t={t} th={th} onToast={setToast} />
+      <SaveModal open={saveOpen} onClose={function () { setSaveOpen(false); }} parts={parts} t={t} th={th} onToast={setToast} onSetLastSaved={setLastSaved} />
       <LoadModal open={loadOpen} onClose={function () { setLoadOpen(false); }} onLoad={function (p) { setParts(p); }} t={t} th={th} />
       <SettingsModal open={settOpen} onClose={function () { setSettOpen(false); }} cfg={cfg} setCfg={setCfg} t={t} th={th} onApplyCustom={setCustomTh} onLangChange={handleLangChange} />
       <TemplateModal open={tplOpen} onClose={function () { setTplOpen(false); }} onUse={function (tpl) { setParts(parts.concat([Object.assign({}, tpl, { id: uid() })])); }} t={t} th={th} />
