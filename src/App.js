@@ -15,7 +15,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v5.8", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v5.9", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -37,10 +37,12 @@ var T = {
     customTheme: "Eigenes Farbschema", customBg: "Hintergrund", customCard: "Karte", customText: "Text",
     customAcc: "Akzent", customBrd: "Rahmen", customSub: "Nebentext", customInp: "Eingabe",
     resetCustom: "Zurücksetzen", applyCustom: "Anwenden",
-    showModeSize: "Anzeigegröße im Show-Modus", sizeSmall: "Klein", sizeLarge: "Groß"
+    showModeSize: "Anzeigegröße im Show-Modus", sizeSmall: "Klein", sizeLarge: "Groß",
+    targetEnd: "Ziel-Endzeit", onSchedule: "Im Zeitplan", behind: "Überzogen", ahead: "Voraus",
+    targetEndHint: "Gewünschtes Show-Ende (HH:MM)"
   },
   en: {
-    title: "Magic Showrunner", ver: "v5.8", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v5.9", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -62,7 +64,9 @@ var T = {
     customTheme: "Custom Color Scheme", customBg: "Background", customCard: "Card", customText: "Text",
     customAcc: "Accent", customBrd: "Border", customSub: "Subtext", customInp: "Input",
     resetCustom: "Reset", applyCustom: "Apply",
-    showModeSize: "Display size in Show Mode", sizeSmall: "Small", sizeLarge: "Large"
+    showModeSize: "Display size in Show Mode", sizeSmall: "Small", sizeLarge: "Large",
+    targetEnd: "Target End Time", onSchedule: "On schedule", behind: "Behind", ahead: "Ahead",
+    targetEndHint: "Desired show end (HH:MM)"
   }
 };
 
@@ -458,8 +462,47 @@ function useClock() {
   return clock;
 }
 
+function TargetEndIndicator(props) {
+  var targetEnd = props.targetEnd, parts = props.parts, idx = props.idx, elapsed = props.elapsed, cfg = props.cfg, pt = props.pt, t = props.t;
+  if (!targetEnd) return null;
+
+  var now = new Date();
+  var tParts = targetEnd.split(":");
+  var targetDate = new Date();
+  targetDate.setHours(parseInt(tParts[0], 10), parseInt(tParts[1], 10), 0, 0);
+  if (targetDate < now) targetDate.setDate(targetDate.getDate() + 1);
+
+  var remainingShowSec = 0;
+  for (var i = idx; i < parts.length; i++) {
+    var partDur = cfg.testMode ? (cfg.testDur || 10) : parts[i].duration;
+    if (i === idx) {
+      remainingShowSec += Math.max(partDur - elapsed, 0);
+    } else {
+      remainingShowSec += partDur;
+    }
+  }
+
+  var estimatedEndMs = now.getTime() + remainingShowSec * 1000;
+  var estimatedEnd = new Date(estimatedEndMs);
+  var diffSec = Math.round((targetDate.getTime() - estimatedEndMs) / 1000);
+  var diffMin = Math.round(diffSec / 60);
+
+  var estStr = String(estimatedEnd.getHours()).padStart(2, "0") + ":" + String(estimatedEnd.getMinutes()).padStart(2, "0");
+
+  var statusColor = diffSec >= 0 ? "#10b981" : "#ef4444";
+  var statusText = diffSec >= 0 ? (diffMin > 0 ? diffMin + " min " + t.ahead : t.onSchedule) : (Math.abs(diffMin) + " min " + t.behind);
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: pt.text, opacity: 0.8 }}>
+      <span>🎯 {targetEnd}</span>
+      <span style={{ color: statusColor, fontWeight: 700 }}>{statusText}</span>
+      <span style={{ opacity: 0.5 }}>→ ~{estStr}</span>
+    </div>
+  );
+}
+
 function PerformMode(props) {
-  var parts = props.parts, cfg = props.cfg, onExit = props.onExit, startInBlackout = props.startInBlackout, onSizeChange = props.onSizeChange;
+  var parts = props.parts, cfg = props.cfg, onExit = props.onExit, startInBlackout = props.startInBlackout, onSizeChange = props.onSizeChange, targetEnd = props.targetEnd;
   var pt = PTH[cfg.perfTheme] || PTH.dark;
   var t = T[cfg.lang] || T.de;
   var clock = useClock();
@@ -601,7 +644,10 @@ function PerformMode(props) {
   return (
     <div style={{ position: "fixed", inset: 0, background: bgStyle, display: "flex", flexDirection: "column", zIndex: 999, transition: useColorTrans ? "background 1.5s ease" : "none" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", gap: 8, flexWrap: "wrap" }}>
-        <div style={{ fontSize: 14, fontFamily: "monospace", color: pt.text, opacity: 0.6, fontWeight: 600 }}>{clock}</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <div style={{ fontSize: 14, fontFamily: "monospace", color: pt.text, opacity: 0.6, fontWeight: 600 }}>{clock}</div>
+          <TargetEndIndicator targetEnd={targetEnd} parts={parts} idx={idx} elapsed={elapsed} cfg={cfg} pt={pt} t={t} />
+        </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginLeft: "auto" }}>
           <span style={{ fontSize: 10, color: pt.text, opacity: 0.5 }}>A</span>
           <input type="range" min={0.4} max={2.0} step={0.05} value={sizeScale} onChange={function (e) { if (onSizeChange) onSizeChange(+e.target.value); }} style={{ width: 80, accentColor: pt.bar }} />
@@ -710,6 +756,7 @@ export default function App() {
   var _parts = useState(function () { return makeDemo("de"); }); var parts = _parts[0], setParts = _parts[1];
   var _perf = useState(false); var perf = _perf[0], setPerf = _perf[1];
   var _startBlackout = useState(false); var startBlackout = _startBlackout[0], setStartBlackout = _startBlackout[1];
+  var _targetEnd = useState(""); var targetEnd = _targetEnd[0], setTargetEnd = _targetEnd[1];
   var _edit = useState(null); var editPart = _edit[0], setEditPart = _edit[1];
   var _editorOpen = useState(false); var editorOpen = _editorOpen[0], setEditorOpen = _editorOpen[1];
   var _saveOpen = useState(false); var saveOpen = _saveOpen[0], setSaveOpen = _saveOpen[1];
@@ -751,8 +798,8 @@ export default function App() {
   var useTemplate = function (tpl) { setParts(function (ps) { return ps.concat([Object.assign({}, tpl, { id: uid() })]); }); setToast(tpl.title + " ✓"); };
 
   var handleDragStart = function (i) { setDragIdx(i); };
-  var handleDragOver = function (e) { e.preventDefault(); };
-  var handleDrop = function (i) {
+  var handleDragOver = function (e, i) {
+    e.preventDefault();
     if (dragIdx === null || dragIdx === i) return;
     setParts(function (ps) {
       var n = ps.slice();
@@ -760,106 +807,119 @@ export default function App() {
       n.splice(i, 0, item);
       return n;
     });
-    setDragIdx(null);
+    setDragIdx(i);
   };
+  var handleDragEnd = function () { setDragIdx(null); };
 
-  var handleCSV = function (e) {
-    var file = e.target.files[0];
-    if (!file) return;
+  var importCSV = function (e) {
+    var file = e.target.files[0]; if (!file) return;
     var reader = new FileReader();
     reader.onload = function (ev) {
-      var lines = ev.target.result.split("\n").slice(1);
-      var imported = [];
-      lines.forEach(function (line) {
-        if (!line.trim()) return;
-        var cols = line.match(/(".*?"|[^,]+)/g);
-        if (!cols || cols.length < 2) return;
-        var clean = function (s) { return (s || "").replace(/^"|"$/g, "").replace(/""/g, '"'); };
-        imported.push({ id: uid(), title: clean(cols[0]), duration: parseInt(clean(cols[1])) || 120, intro: clean(cols[2] || ""), preAnn: parseInt(clean(cols[3])) || 0, preAnnText: clean(cols[4] || ""), notes: clean(cols[5] || ""), color: clean(cols[6]) || COLORS[0] });
-      });
-      if (imported.length > 0) { setParts(imported); setToast("CSV ✓ (" + imported.length + ")"); }
+      var lines = ev.target.result.split("\n").filter(function (l) { return l.trim(); });
+      if (lines.length < 2) return;
+      var newParts = [];
+      for (var i = 1; i < lines.length; i++) {
+        var cols = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+        if (!cols || cols.length < 2) continue;
+        var clean = cols.map(function (c) { return c.replace(/^"|"$/g, "").replace(/""/g, '"'); });
+        newParts.push({ id: uid(), title: clean[0] || "", duration: parseInt(clean[1]) || 120, intro: clean[2] || "", preAnn: parseInt(clean[3]) || 0, preAnnText: clean[4] || "", notes: clean[5] || "", color: clean[6] || COLORS[0] });
+      }
+      if (newParts.length > 0) { setParts(newParts); setToast("CSV ✓ (" + newParts.length + ")"); }
     };
     reader.readAsText(file);
   };
 
   if (perf) {
-    return <PerformMode parts={parts} cfg={cfg} onExit={function () { setPerf(false); }} startInBlackout={startBlackout} onSizeChange={handleSizeChange} />;
+    return <PerformMode parts={parts} cfg={cfg} onExit={function () { setPerf(false); }} startInBlackout={startBlackout} onSizeChange={handleSizeChange} targetEnd={targetEnd} />;
   }
 
-  var bs = function (extra) {
-    return Object.assign({ padding: "8px 16px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 13 }, extra || {});
-  };
+  var bs = { padding: "8px 14px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 13 };
 
   return (
-    <div style={{ minHeight: "100vh", background: th.bg, color: th.text, fontFamily: cfg.fontFamily === "System" ? "-apple-system, BlinkMacSystemFont, sans-serif" : cfg.fontFamily, fontSize: cfg.fontSize, transition: cfg.animations ? "background 0.5s, color 0.5s" : "none" }}>
+    <div style={{ minHeight: "100vh", background: th.bg, color: th.text, fontFamily: cfg.fontFamily === "System" ? "-apple-system, BlinkMacSystemFont, sans-serif" : cfg.fontFamily, fontSize: cfg.fontSize, transition: cfg.animations ? "background 0.5s" : "none" }}>
       <div style={{ maxWidth: 600, margin: "0 auto", padding: 16 }}>
         <Banner th={th} />
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8, marginTop: 12, marginBottom: 16 }}>
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12, marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
           <span style={{ fontSize: 11, color: th.sub }}>{t.ver}</span>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            <button onClick={function () { setSaveOpen(true); }} style={bs({ background: th.acc, color: "#fff" })}>{t.save}</button>
-            <button onClick={function () { setLoadOpen(true); }} style={bs({ background: th.inp, color: th.text, border: "1px solid " + th.brd })}>{t.load}</button>
-            <button onClick={function () { setSettOpen(true); }} style={bs({ background: th.inp, color: th.text, border: "1px solid " + th.brd })}>⚙️</button>
+            <button onClick={function () { setSaveOpen(true); }} style={Object.assign({}, bs, { background: th.acc, color: "#fff" })}>{t.save}</button>
+            <button onClick={function () { setLoadOpen(true); }} style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd })}>{t.load}</button>
+            <button onClick={function () { setSettOpen(true); }} style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd })}>⚙️</button>
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 16 }}>
-          <button onClick={addPart} style={bs({ background: th.acc, color: "#fff" })}>+ {t.newPart}</button>
-          <button onClick={function () { setTplOpen(true); }} style={bs({ background: th.inp, color: th.text, border: "1px solid " + th.brd })}>⭐ {t.templates}</button>
-          <button onClick={function () { exportCSV(parts); }} style={bs({ background: th.inp, color: th.text, border: "1px solid " + th.brd })}>{t.csv} ↓</button>
-          <button onClick={function () { exportTXT(parts); }} style={bs({ background: th.inp, color: th.text, border: "1px solid " + th.brd })}>TXT ↓</button>
-          <label style={Object.assign({}, bs({ background: th.inp, color: th.text, border: "1px solid " + th.brd, display: "inline-flex", alignItems: "center" }))}>
-            {t.csv} ↑ <input ref={csvRef} type="file" accept=".csv" onChange={handleCSV} style={{ display: "none" }} />
+        <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+          <button onClick={addPart} style={Object.assign({}, bs, { background: th.acc, color: "#fff" })}>+ {t.newPart}</button>
+          <button onClick={function () { setTplOpen(true); }} style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd })}>⭐ {t.templates}</button>
+          <button onClick={function () { exportCSV(parts); }} style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd })}>{t.csv} ↓</button>
+          <button onClick={function () { exportTXT(parts); }} style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd })}>TXT ↓</button>
+          <label style={Object.assign({}, bs, { background: th.inp, color: th.text, border: "1px solid " + th.brd, display: "inline-flex", alignItems: "center" })}>
+            {t.csv} ↑
+            <input ref={csvRef} type="file" accept=".csv" onChange={importCSV} style={{ display: "none" }} />
           </label>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
-          {parts.map(function (p, i) {
-            return (
-              <div key={p.id} draggable onDragStart={function () { handleDragStart(i); }} onDragOver={handleDragOver} onDrop={function () { handleDrop(i); }} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 12, background: th.card, border: "1px solid " + th.brd, cursor: "grab", transition: cfg.animations ? "transform 0.2s, box-shadow 0.2s" : "none" }}>
-                <div style={{ width: 10, height: 10, borderRadius: 5, background: p.color, flexShrink: 0 }} />
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 600, fontSize: 14 }}>{p.title}</div>
-                  <div style={{ fontSize: 12, color: th.sub }}>{fmt(p.duration)}{p.intro ? " • 🎤" : ""}{p.notes ? " • 📝" : ""}</div>
-                </div>
-                <button onClick={function () { doEdit(p); }} style={{ background: "none", border: "none", color: th.sub, cursor: "pointer", fontSize: 16 }} title={t.edit}>✏️</button>
-                <button onClick={function () { dupPart(p); }} style={{ background: "none", border: "none", color: th.sub, cursor: "pointer", fontSize: 16 }} title={t.dup}>📋</button>
-                <button onClick={function () { delPart(p.id); }} style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", fontSize: 16 }} title={t.del}>🗑️</button>
+        {parts.map(function (p, i) {
+          return (
+            <div key={p.id} draggable onDragStart={function () { handleDragStart(i); }} onDragOver={function (e) { handleDragOver(e, i); }} onDragEnd={handleDragEnd}
+              style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderRadius: 12, marginBottom: 6, background: th.card, border: dragIdx === i ? "2px solid " + th.acc : "1px solid " + th.brd, cursor: "grab", transition: cfg.animations ? "all 0.2s" : "none" }}>
+              <div style={{ width: 10, height: 10, borderRadius: 5, background: p.color, flexShrink: 0 }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 600, fontSize: 14 }}>{p.title}</div>
+                <div style={{ fontSize: 11, color: th.sub }}>{fmt(p.duration)}</div>
               </div>
-            );
-          })}
+              <button onClick={function () { doEdit(p); }} style={{ padding: "4px 10px", borderRadius: 6, border: "none", background: th.inp, color: th.text, cursor: "pointer", fontSize: 11 }}>{t.edit}</button>
+              <button onClick={function () { dupPart(p); }} style={{ padding: "4px 10px", borderRadius: 6, border: "none", background: th.inp, color: th.text, cursor: "pointer", fontSize: 11 }}>{t.dup}</button>
+              <button onClick={function () { delPart(p.id); }} style={{ padding: "4px 10px", borderRadius: 6, border: "none", background: "#ef444422", color: "#ef4444", cursor: "pointer", fontSize: 11 }}>{t.del}</button>
+            </div>
+          );
+        })}
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16, padding: "10px 14px", borderRadius: 12, background: th.card, border: "1px solid " + th.brd }}>
+          <div>
+            <span style={{ fontSize: 12, color: th.sub }}>{t.total}: </span>
+            <span style={{ fontWeight: 700 }}>{fmt(totalDur)}</span>
+            <span style={{ fontSize: 12, color: th.sub, marginLeft: 8 }}>({parts.length} {t.parts})</span>
+          </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", borderRadius: 10, background: th.card, border: "1px solid " + th.brd, marginBottom: 16 }}>
-          <span style={{ fontSize: 13, color: th.sub }}>{parts.length} {t.parts} • {t.total}: {fmt(totalDur)}</span>
+        <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 12, background: th.card, border: "1px solid " + th.brd }}>
+          <label style={{ fontSize: 12, color: th.sub, display: "block", marginBottom: 4 }}>🎯 {t.targetEnd}</label>
+          <input type="time" value={targetEnd} onChange={function (e) { setTargetEnd(e.target.value); }}
+            style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, fontSize: 14 }} />
+          {targetEnd && (
+            <span style={{ fontSize: 11, color: th.sub, marginLeft: 8 }}>{t.targetEndHint}</span>
+          )}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, padding: 14, borderRadius: 12, background: th.card, border: "1px solid " + th.brd, marginBottom: 16 }}>
-          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
+        <div style={{ marginTop: 12, padding: "10px 14px", borderRadius: 12, background: th.card, border: "1px solid " + th.brd }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", marginBottom: 8 }}>
             <input type="checkbox" checked={cfg.testMode} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testMode: e.target.checked }); }); }} /> {t.testModeLbl}
           </label>
           {cfg.testMode && (
             <div>
               <label style={{ fontSize: 12, color: th.sub }}>{t.testDurLbl}</label>
-              <input type="number" min={1} value={cfg.testDur} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testDur: +e.target.value }); }); }} style={{ width: 80, padding: 6, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginLeft: 8 }} />
+              <input type="number" min={1} value={cfg.testDur} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testDur: +e.target.value }); }); }}
+                style={{ width: 80, padding: 6, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginLeft: 8 }} />
             </div>
           )}
-          <div>
-            <label style={{ fontSize: 12, color: th.sub }}>{t.countdownSek}</label>
-            <select value={cfg.countdown} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { countdown: +e.target.value }); }); }} style={{ marginLeft: 8, padding: 6, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text }}>
-              <option value={0}>{t.countdownOff}</option>
-              <option value={3}>3 {t.sek}</option>
-              <option value={5}>5 {t.sek}</option>
-              <option value={10}>10 {t.sek}</option>
-              <option value={60}>60 {t.sek}</option>
-            </select>
-          </div>
-          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
+          <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", marginBottom: 8, marginTop: 8 }}>
             <input type="checkbox" checked={startBlackout} onChange={function (e) { setStartBlackout(e.target.checked); }} /> {t.startBlackout}
           </label>
+          <label style={{ fontSize: 12, color: th.sub, display: "block", marginBottom: 4 }}>{t.countdownSek}</label>
+          <div style={{ display: "flex", gap: 6 }}>
+            {[0, 3, 5, 10, 60].map(function (v) {
+              return <button key={v} onClick={function () { setCfg(function (c) { return Object.assign({}, c, { countdown: v }); }); }}
+                style={{ padding: "6px 12px", borderRadius: 8, border: cfg.countdown === v ? "2px solid " + th.acc : "2px solid transparent", background: cfg.countdown === v ? th.acc + "22" : th.inp, color: th.text, cursor: "pointer", fontSize: 12 }}>
+                {v === 0 ? t.countdownOff : v + " " + t.sek}
+              </button>;
+            })}
+          </div>
         </div>
 
-        <button onClick={function () { if (parts.length > 0) setPerf(true); }} style={{ width: "100%", padding: 14, borderRadius: 12, border: "none", background: "linear-gradient(135deg, " + th.acc + ", #ec4899)", color: "#fff", fontSize: 18, fontWeight: 800, cursor: parts.length > 0 ? "pointer" : "default", opacity: parts.length > 0 ? 1 : 0.5, letterSpacing: 1 }}>
+        <button onClick={function () { if (parts.length > 0) setPerf(true); }}
+          style={{ marginTop: 16, width: "100%", padding: 14, borderRadius: 12, border: "none", background: "linear-gradient(135deg, " + th.acc + ", #8b5cf6)", color: "#fff", fontSize: 18, fontWeight: 800, cursor: "pointer", letterSpacing: 1 }}>
           ▶ {cfg.testMode ? t.test : t.start}
         </button>
       </div>
