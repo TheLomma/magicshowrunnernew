@@ -507,7 +507,7 @@ function SettingsModal(props) {
       { icon: "⏸", title: "Pause", desc: "Im Show-Modus pausiert dieser Button den Timer. Drücke 'Weiter', um fortzufahren." },
       { icon: "🚨", title: "Notfallpause", desc: "Stoppt die Show sofort mit einem Vollbild-Overlay. Zeigt Stoppuhr und Optionen zum Fortsetzen oder Beenden." },
       { icon: "⏭", title: "Vor / Zurück", desc: "Wechsle manuell zum nächsten oder vorherigen Programmteil." },
-      { icon: "🌑", title: "Blackout", desc: "Schaltet den Bildschirm schwarz für Bühnenübergänge. Tippe auf den Bildschirm, um ihn zu beenden. Starte die Show mit 'Start mit Countdown' für einen automatischen Countdown vor dem ersten Teil." },
+      { icon: "⏳", title: "Countdown", desc: "Starte die Show mit 'Start mit Countdown' für einen automatischen Countdown vor dem ersten Teil. Im Show-Modus kann auch der Bildschirm geschwärzt werden (Blackout) – tippe darauf, um ihn zu beenden." },
       { icon: "📋", title: "Setlist", desc: "Zeigt alle Teile als Übersicht. Klicke auf einen Teil, um direkt dorthin zu springen." },
       { icon: "📝", title: "Notizen", desc: "Blendet die Notizen des aktuellen Teils im Show-Modus ein." },
       { icon: "💾", title: "Speichern & Laden", desc: "Speichere deine Show unter einem Namen und lade sie später wieder. Es gibt auch einen Autosave." },
@@ -516,7 +516,7 @@ function SettingsModal(props) {
       { icon: "🎯", title: "Ziel-Endzeit", desc: "Gib eine gewünschte Endzeit ein. Die App zeigt ob du im Zeitplan liegst." },
       { icon: "🔊", title: "Signaltöne", desc: "Automatische Töne bei Vorankündigungen und Teilwechseln." },
       { icon: "🗣️", title: "Text-to-Speech", desc: "Die App liest Intro-Texte automatisch vor. Stimme, Tempo und Tonhöhe sind einstellbar." },
-      { icon: "🎨", title: "Themes", desc: "Wähle zwischen Light, Dark, Midnight, Ember oder erstelle ein eigenes Farbschema." },
+      { icon: "🎨", title: "Design", desc: "Wähle zwischen Light, Dark, Midnight, Ember oder erstelle ein eigenes Farbschema. Auch Timer-Stil und Farb-Übergänge sind hier einstellbar." },
       { icon: "⏱️", title: "Timer-Stil", desc: "Wähle zwischen Balken-Timer und Kreis-Timer im Reiter 'Design'." },
       { icon: "🔤", title: "Schrift & Größe", desc: "Passe die Anzeigegröße im Show-Modus stufenlos an, mit Live-Vorschau." }
     ] : [
@@ -528,7 +528,7 @@ function SettingsModal(props) {
       { icon: "⏸", title: "Pause", desc: "In Show Mode, this button pauses the timer. Press 'Resume' to continue." },
       { icon: "🚨", title: "Emergency Pause", desc: "Stops the show immediately with a fullscreen overlay. Shows a stopwatch and options to resume or end." },
       { icon: "⏭", title: "Prev / Next", desc: "Manually switch to the next or previous program part." },
-      { icon: "🌑", title: "Blackout", desc: "Turns the screen black for stage transitions. Tap the screen to exit. Use 'Start with Countdown' to begin the show with an automatic countdown before the first part." },
+      { icon: "⏳", title: "Countdown", desc: "Use 'Start with Countdown' to begin the show with an automatic countdown before the first part. In Show Mode the screen can also be blacked out – tap it to exit." },
       { icon: "📋", title: "Setlist", desc: "Shows all parts as overview. Click a part to jump directly to it." },
       { icon: "📝", title: "Notes", desc: "Displays the current part's notes in Show Mode." },
       { icon: "💾", title: "Save & Load", desc: "Save your show under a name and reload it later. There is also an autosave." },
@@ -537,7 +537,7 @@ function SettingsModal(props) {
       { icon: "🎯", title: "Target End Time", desc: "Enter a desired end time. The app shows if you are on schedule, ahead or behind." },
       { icon: "🔊", title: "Alert Sounds", desc: "Automatic tones for pre-announcements and part changes." },
       { icon: "🗣️", title: "Text-to-Speech", desc: "The app reads intro texts automatically. Voice, speed and pitch are configurable." },
-      { icon: "🎨", title: "Themes", desc: "Choose between Light, Dark, Midnight, Ember or create a custom color scheme." },
+      { icon: "🎨", title: "Design", desc: "Choose between Light, Dark, Midnight, Ember or create a custom color scheme. Timer style and color transitions are also configurable here." },
       { icon: "⏱️", title: "Timer Style", desc: "Choose between bar timer and circle timer in the 'Design' tab." },
       { icon: "🔤", title: "Font & Size", desc: "Adjust the display size in Show Mode steplessly, with live preview." }
     ];
