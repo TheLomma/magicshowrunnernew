@@ -17,7 +17,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v6.3", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v6.4", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -46,7 +46,7 @@ var T = {
     circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil"
   },
   en: {
-    title: "Magic Showrunner", ver: "v6.3", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v6.4", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -821,12 +821,17 @@ export default function App() {
   });
   var cfg = _cfg[0], setCfg = _cfg[1];
   var _customTh = useState(getCustomTheme()); var customTh = _customTh[0], setCustomTh = _customTh[1];
+  var _history = useState([]); var history = _history[0], setHistory = _history[1];
+  var _redoStack = useState([]); var redoStack = _redoStack[0], setRedoStack = _redoStack[1];
   var _parts = useState(function () {
     var shared = loadSharedShow();
     if (shared) { window.location.hash = ""; return shared; }
     return makeDemo("de");
   });
-  var parts = _parts[0], setParts = _parts[1];
+  var parts = _parts[0], setPartsRaw = _parts[1];
+  var setParts = function (np) { var r = typeof np === 'function' ? np(parts) : np; setHistory(function (h) { return h.concat([parts]); }); setRedoStack([]); setPartsRaw(r); };
+  var doUndo = function () { if (!history.length) return; var p = history[history.length-1]; setRedoStack(function(rs){return rs.concat([parts]);}); setPartsRaw(p); setHistory(function(h){return h.slice(0,-1);}); };
+  var doRedo = function () { if (!redoStack.length) return; var n = redoStack[redoStack.length-1]; setHistory(function(h){return h.concat([parts]);}); setPartsRaw(n); setRedoStack(function(rs){return rs.slice(0,-1);}); };
   var _perf = useState(false); var perf = _perf[0], setPerf = _perf[1];
   var _startBlackout = useState(false); var startBlackout = _startBlackout[0], setStartBlackout = _startBlackout[1];
   var _targetEnd = useState(""); var targetEnd = _targetEnd[0], setTargetEnd = _targetEnd[1];
@@ -898,6 +903,8 @@ export default function App() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
           <div style={{ fontSize: 14, fontWeight: 700 }}>{parts.length} {t.parts} · {fmt(totalDur)} {t.total}</div>
           <div style={{ display: "flex", gap: 6 }}>
+            <button onClick={doUndo} disabled={history.length === 0} title="Rückgängig" style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: history.length === 0 ? th.sub : th.text, cursor: history.length === 0 ? "default" : "pointer", fontSize: 14, opacity: history.length === 0 ? 0.35 : 1 }}>↩</button>
+            <button onClick={doRedo} disabled={redoStack.length === 0} title="Wiederholen" style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: redoStack.length === 0 ? th.sub : th.text, cursor: redoStack.length === 0 ? "default" : "pointer", fontSize: 14, opacity: redoStack.length === 0 ? 0.35 : 1 }}>↪</button>
             <button onClick={function () { setTplOpen(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>⭐ {t.templates}</button>
             <button onClick={function () { setEditPart(null); setShowEditor(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 12 }}>+ {t.newPart}</button>
           </div>
