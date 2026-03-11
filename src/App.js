@@ -1,6 +1,6 @@
 
 
-// v6.7
+// v6.8
 import React, { useState, useEffect, useRef } from "react";
 
 var uid = function () { return Math.random().toString(36).slice(2, 9); };
@@ -18,7 +18,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v6.7", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v6.8", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -46,7 +46,7 @@ var T = {
     circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil"
   },
   en: {
-    title: "Magic Showrunner", ver: "v6.7", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v6.8", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -395,8 +395,8 @@ function SettingsModal(props) {
   var is = { width: "100%", padding: 8, borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginBottom: 8, boxSizing: "border-box" };
   if (!open) return null;
   var upCfg = function (k, v) { setCfg(function (c) { var o = {}; o[k] = v; return Object.assign({}, c, o); }); };
-  var tabs = ["design", "audio", "voice", "font", "lang"];
-  var icons = { design: "Design", audio: "Audio", voice: cfg.lang === "de" ? "Stimme" : "Voice", font: cfg.lang === "de" ? "Schrift" : "Font", lang: cfg.lang === "de" ? "Sprache" : "Language" };
+  var tabs = ["design", "audio", "voice", "font", "lang", "tutorial"];
+  var icons = { design: "Design", audio: "Audio", voice: cfg.lang === "de" ? "Stimme" : "Voice", font: cfg.lang === "de" ? "Schrift" : "Font", lang: cfg.lang === "de" ? "Sprache" : "Language", tutorial: cfg.lang === "de" ? "Anleitung" : "Tutorial" };
   var content = null;
 
   if (tab === "design") {
@@ -494,7 +494,67 @@ function SettingsModal(props) {
         </select>
       </div>
     );
-  } else {
+  } else if (tab === "tutorial") {
+    var tutItems = cfg.lang === "de" ? [
+      { icon: "➕", title: "Neuer Teil", desc: "Klicke auf '+ Neuer Teil', um einen Programmteil hinzuzufügen. Gib Titel, Dauer, Intro-Ansage und Notizen ein." },
+      { icon: "✏️", title: "Teil bearbeiten", desc: "Klicke auf das Stift-Symbol neben einem Teil, um ihn zu bearbeiten." },
+      { icon: "⧉", title: "Teil duplizieren", desc: "Das ⧉-Symbol kopiert einen Teil inklusive aller Einstellungen." },
+      { icon: "🗑️", title: "Teil löschen", desc: "Das Mülleimer-Symbol löscht einen Teil permanent." },
+      { icon: "▶", title: "Show starten", desc: "Startet die Show im Vollbild-Perform-Modus. Der Timer läuft automatisch durch alle Teile." },
+      { icon: "⏸", title: "Pause", desc: "Im Show-Modus pausiert dieser Button den Timer. Drücke 'Weiter', um fortzufahren." },
+      { icon: "🚨", title: "Notfallpause", desc: "Stoppt die Show sofort mit einem Vollbild-Overlay. Zeigt Stoppuhr und Optionen zum Fortsetzen oder Beenden." },
+      { icon: "⏭", title: "Vor / Zurück", desc: "Wechsle manuell zum nächsten oder vorherigen Programmteil." },
+      { icon: "🌑", title: "Blackout", desc: "Schaltet den Bildschirm schwarz. Tippe auf den Bildschirm, um den Blackout zu beenden." },
+      { icon: "📋", title: "Setlist", desc: "Zeigt alle Teile als Übersicht. Klicke auf einen Teil, um direkt dorthin zu springen." },
+      { icon: "📝", title: "Notizen", desc: "Blendet die Notizen des aktuellen Teils im Show-Modus ein." },
+      { icon: "💾", title: "Speichern & Laden", desc: "Speichere deine Show unter einem Namen und lade sie später wieder. Es gibt auch einen Autosave." },
+      { icon: "⭐", title: "Vorlagen", desc: "Speichere Teile als Vorlage und verwende sie in anderen Shows wieder." },
+      { icon: "📊", title: "CSV-Export", desc: "Exportiert die Setlist als CSV-Datei für Excel oder zur Weitergabe." },
+      { icon: "🎯", title: "Ziel-Endzeit", desc: "Gib eine gewünschte Endzeit ein. Die App zeigt ob du im Zeitplan liegst." },
+      { icon: "🔊", title: "Signaltöne", desc: "Automatische Töne bei Vorankündigungen und Teilwechseln." },
+      { icon: "🗣️", title: "Text-to-Speech", desc: "Die App liest Intro-Texte automatisch vor. Stimme, Tempo und Tonhöhe sind einstellbar." },
+      { icon: "🎨", title: "Themes", desc: "Wähle zwischen Light, Dark, Midnight, Ember oder erstelle ein eigenes Farbschema." },
+      { icon: "⏱️", title: "Timer-Stil", desc: "Wähle zwischen Balken-Timer und Kreis-Timer im Reiter 'Design'." },
+      { icon: "🔤", title: "Schrift & Größe", desc: "Passe die Anzeigegröße im Show-Modus stufenlos an, mit Live-Vorschau." }
+    ] : [
+      { icon: "➕", title: "New Part", desc: "Click '+ New Part' to add a program segment. Enter title, duration, intro and notes." },
+      { icon: "✏️", title: "Edit Part", desc: "Click the pencil icon next to a part to edit it." },
+      { icon: "⧉", title: "Duplicate Part", desc: "The ⧉ icon copies a part including all settings." },
+      { icon: "🗑️", title: "Delete Part", desc: "The trash icon permanently deletes a part." },
+      { icon: "▶", title: "Start Show", desc: "Starts the show in fullscreen Perform Mode. The timer runs through all parts automatically." },
+      { icon: "⏸", title: "Pause", desc: "In Show Mode, this button pauses the timer. Press 'Resume' to continue." },
+      { icon: "🚨", title: "Emergency Pause", desc: "Stops the show immediately with a fullscreen overlay. Shows a stopwatch and options to resume or end." },
+      { icon: "⏭", title: "Prev / Next", desc: "Manually switch to the next or previous program part." },
+      { icon: "🌑", title: "Blackout", desc: "Turns the screen black. Tap the screen to exit blackout." },
+      { icon: "📋", title: "Setlist", desc: "Shows all parts as overview. Click a part to jump directly to it." },
+      { icon: "📝", title: "Notes", desc: "Displays the current part's notes in Show Mode." },
+      { icon: "💾", title: "Save & Load", desc: "Save your show under a name and reload it later. There is also an autosave." },
+      { icon: "⭐", title: "Templates", desc: "Save parts as templates and reuse them in other shows." },
+      { icon: "📊", title: "CSV Export", desc: "Exports the setlist as a CSV file for Excel or sharing." },
+      { icon: "🎯", title: "Target End Time", desc: "Enter a desired end time. The app shows if you are on schedule, ahead or behind." },
+      { icon: "🔊", title: "Alert Sounds", desc: "Automatic tones for pre-announcements and part changes." },
+      { icon: "🗣️", title: "Text-to-Speech", desc: "The app reads intro texts automatically. Voice, speed and pitch are configurable." },
+      { icon: "🎨", title: "Themes", desc: "Choose between Light, Dark, Midnight, Ember or create a custom color scheme." },
+      { icon: "⏱️", title: "Timer Style", desc: "Choose between bar timer and circle timer in the 'Design' tab." },
+      { icon: "🔤", title: "Font & Size", desc: "Adjust the display size in Show Mode steplessly, with live preview." }
+    ];
+    content = (
+      <div style={{ maxHeight: 400, overflowY: "auto", paddingRight: 4 }}>
+        <div style={{ fontSize: 13, color: th.sub, marginBottom: 12 }}>{cfg.lang === "de" ? "Kurze Erklärung aller Funktionen:" : "Quick overview of all features:"}</div>
+        {tutItems.map(function (item, i) {
+          return (
+            <div key={i} style={{ display: "flex", gap: 10, padding: "10px 12px", borderRadius: 10, marginBottom: 6, background: th.inp, border: "1px solid " + th.brd }}>
+              <div style={{ fontSize: 20, flexShrink: 0, width: 28, textAlign: "center" }}>{item.icon}</div>
+              <div>
+                <div style={{ fontWeight: 700, fontSize: 13, color: th.text, marginBottom: 2 }}>{item.title}</div>
+                <div style={{ fontSize: 12, color: th.sub, lineHeight: 1.5 }}>{item.desc}</div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  } else if (tab === "lang") {
     content = (
       <div style={{ display: "flex", gap: 8 }}>
         {["de", "en"].map(function (l) {
