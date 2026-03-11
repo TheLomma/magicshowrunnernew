@@ -1,6 +1,6 @@
 
 
-// v6.6
+// v6.7
 import React, { useState, useEffect, useRef } from "react";
 
 var uid = function () { return Math.random().toString(36).slice(2, 9); };
@@ -18,7 +18,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v6.6", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v6.7", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -46,7 +46,7 @@ var T = {
     circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil"
   },
   en: {
-    title: "Magic Showrunner", ver: "v6.6", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v6.7", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -158,7 +158,9 @@ function doSpeak(text, rate, pitch, uri) {
 }
 
 function getAutoSave() { try { return JSON.parse(localStorage.getItem("ms3_autosave") || "null"); } catch (e) { return null; } }
-function setAutoSave(parts) { try { localStorage.setItem("ms3_autosave", JSON.stringify(parts)); } catch (e) {} }
+function setAutoSave(data) { try { localStorage.setItem("ms3_autosave", JSON.stringify(data)); } catch (e) {} }
+function getAutoSaveMeta() { try { return JSON.parse(localStorage.getItem("ms3_autosave_meta") || "null"); } catch (e) { return null; } }
+function setAutoSaveMeta(meta) { try { localStorage.setItem("ms3_autosave_meta", JSON.stringify(meta)); } catch (e) {} }
 
 function getTemplates() { try { return JSON.parse(localStorage.getItem("ms3_templates") || "[]"); } catch (e) { return []; } }
 function saveTemplates(arr) { localStorage.setItem("ms3_templates", JSON.stringify(arr)); }
@@ -289,22 +291,57 @@ function SaveModal(props) {
 function LoadModal(props) {
   var open = props.open, onClose = props.onClose, onLoad = props.onLoad, t = props.t, th = props.th;
   var _sv = useState([]); var saves = _sv[0], setSaves = _sv[1];
-  useEffect(function () { if (open) setSaves(JSON.parse(localStorage.getItem("ms3_shows") || "[]")); }, [open]);
+  var _tab = useState("manual"); var tab = _tab[0], setTab = _tab[1];
+  var _as = useState(null); var autoSave = _as[0], setAutoSave2 = _as[1];
+  var _asMeta = useState(null); var autoSaveMeta = _asMeta[0], setAutoSaveMeta2 = _asMeta[1];
+  useEffect(function () {
+    if (open) {
+      setSaves(JSON.parse(localStorage.getItem("ms3_shows") || "[]"));
+      setAutoSave2(getAutoSave());
+      setAutoSaveMeta2(getAutoSaveMeta());
+    }
+  }, [open]);
   if (!open) return null;
+  var tabStyle = function(active) { return { flex: 1, padding: "8px 4px", borderRadius: 8, border: active ? "2px solid " + th.acc : "2px solid transparent", background: active ? th.acc + "22" : "transparent", color: th.text, cursor: "pointer", fontSize: 13, fontWeight: active ? 700 : 400 }; };
   return (
     <Modal open={open} onClose={onClose} title={t.load} th={th}>
-      {saves.length === 0 && <p style={{ color: th.sub }}>{t.noSaved}</p>}
-      {saves.map(function (s) {
-        return (
-          <div key={s.name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", borderRadius: 8, marginBottom: 4, background: th.inp }}>
-            <div>
-              <div style={{ fontWeight: 600, fontSize: 14 }}>{s.name}</div>
-              <div style={{ fontSize: 11, color: th.sub }}>{s.parts.length} {t.parts}</div>
+      <div style={{ display: "flex", gap: 4, marginBottom: 14 }}>
+        <button style={tabStyle(tab === "manual")} onClick={function() { setTab("manual"); }}>{t.lang === "en" ? "Manual saves" : "Manuell gespeichert"}</button>
+        <button style={tabStyle(tab === "auto")} onClick={function() { setTab("auto"); }}>Autosave</button>
+      </div>
+      {tab === "manual" && (
+        <div>
+          {saves.length === 0 && <p style={{ color: th.sub }}>{t.noSaved}</p>}
+          {saves.map(function (s) {
+            return (
+              <div key={s.name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", borderRadius: 8, marginBottom: 4, background: th.inp }}>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: 14 }}>{s.name}</div>
+                  <div style={{ fontSize: 11, color: th.sub }}>{s.parts.length} {t.parts}</div>
+                </div>
+                <button onClick={function () { onLoad(s.parts); onClose(); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", cursor: "pointer", fontWeight: 600 }}>{t.load}</button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+      {tab === "auto" && (
+        <div>
+          {!autoSave && <p style={{ color: th.sub, fontSize: 13 }}>{t.lang === "en" ? "No autosave found." : "Kein Autosave vorhanden."}</p>}
+          {autoSave && (
+            <div style={{ padding: "12px 14px", borderRadius: 10, background: th.inp, border: "1px solid " + th.acc + "55" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                <div style={{ fontSize: 20 }}>💾</div>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 14 }}>{t.lang === "en" ? "Last Autosave" : "Letzter Autosave"}</div>
+                  {autoSaveMeta && <div style={{ fontSize: 11, color: th.sub }}>{autoSave.length} {t.parts} &nbsp;·&nbsp; {new Date(autoSaveMeta.date).toLocaleString()}</div>}
+                </div>
+              </div>
+              <button onClick={function () { onLoad(autoSave); onClose(); }} style={{ width: "100%", padding: "10px", borderRadius: 10, border: "none", background: th.acc, color: "#fff", fontWeight: 700, cursor: "pointer" }}>{t.load}</button>
             </div>
-            <button onClick={function () { onLoad(s.parts); onClose(); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", cursor: "pointer", fontWeight: 600 }}>{t.load}</button>
-          </div>
-        );
-      })}
+          )}
+        </div>
+      )}
     </Modal>
   );
 }
@@ -936,6 +973,14 @@ export default function App() {
   var _loadOpen = useState(false); var loadOpen = _loadOpen[0], setLoadOpen = _loadOpen[1];
   var _settOpen = useState(false); var settOpen = _settOpen[0], setSettOpen = _settOpen[1];
   var _tplOpen = useState(false); var tplOpen = _tplOpen[0], setTplOpen = _tplOpen[1];
+  useEffect(function () {
+    var iv = setInterval(function () {
+      setAutoSave(parts);
+      setAutoSaveMeta({ date: new Date().toISOString() });
+    }, 60000);
+    return function () { clearInterval(iv); };
+  }, [parts]);
+  useEffect(function () { var iv = setInterval(function () { setAutoSave(parts); setAutoSaveMeta({ date: new Date().toISOString() }); }, 60000); return function () { clearInterval(iv); }; }, [parts]);
   var _toast = useState(""); var toast = _toast[0], setToast = _toast[1];
   var _dragIdx = useState(null); var dragIdx = _dragIdx[0], setDragIdx = _dragIdx[1];
   var _dragOver = useState(null); var dragOver = _dragOver[0], setDragOver = _dragOver[1];
