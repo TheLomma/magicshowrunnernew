@@ -107,6 +107,25 @@ var DEMO_DATA = {
   ]
 };
 
+function GroupEditor(props) {
+  var open = props.open, group = props.group, onSave = props.onSave, onClose = props.onClose, th = props.th, t = props.t;
+  var blank = { title: "", type: "group" };
+  var _f = useState(group || blank); var f = _f[0], setF = _f[1];
+  useEffect(function () { setF(group || blank); }, [group, open]);
+  var is = { width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginBottom: 8, boxSizing: "border-box" };
+  if (!open) return null;
+  return (
+    <Modal open={open} onClose={onClose} title={group ? "Akt bearbeiten" : t.newGroup} th={th}>
+      <label style={{ fontSize: 12, color: th.sub }}>{t.titleL}</label>
+      <input style={is} value={f.title} onChange={function (e) { setF(function (p) { return Object.assign({}, p, { title: e.target.value }); }); }} />
+      <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+        <button onClick={function () { if (!f.title) return; onSave(Object.assign({}, f, { id: f.id || uid(), type: "group" })); onClose(); }} style={{ flex: 1, padding: 10, borderRadius: 10, border: "none", background: th.acc, color: "#fff", fontWeight: 700, cursor: "pointer" }}>{t.saveBtn}</button>
+        <button onClick={onClose} style={{ flex: 1, padding: 10, borderRadius: 10, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer" }}>{t.cancel}</button>
+      </div>
+    </Modal>
+  );
+}
+
 var makeDemo = function (lang) {
   var data = DEMO_DATA[lang] || DEMO_DATA.de;
   return data.map(function (d) { return Object.assign({}, d, { id: uid(), _isDemo: true }); });
@@ -944,6 +963,8 @@ export default function App() {
   var _toast = useState(""); var toast = _toast[0], setToast = _toast[1];
   var _dragIdx = useState(null); var dragIdx = _dragIdx[0], setDragIdx = _dragIdx[1];
   var _dragOver = useState(null); var dragOver = _dragOver[0], setDragOver = _dragOver[1];
+  var _showGroupEditor = useState(false); var showGroupEditor = _showGroupEditor[0], setShowGroupEditor = _showGroupEditor[1];
+  var _editGroup = useState(null); var editGroup = _editGroup[0], setEditGroup = _editGroup[1];
   var _lastSaved = useState(""); var lastSaved = _lastSaved[0], setLastSaved = _lastSaved[1];
   var _autoSaveMsg = useState(""); var autoSaveMsg = _autoSaveMsg[0], setAutoSaveMsg = _autoSaveMsg[1];
 
@@ -983,6 +1004,11 @@ export default function App() {
   var addPart = function (p) {
     if (editPart) { setParts(parts.map(function (x) { return x.id === p.id ? p : x; })); }
     else { setParts(parts.concat([p])); }
+  };
+
+  var addGroup = function (g) {
+    if (editGroup) { setParts(parts.map(function (x) { return x.id === g.id ? g : x; })); }
+    else { setParts(parts.concat([g])); }
   };
 
   var handleDragStart = function (i) { setDragIdx(i); };
@@ -1054,6 +1080,7 @@ export default function App() {
           <div style={{ display: "flex", gap: 6 }}>
             <button onClick={doUndo} disabled={history.length === 0} title="Rückgängig" style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: history.length === 0 ? th.sub : th.text, cursor: history.length === 0 ? "default" : "pointer", fontSize: 14, opacity: history.length === 0 ? 0.35 : 1 }}>↩</button>
             <button onClick={doRedo} disabled={redoStack.length === 0} title="Wiederholen" style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: redoStack.length === 0 ? th.sub : th.text, cursor: redoStack.length === 0 ? "default" : "pointer", fontSize: 14, opacity: redoStack.length === 0 ? 0.35 : 1 }}>↪</button>
+            <button onClick={function () { setEditGroup(null); setShowGroupEditor(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.acc, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>🎭 {t.newGroup}</button>
             <button onClick={function () { setTplOpen(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>⭐ {t.templates}</button>
             <button onClick={function () { setEditPart(null); setShowEditor(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 12 }}>+ {t.newPart}</button>
           </div>
@@ -1061,6 +1088,22 @@ export default function App() {
 
         {parts.map(function (p, i) {
           var isDragTarget = dragOver === i && dragIdx !== i;
+          if (p.type === "group") {
+            return (
+              <div key={p.id}
+                draggable
+                onDragStart={function () { handleDragStart(i); }}
+                onDragOver={function (e) { handleDragOver(e, i); }}
+                onDragEnd={handleDragEnd}
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 8, marginBottom: 6, marginTop: 4, border: "1px dashed " + th.acc + "88", background: th.acc + "11", cursor: "grab" }}
+              >
+                <div style={{ cursor: "grab", color: th.sub, fontSize: 14, userSelect: "none" }}>☰</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: th.acc, flex: 1, letterSpacing: 1 }}>🎭 {p.title}</div>
+                <button onClick={function () { setEditGroup(p); setShowGroupEditor(true); }} style={{ padding: "3px 8px", borderRadius: 6, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 11 }}>{t.edit}</button>
+                <button onClick={function () { setParts(parts.filter(function (x) { return x.id !== p.id; })); }} style={{ padding: "3px 8px", borderRadius: 6, border: "none", background: "#ef4444", color: "#fff", cursor: "pointer", fontSize: 11 }}>🗑️</button>
+              </div>
+            );
+          }
           return (
             <div
               key={p.id}
@@ -1128,6 +1171,7 @@ export default function App() {
         </div>
       </div>
 
+      <GroupEditor open={showGroupEditor} group={editGroup} onSave={addGroup} onClose={function () { setShowGroupEditor(false); setEditGroup(null); }} t={t} th={th} />
       <PartEditor open={showEditor} part={editPart} onSave={addPart} onClose={function () { setShowEditor(false); setEditPart(null); }} t={t} th={th} onToast={setToast} />
       <SaveModal open={saveOpen} onClose={function () { setSaveOpen(false); }} parts={parts} t={t} th={th} onToast={setToast} onSetLastSaved={setLastSaved} />
       <LoadModal open={loadOpen} onClose={function () { setLoadOpen(false); }} onLoad={function (p) { setParts(p); }} t={t} th={th} />
