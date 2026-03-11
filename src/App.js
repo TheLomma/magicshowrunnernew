@@ -17,7 +17,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v6.2", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v6.3", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -46,7 +46,7 @@ var T = {
     circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil"
   },
   en: {
-    title: "Magic Showrunner", ver: "v6.2", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v6.3", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -534,6 +534,8 @@ function PerformMode(props) {
   var _idx = useState(0); var idx = _idx[0], setIdx = _idx[1];
   var _el = useState(0); var elapsed = _el[0], setElapsed = _el[1];
   var _paused = useState(false); var paused = _paused[0], setPaused = _paused[1];
+  var _pauseElapsed = useState(0); var pauseElapsed = _pauseElapsed[0], setPauseElapsed = _pauseElapsed[1];
+  var _pausePulse = useState(false); var pausePulse = _pausePulse[0], setPausePulse = _pausePulse[1];
   var _showElapsed = useState(false); var showElapsed = _showElapsed[0], setShowElapsed = _showElapsed[1];
   var _showSetlist = useState(false); var showSetlist = _showSetlist[0], setShowSetlist = _showSetlist[1];
   var _showNotes = useState(false); var showNotes = _showNotes[0], setShowNotes = _showNotes[1];
@@ -559,6 +561,15 @@ function PerformMode(props) {
     }, 1000);
     return function () { clearInterval(iv); };
   }, [cdRunning]);
+
+  useEffect(function () {
+    if (!paused) { setPauseElapsed(0); setPausePulse(false); return; }
+    var iv = setInterval(function () {
+      setPauseElapsed(function (v) { return v + 1; });
+      setPausePulse(function (v) { return !v; });
+    }, 1000);
+    return function () { clearInterval(iv); };
+  }, [paused]);
 
   useEffect(function () {
     if (cdRunning || paused || done) return;
@@ -701,7 +712,7 @@ function PerformMode(props) {
         )}
         <div style={{ display: "flex", gap: 12 }}>
           <button onClick={function () { if (idx > 0) { setIdx(idx - 1); setElapsed(0); preAnnRef.current = {}; introRef.current = {}; } }} disabled={idx === 0} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: pt.barBg, color: pt.text, fontWeight: 600, cursor: idx > 0 ? "pointer" : "default", opacity: idx === 0 ? 0.3 : 1 }}>{t.prev}</button>
-          <button onClick={function () { setPaused(!paused); }} style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: pt.bar, color: "#fff", fontWeight: 700, cursor: "pointer", minWidth: 100 }}>{paused ? t.resume : t.pause}</button>
+          <button onClick={function () { setPaused(!paused); setPauseElapsed(0); }} style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: paused ? (pausePulse ? "#ef4444" : "#b91c1c") : pt.bar, color: "#fff", fontWeight: 700, cursor: "pointer", minWidth: 120, transition: "background 0.5s ease", boxShadow: paused ? (pausePulse ? "0 0 16px #ef4444" : "0 0 6px #7f1d1d") : "none" }}>{paused ? ("⏸ " + fmt(pauseElapsed)) : t.pause}</button>
           <button onClick={function () { if (idx < parts.length - 1) { setIdx(idx + 1); setElapsed(0); preAnnRef.current = {}; introRef.current = {}; } }} disabled={idx >= parts.length - 1} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: pt.barBg, color: pt.text, fontWeight: 600, cursor: idx < parts.length - 1 ? "pointer" : "default", opacity: idx >= parts.length - 1 ? 0.3 : 1 }}>{t.next}</button>
         </div>
         {showNotes && cur.notes && (
