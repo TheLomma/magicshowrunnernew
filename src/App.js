@@ -15,7 +15,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v5.2", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v5.3", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -33,7 +33,7 @@ var T = {
     confirmStop: "Show wirklich beenden?"
   },
   en: {
-    title: "Magic Showrunner", ver: "v5.2", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v5.3", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -90,11 +90,11 @@ function doBeep(vol, freq, ms, soundKey) {
     g.gain.exponentialRampToValueAtTime(0.01, c.currentTime + duration / 1000);
     o.start();
     o.stop(c.currentTime + duration / 1000);
-  } catch (e) { /* ignore */ }
+  } catch (e) {}
 }
 
 function doVibrate(ms) {
-  try { if (navigator.vibrate) navigator.vibrate(ms || 200); } catch (e) { /* ignore */ }
+  try { if (navigator.vibrate) navigator.vibrate(ms || 200); } catch (e) {}
 }
 
 function doSpeak(text, rate, pitch, uri) {
@@ -109,7 +109,6 @@ function doSpeak(text, rate, pitch, uri) {
   speechSynthesis.speak(u);
 }
 
-/* ---- Modal ---- */
 function Modal(props) {
   if (!props.open) return null;
   return (
@@ -122,7 +121,6 @@ function Modal(props) {
   );
 }
 
-/* ---- Toast ---- */
 function Toast(props) {
   useEffect(function () { var t = setTimeout(props.onDone, 2200); return function () { clearTimeout(t); }; }, []);
   if (!props.msg) return null;
@@ -133,7 +131,6 @@ function Toast(props) {
   );
 }
 
-/* ---- PartEditor ---- */
 function PartEditor(props) {
   var open = props.open, part = props.part, onSave = props.onSave, onClose = props.onClose, t = props.t, th = props.th;
   var blank = { title: "", duration: 120, intro: "", preAnn: 10, preAnnText: "", notes: "", color: COLORS[0] };
@@ -171,7 +168,6 @@ function PartEditor(props) {
   );
 }
 
-/* ---- SaveModal ---- */
 function SaveModal(props) {
   var open = props.open, onClose = props.onClose, parts = props.parts, t = props.t, th = props.th, onToast = props.onToast;
   var _n = useState("");
@@ -202,7 +198,6 @@ function SaveModal(props) {
   );
 }
 
-/* ---- LoadModal ---- */
 function LoadModal(props) {
   var open = props.open, onClose = props.onClose, onLoad = props.onLoad, t = props.t, th = props.th;
   var _sv = useState([]);
@@ -227,7 +222,6 @@ function LoadModal(props) {
   );
 }
 
-/* ---- SettingsModal ---- */
 function SettingsModal(props) {
   var open = props.open, onClose = props.onClose, cfg = props.cfg, setCfg = props.setCfg, t = props.t, th = props.th;
   var _t = useState("design");
@@ -347,7 +341,6 @@ function SettingsModal(props) {
   );
 }
 
-/* ---- PerformMode ---- */
 function PerformMode(props) {
   var parts = props.parts, cfg = props.cfg, onExit = props.onExit, startInBlackout = props.startInBlackout;
   var pt = PTH[cfg.perfTheme] || PTH.dark;
@@ -384,7 +377,6 @@ function PerformMode(props) {
   var cur = parts[idx];
   var dur = cfg.testMode ? (cfg.testDur || 10) : (cur ? cur.duration : 60);
 
-  // Countdown timer
   useEffect(function () {
     if (!cdRunning) return;
     if (cdVal <= 0) { setCdRunning(false); return; }
@@ -398,20 +390,17 @@ function PerformMode(props) {
     return function () { clearInterval(iv); };
   }, [cdRunning]);
 
-  // Main timer
   useEffect(function () {
     if (cdRunning || paused || done) return;
     var iv = setInterval(function () {
       setElapsed(function (e) {
         var ne = e + 1;
-        // pre-announce
         if (cur && cur.preAnn && ne === dur - cur.preAnn && !preAnnRef.current[idx]) {
           preAnnRef.current[idx] = true;
           if (cur.preAnnText) doSpeak(cur.preAnnText, cfg.ttsRate, cfg.ttsPitch, cfg.ttsVoice);
           if (cfg.beeps) doBeep(cfg.volume, 600, 100, cfg.beepSound);
           if (cfg.vibrate) doVibrate(200);
         }
-        // end of part
         if (ne >= dur) {
           if (cfg.beeps) doBeep(cfg.volume, 880, 200, cfg.beepSound);
           if (cfg.vibrate) doVibrate(400);
@@ -431,7 +420,6 @@ function PerformMode(props) {
     return function () { clearInterval(iv); };
   }, [cdRunning, paused, done, idx, dur]);
 
-  // Intro TTS
   useEffect(function () {
     if (cdRunning || done) return;
     if (cur && cur.intro && !introRef.current[idx]) {
@@ -448,11 +436,9 @@ function PerformMode(props) {
   var rem = Math.max(dur - elapsed, 0);
   var timerVal = showElapsed ? fmt(elapsed) : fmt(rem);
   var timerLabel = showElapsed ? t.elapsed : t.remaining;
-
   var partColor = cur.color || COLORS[0];
   var useColorTrans = cfg.colorTransitions !== false;
 
-  // Blackout mode
   if (blackout) {
     return (
       <div style={{ position: "fixed", inset: 0, background: "#000", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 999, cursor: "pointer" }} onClick={function () { setBlackout(false); }}>
@@ -463,7 +449,6 @@ function PerformMode(props) {
     );
   }
 
-  // Countdown screen
   if (cdRunning) {
     return (
       <div style={{ position: "fixed", inset: 0, background: pt.bg, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999 }}>
@@ -475,7 +460,6 @@ function PerformMode(props) {
     );
   }
 
-  // Done screen
   if (done) {
     return (
       <div style={{ position: "fixed", inset: 0, background: pt.bg, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 999 }}>
@@ -488,7 +472,6 @@ function PerformMode(props) {
     );
   }
 
-  // Confirm stop dialog
   if (confirmStop) {
     return (
       <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.8)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000 }}>
@@ -518,47 +501,38 @@ function PerformMode(props) {
 
   return (
     <div style={{ position: "fixed", inset: 0, background: bgStyle, display: "flex", flexDirection: "column", zIndex: 999, transition: useColorTrans ? "background 1.5s ease" : "none" }}>
-      {/* Top bar */}
       <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", padding: "12px 16px", gap: 8 }}>
-        <button onClick={function () { setConfirmStop(true); }} style={{ display: "none" }}>.</button>
-          
-          <button onClick={function () { setShowSetlist(!showSetlist); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: showSetlist ? pt.bar : "transparent", color: showSetlist ? "#fff" : pt.text, cursor: "pointer", fontSize: 12 }}>{t.setlist}</button>
-          <button onClick={function () { setShowNotes(!showNotes); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: showNotes ? pt.bar : "transparent", color: showNotes ? "#fff" : pt.text, cursor: "pointer", fontSize: 12 }}>{t.notes}</button>
-          <button onClick={function () { setBlackout(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: "transparent", color: pt.text, cursor: "pointer", fontSize: 12 }}>🌑</button>
-          <button onClick={function () { setConfirmStop(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "none", background: "#ef4444", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 12 }}>{t.stop}</button>
+        <button onClick={function () { setShowSetlist(!showSetlist); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: showSetlist ? pt.bar : "transparent", color: showSetlist ? "#fff" : pt.text, cursor: "pointer", fontSize: 12 }}>{t.setlist}</button>
+        <button onClick={function () { setShowNotes(!showNotes); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: showNotes ? pt.bar : "transparent", color: showNotes ? "#fff" : pt.text, cursor: "pointer", fontSize: 12 }}>{t.notes}</button>
+        <button onClick={function () { setBlackout(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: "transparent", color: pt.text, cursor: "pointer", fontSize: 12 }}>🌑</button>
+        <button onClick={function () { setConfirmStop(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "none", background: "#ef4444", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 12 }}>{t.stop}</button>
       </div>
 
-      {/* Main content */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px" }}>
         <div style={{ fontSize: sz.title, fontWeight: 700, color: pt.text, marginBottom: 8, textAlign: "center" }}>{cur.title}</div>
         <div style={{ fontSize: 14, color: pt.text, opacity: 0.5, marginBottom: 16 }}>{t.partOf} {idx + 1} {t.of} {parts.length}</div>
 
-        {/* Timer – click to toggle elapsed/remaining */}
         <div onClick={function () { setShowElapsed(!showElapsed); }} style={{ cursor: "pointer", textAlign: "center", marginBottom: 8 }}>
           <div style={{ fontSize: sz.timer, fontWeight: 800, color: rem <= 10 ? "#ef4444" : pt.timer, fontFamily: "monospace", transition: "color 0.3s" }}>{timerVal}</div>
           <div style={{ fontSize: 12, color: pt.text, opacity: 0.4 }}>{timerLabel}</div>
         </div>
 
-        {/* Progress bar with seek */}
         <div ref={barRef} onClick={handleSeek} style={{ width: "100%", maxWidth: 400, height: 12, background: pt.barBg, borderRadius: 6, cursor: "pointer", position: "relative", marginBottom: 16 }}>
           <div style={{ width: pct + "%", height: "100%", background: rem <= 10 ? "#ef4444" : pt.bar, borderRadius: 6, transition: "width 0.3s" }} />
           <div style={{ position: "absolute", top: -4, left: "calc(" + pct + "% - 10px)", width: 20, height: 20, borderRadius: "50%", background: rem <= 10 ? "#ef4444" : pt.bar, border: "3px solid " + pt.bg, cursor: "grab" }} />
         </div>
 
-        {/* Controls */}
         <div style={{ display: "flex", gap: 12 }}>
           <button onClick={function () { if (idx > 0) { setIdx(idx - 1); setElapsed(0); preAnnRef.current = {}; introRef.current = {}; } }} disabled={idx === 0} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: pt.barBg, color: pt.text, fontWeight: 600, cursor: idx > 0 ? "pointer" : "default", opacity: idx === 0 ? 0.3 : 1 }}>{t.prev}</button>
           <button onClick={function () { setPaused(!paused); }} style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: pt.bar, color: "#fff", fontWeight: 700, cursor: "pointer", minWidth: 100 }}>{paused ? t.resume : t.pause}</button>
           <button onClick={function () { if (idx < parts.length - 1) { setIdx(idx + 1); setElapsed(0); preAnnRef.current = {}; introRef.current = {}; } }} disabled={idx >= parts.length - 1} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: pt.barBg, color: pt.text, fontWeight: 600, cursor: idx < parts.length - 1 ? "pointer" : "default", opacity: idx >= parts.length - 1 ? 0.3 : 1 }}>{t.next}</button>
         </div>
 
-        {/* Notes panel */}
         {showNotes && cur.notes && (
           <div style={{ marginTop: 16, padding: 12, background: pt.barBg, borderRadius: 10, maxWidth: 400, width: "100%", fontSize: 14, color: pt.text }}>{cur.notes}</div>
         )}
       </div>
 
-      {/* Setlist panel */}
       {showSetlist && (
         <div style={{ position: "absolute", right: 0, top: 50, bottom: 0, width: 200, background: pt.bg, borderLeft: "1px solid " + pt.barBg, padding: 12, overflowY: "auto" }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: pt.text, marginBottom: 8 }}>{t.setlist}</div>
@@ -576,8 +550,7 @@ function PerformMode(props) {
   );
 }
 
-/* ---- CSV helpers ---- */
-function exportCSV(parts, t) {
+function exportCSV(parts) {
   var header = "Title,Duration,Intro,PreAnn,PreAnnText,Notes,Color\n";
   var rows = parts.map(function (p) {
     return [p.title, p.duration, p.intro, p.preAnn, p.preAnnText, p.notes, p.color].map(function (v) { return '"' + String(v || "").replace(/"/g, '""') + '"'; }).join(",");
@@ -598,7 +571,6 @@ function exportTXT(parts) {
   a.click();
 }
 
-/* ---- Main App ---- */
 export default function App() {
   var _cfg = useState({
     theme: "dark", perfTheme: "dark", lang: "de", beeps: true, vibrate: true, volume: 0.5,
@@ -769,17 +741,34 @@ export default function App() {
           {parts.length} {t.parts} – {t.total}: {fmt(totalDur)}
         </div>
 
-        {/* CSV / TXT */}
-        <div style={{ display: "flex", gap: 6, marginBottom: 16, justifyContent: "center" }}>
-          <button onClick={function () { exportCSV(parts, t); }} style={bs({ background: th.inp, color: th.text, fontSize: 11 })}>📥 CSV Export</button>
+        {/* CSV / TXT / Testmodus - single row */}
+        <div style={{ display: "flex", gap: 6, marginBottom: 16, justifyContent: "center", flexWrap: "wrap", alignItems: "center" }}>
+          <button onClick={function () { exportCSV(parts); }} style={bs({ background: th.inp, color: th.text, fontSize: 11 })}>📥 CSV Export</button>
           <button onClick={function () { csvRef.current && csvRef.current.click(); }} style={bs({ background: th.inp, color: th.text, fontSize: 11 })}>📤 CSV Import</button>
           <button onClick={function () { exportTXT(parts); }} style={bs({ background: th.inp, color: th.text, fontSize: 11 })}>📄 TXT</button>
+          <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, cursor: "pointer", padding: "8px 12px", borderRadius: 10, background: cfg.testMode ? th.acc + "22" : th.inp, color: cfg.testMode ? th.acc : th.text, border: cfg.testMode ? "1px solid " + th.acc : "1px solid transparent", fontWeight: 600 }}>
+            <input type="checkbox" checked={cfg.testMode} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testMode: e.target.checked }); }); }} style={{ margin: 0 }} />
+            {t.testModeLbl}
+          </label>
           <input ref={csvRef} type="file" accept=".csv" style={{ display: "none" }} onChange={handleCSVImport} />
         </div>
 
+        {/* Test duration (only when test mode active) */}
+        {cfg.testMode && (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 12, fontSize: 12, color: th.sub }}>
+            <label>{t.testDurLbl}:</label>
+            <input
+              type="number" min={3} max={60} value={cfg.testDur}
+              onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testDur: Math.max(3, +e.target.value) }); }); }}
+              style={{ width: 50, padding: 4, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, textAlign: "center" }}
+            />
+            <span>{t.sek}</span>
+          </div>
+        )}
+
         {/* Countdown setting */}
         <div style={{ background: th.card, borderRadius: 12, padding: 16, marginBottom: 12, border: "1px solid " + th.brd }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <label style={{ fontSize: 13, fontWeight: 600 }}>{t.countdownSek}</label>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <input
@@ -789,24 +778,6 @@ export default function App() {
               />
               <span style={{ fontSize: 11, color: th.sub }}>{cfg.countdown === 0 ? t.countdownOff : cfg.countdown + " " + t.sek}</span>
             </div>
-          </div>
-
-          {/* Test mode */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-            <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
-              <input type="checkbox" checked={cfg.testMode} onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testMode: e.target.checked }); }); }} />
-              {t.testModeLbl}
-            </label>
-            {cfg.testMode && (
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <label style={{ fontSize: 11, color: th.sub }}>{t.testDurLbl}</label>
-                <input
-                  type="number" min={3} max={60} value={cfg.testDur}
-                  onChange={function (e) { setCfg(function (c) { return Object.assign({}, c, { testDur: Math.max(3, +e.target.value) }); }); }}
-                  style={{ width: 50, padding: 4, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, textAlign: "center" }}
-                />
-              </div>
-            )}
           </div>
         </div>
 
