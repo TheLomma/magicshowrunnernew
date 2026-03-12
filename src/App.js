@@ -17,13 +17,7 @@ var T = {
   de: {
     title: "Magic Showrunner", ver: "v7.4", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
-    planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
-    vibOnPartChange: "Bei Teilwechsel", vibOnPreAnn: "Bei Vorankündigung",
-    vibOnWarning1: "Erste Warnung", vibOnWarning2: "Zweite Warnung",
-    vibOnCountdown: "Countdown (jede Sek)",
-    vibWarning1Sec: "Erste Warnung (Sek vor Ende)", vibWarning2Sec: "Zweite Warnung (Sek vor Ende)",
-    vibCountdownStart: "Countdown ab (Sek vor Ende)", vibPattern: "Muster",
-    vibTest: "Test", vibOff: "Aus",
+    planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
     durL: "Dauer (Sek)", introL: "Intro-Ansage", preAnnL: "Vorankündigung (Sek)",
     preAnnTxt: "Vorankündigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern",
@@ -53,13 +47,7 @@ var T = {
   en: {
     title: "Magic Showrunner", ver: "v7.4", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
-    planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
-    vibOnPartChange: "On Part Change", vibOnPreAnn: "On Pre-Announce",
-    vibOnWarning1: "First Warning", vibOnWarning2: "Second Warning",
-    vibOnCountdown: "Countdown (every sec)",
-    vibWarning1Sec: "First Warning (sec before end)", vibWarning2Sec: "Second Warning (sec before end)",
-    vibCountdownStart: "Countdown from (sec before end)", vibPattern: "Pattern",
-    vibTest: "Test", vibOff: "Off",
+    planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
     durL: "Duration (sec)", introL: "Intro (TTS)", preAnnL: "Pre-announce (sec)",
     preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save",
@@ -138,35 +126,6 @@ function doBeep(vol, freq, ms, soundKey) {
     g.gain.setValueAtTime(vol || 0.5, c.currentTime);
     g.gain.exponentialRampToValueAtTime(0.01, c.currentTime + duration / 1000);
     o.start(); o.stop(c.currentTime + duration / 1000);
-  } catch (e) {}
-}
-
-var VIB_PATTERNS = {
-  shortOnce: { label: { de: "Kurz 1×", en: "Short 1×" }, pattern: [100] },
-  shortTwice: { label: { de: "Kurz 2×", en: "Short 2×" }, pattern: [100, 80, 100] },
-  longOnce: { label: { de: "Lang 1×", en: "Long 1×" }, pattern: [400] },
-  longTwice: { label: { de: "Lang 2×", en: "Long 2×" }, pattern: [400, 150, 400] },
-  strong: { label: { de: "Stark", en: "Strong" }, pattern: [600, 100, 600] },
-  pulse: { label: { de: "Puls", en: "Pulse" }, pattern: [100, 50, 100, 50, 100] }
-};
-
-var DEFAULT_VIB_CFG = {
-  enabled: true,
-  onPartChange: "strong",
-  onPreAnnounce: "shortOnce",
-  onWarning1: "shortOnce",
-  onWarning2: "shortOnce",
-  onCountdown: "shortOnce",
-  warning1Sec: 30,
-  warning2Sec: 15,
-  countdownStartSec: 5
-};
-
-function doVibratePattern(patternKey) {
-  try {
-    if (!navigator.vibrate) return;
-    var p = VIB_PATTERNS[patternKey];
-    if (p && p.pattern) { navigator.vibrate(p.pattern); } else { navigator.vibrate(200); }
   } catch (e) {}
 }
 
@@ -431,9 +390,9 @@ function SettingsModal(props) {
   var is = { width: "100%", padding: 8, borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginBottom: 8, boxSizing: "border-box" };
   if (!open) return null;
   var upCfg = function (k, v) { setCfg(function (c) { var o = {}; o[k] = v; return Object.assign({}, c, o); }); };
-  var tabs = ["design", "audio", "vibration", "voice", "font", "lang"];
-  var icons = { design: "Design", audio: "Audio", vibration: cfg.lang === "de" ? "Vibration" : "Vibration", voice: cfg.lang === "de" ? "Stimme" : "Voice", font: cfg.lang === "de" ? "Schrift" : "Font", lang: cfg.lang === "de" ? "Sprache" : "Language" };
-  var tiMap2 = { design: "🎨", audio: "🔊", vibration: "📳", voice: "🗣️", font: "🔤", lang: "🌐" };
+  var tabs = ["design", "audio", "voice", "font", "lang"];
+  var icons = { design: "Design", audio: "Audio", voice: cfg.lang === "de" ? "Stimme" : "Voice", font: cfg.lang === "de" ? "Schrift" : "Font", lang: cfg.lang === "de" ? "Sprache" : "Language" };
+  var tiMap2 = { design: "🎨", audio: "🔊", voice: "🗣️", font: "🔤", lang: "🌐" };
   var content = null;
 
   if (tab === "design") {
