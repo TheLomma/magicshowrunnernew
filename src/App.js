@@ -15,7 +15,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v7.5", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v7.6", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -25,7 +25,7 @@ var T = {
     pause: "Pause", resume: "Weiter", prev: "Zurück", next: "Weiter", partOf: "Teil", of: "/",
     dup: "⧉", del: "Löschen", edit: "✏️", sek: "Sek", csv: "CSV",
     fontSize: "Größe", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo",
-    ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen",
+    ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen", voiceControl: "Sprachsteuerung", voiceControl: "Sprachsteuerung",
     stop: "Stop", setlist: "Setlist", elapsed: "Vergangen", remaining: "Verbleibend",
     soundLabel: "Signalton", colorTrans: "Farb-Übergänge", blackout: "Blackout",
     startBlackout: "Start mit Countdown", countdown: "Countdown", countdownSek: "Countdown (Sek)",
@@ -45,7 +45,7 @@ var T = {
     newGroup: "Neuer Akt"
   },
   en: {
-    title: "Magic Showrunner", ver: "v7.5", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v7.6", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -55,7 +55,7 @@ var T = {
     pause: "Pause", resume: "Resume", prev: "Back", next: "Next", partOf: "Part", of: "/",
     dup: "⧉", del: "Delete", edit: "✏️", sek: "sec", csv: "CSV",
     fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed",
-    ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes",
+    ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes", voiceControl: "Voice Control", voiceControl: "Voice Control",
     stop: "Stop", setlist: "Setlist", elapsed: "Elapsed", remaining: "Remaining",
     soundLabel: "Alert Sound", colorTrans: "Color Transitions", blackout: "Blackout",
     startBlackout: "Start with Countdown", countdown: "Countdown", countdownSek: "Countdown (sec)",
@@ -421,6 +421,9 @@ function SettingsModal(props) {
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", marginBottom: 12 }}>
           <input type="checkbox" checked={cfg.blinkLast10 !== false} onChange={function (e) { upCfg("blinkLast10", e.target.checked); }} /> {t.blinkLast10}
         </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", marginBottom: 12 }}>
+          <input type="checkbox" checked={cfg.voiceControl} onChange={function (e) { upCfg("voiceControl", e.target.checked); }} /> {t.voiceControl}
+        </label>
         <label style={{ fontSize: 12, color: th.sub, display: "block" }}>{t.timerStyle}</label>
         <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
           <button onClick={function () { upCfg("timerStyle", "bar"); }} style={{ padding: "8px 14px", borderRadius: 8, border: (cfg.timerStyle === "bar" || !cfg.timerStyle) ? "2px solid " + th.acc : "2px solid transparent", background: th.inp, color: th.text, cursor: "pointer", fontSize: 12 }}>{t.barTimer}</button>
@@ -660,6 +663,35 @@ function PerformMode(props) {
   var clock = useClock();
   useWakeLock();
 
+  // Voice recognition
+  useEffect(function () {
+    if (!cfg.voiceControl || cdRunning || done) return;
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) return;
+    var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = cfg.lang === 'de' ? 'de-DE' : 'en-US';
+    recognition.onresult = function (e) {
+      var transcript = e.results[e.results.length - 1][0].transcript.toLowerCase().trim();
+      setVoiceActive(true);
+      setTimeout(function () { setVoiceActive(false); }, 800);
+      if (transcript.includes('start') || transcript.includes('los')) { if (paused) setPaused(false); }
+      else if (transcript.includes('pause')) { setPaused(true); }
+      else if (transcript.includes('weiter') || transcript.includes('resume')) { setPaused(false); }
+      else if (transcript.includes('nächster') || transcript.includes('next')) { if (idx < parts.length - 1) { setIdx(idx + 1); setElapsed(0); setPaused(false); } }
+      else if (transcript.includes('zurück') || transcript.includes('previous') || transcript.includes('back')) { if (idx > 0) { setIdx(idx - 1); setElapsed(0); setPaused(false); } }
+      else if (transcript.includes('stop')) { setConfirmStop(true); }
+      else if (transcript.includes('blackout')) { setBlackout(!blackout); }
+      else if (transcript.includes('notizen') || transcript.includes('notes')) { setShowNotes(!showNotes); }
+      else if (transcript.includes('setlist')) { setShowSetlist(!showSetlist); }
+    };
+    recognition.onerror = function () {};
+    recognition.start();
+    recognitionRef.current = recognition;
+    return function () { if (recognitionRef.current) { recognitionRef.current.stop(); recognitionRef.current = null; } };
+  }, [cfg.voiceControl, cdRunning, done, paused, idx, blackout, showNotes, showSetlist]);
+
   var _cd = useState(cfg.countdown > 0 ? cfg.countdown : 0); var cdVal = _cd[0], setCdVal = _cd[1];
   var _cdr = useState(cfg.countdown > 0); var cdRunning = _cdr[0], setCdRunning = _cdr[1];
   var _idx = useState(0); var idx = _idx[0], setIdx = _idx[1];
@@ -670,6 +702,11 @@ function PerformMode(props) {
   var _showElapsed = useState(false); var showElapsed = _showElapsed[0], setShowElapsed = _showElapsed[1];
   var _showSetlist = useState(false); var showSetlist = _showSetlist[0], setShowSetlist = _showSetlist[1];
   var _showNotes = useState(false); var showNotes = _showNotes[0], setShowNotes = _showNotes[1];
+  var _voiceActive = useState(false); var voiceActive = _voiceActive[0], setVoiceActive = _voiceActive[1];
+  var recognitionRef = useRef(null);
+  var _voiceActive = useState(false); var voiceActive = _voiceActive[0], setVoiceActive = _voiceActive[1];
+  var recognitionRef = useRef(null);
+  var upCfg = function (k, v) { var newCfg = {}; newCfg[k] = v; props.setCfg(Object.assign({}, cfg, newCfg)); };
   var _blackout = useState(startInBlackout || false); var blackout = _blackout[0], setBlackout = _blackout[1];
   var _confirmStop = useState(false); var confirmStop = _confirmStop[0], setConfirmStop = _confirmStop[1];
   var _done = useState(false); var done = _done[0], setDone = _done[1];
@@ -883,7 +920,7 @@ function PerformMode(props) {
 
   return (
     <div style={{ position: "fixed", inset: 0, background: bgStyle, display: "flex", flexDirection: "column", zIndex: 999, transition: useColorTrans ? "background 1.5s ease" : "none", opacity: shouldBlink ? (blinkVisible ? 1 : 0.35) : 1 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", gap: 8, flexWrap: "wrap" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", gap: 8, flexWrap: "wrap", pointerEvents: "auto" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <div style={{ fontSize: 14, fontFamily: "monospace", color: pt.text, opacity: 0.6, fontWeight: 600 }}>{clock}</div>
           <TargetEndIndicator targetEnd={targetEnd} parts={parts} idx={idx} elapsed={elapsed} cfg={cfg} pt={pt} t={t} />
@@ -895,6 +932,13 @@ function PerformMode(props) {
         </div>
         <button onClick={function () { setShowSetlist(!showSetlist); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: showSetlist ? pt.bar : "transparent", color: showSetlist ? "#fff" : pt.text, cursor: "pointer", fontSize: 12 }}>{t.setlist}</button>
         <button onClick={function () { setShowNotes(!showNotes); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: showNotes ? pt.bar : "transparent", color: showNotes ? "#fff" : pt.text, cursor: "pointer", fontSize: 12 }}>{t.notes}</button>
+        {cfg.voiceControl && (
+          <div style={{ padding: "8px 12px", borderRadius: 10, background: voiceActive ? "#ef4444" : "#10b981", display: "flex", alignItems: "center", gap: 6, transition: "background 0.3s", border: "2px solid #fff", pointerEvents: "none" }}>
+            <div style={{ width: 8, height: 8, borderRadius: 4, background: "#fff" }} />
+            <span style={{ fontSize: 11, color: "#fff", fontWeight: 600 }}>🎤</span>
+            <span style={{ fontSize: 10, color: "#fff", fontWeight: 600, marginLeft: 2 }}>ON</span>
+          </div>
+        )}
         <button onClick={function () { setBlackout(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: "transparent", color: pt.text, cursor: "pointer", fontSize: 12 }}>🌑</button>
         <button onClick={function () { setConfirmStop(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "none", background: "#ef4444", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 12 }}>{t.stop}</button>
       </div>
