@@ -15,7 +15,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v7.3", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v7.4", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
     vibOnPartChange: "Bei Teilwechsel", vibOnPreAnn: "Bei Vorankündigung",
@@ -51,7 +51,7 @@ var T = {
     newGroup: "Neuer Akt"
   },
   en: {
-    title: "Magic Showrunner", ver: "v7.3", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v7.4", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
     vibOnPartChange: "On Part Change", vibOnPreAnn: "On Pre-Announce",
@@ -715,6 +715,8 @@ function PerformMode(props) {
   var _confirmStop = useState(false); var confirmStop = _confirmStop[0], setConfirmStop = _confirmStop[1];
   var _done = useState(false); var done = _done[0], setDone = _done[1];
   var _blinkVisible = useState(true); var blinkVisible = _blinkVisible[0], setBlinkVisible = _blinkVisible[1];
+  var _overrun = useState(0); var overrun = _overrun[0], setOverrun = _overrun[1];
+  var _showOverrun = useState(false); var showOverrun = _showOverrun[0], setShowOverrun = _showOverrun[1];
 
   var preAnnRef = useRef({}); var introRef = useRef({}); var barRef = useRef(null);
 
@@ -750,6 +752,22 @@ function PerformMode(props) {
   useEffect(function () {
     setBlinkVisible(true);
   }, [idx]);
+
+  // Overrun mode: when show ends, start counting overrun
+  useEffect(function () {
+    if (idx >= parts.length - 1 && elapsed >= dur && !paused) {
+      setShowOverrun(true);
+    }
+  }, [idx, elapsed, dur, parts.length, paused]);
+
+  // Overrun counter
+  useEffect(function () {
+    if (!showOverrun || paused) return;
+    var iv = setInterval(function () {
+      setOverrun(function (o) { return o + 1; });
+    }, 1000);
+    return function () { clearInterval(iv); };
+  }, [showOverrun, paused]);
 
   useEffect(function () {
     if (!cdRunning) return;
@@ -858,6 +876,22 @@ function PerformMode(props) {
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: 120, fontWeight: 800, color: pt.timer }}>{cdVal}</div>
           <div style={{ fontSize: 18, color: pt.text, opacity: 0.6 }}>{t.countdown}...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (showOverrun) {
+    return (
+      <div style={{ position: "fixed", inset: 0, background: "#dc2626", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 9999, padding: 20 }}>
+        <div style={{ textAlign: "center", marginBottom: 40 }}>
+          <div style={{ fontSize: Math.round(120 * sizeScale), fontWeight: 900, color: "#fff", fontFamily: "monospace", marginBottom: 10 }}>+{fmt(overrun)}</div>
+          <div style={{ fontSize: Math.round(32 * sizeScale), color: "#fee", fontWeight: 700, marginBottom: 8 }}>{cfg.lang === "de" ? "ÜBERSCHREITUNG" : "OVERRUN"}</div>
+          <div style={{ fontSize: Math.round(18 * sizeScale), color: "#fdd", opacity: 0.9 }}>{cur ? cur.title : ""}</div>
+        </div>
+        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", justifyContent: "center" }}>
+          <button onClick={function () { setPaused(!paused); }} style={{ padding: "16px 40px", borderRadius: 16, border: "3px solid #fff", background: paused ? "#fff" : "transparent", color: paused ? "#dc2626" : "#fff", fontSize: 20, fontWeight: 800, cursor: "pointer", minWidth: 140 }}>{paused ? t.resume : t.pause}</button>
+          <button onClick={onExit} style={{ padding: "16px 40px", borderRadius: 16, border: "none", background: "#fff", color: "#dc2626", fontSize: 20, fontWeight: 800, cursor: "pointer", minWidth: 140 }}>{t.stop}</button>
         </div>
       </div>
     );
@@ -1006,7 +1040,7 @@ function Banner(props) {
           <span style={{ fontSize: 20, fontWeight: 800, color: "#f5c842", letterSpacing: 2, fontFamily: "Georgia, serif", textShadow: "0 0 8px rgba(245,200,66,0.3)" }}>🎩 Magic Showrunner</span>
         </div>
         <div style={{ height: 1, background: "linear-gradient(90deg, transparent, #c9a84c, transparent)", margin: "4px 32px" }} />
-        <div style={{ fontSize: 9, color: "#c9a84c", letterSpacing: 5, opacity: 0.7 }}>SHOW MANAGEMENT v7.3</div>
+        <div style={{ fontSize: 9, color: "#c9a84c", letterSpacing: 5, opacity: 0.7 }}>SHOW MANAGEMENT v7.4</div>
       </div>
     </div>
   );
@@ -1249,3 +1283,4 @@ export default function App() {
     </div>
   );
 }
+
