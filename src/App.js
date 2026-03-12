@@ -1,6 +1,3 @@
-
-
-// v7.1
 import React, { useState, useEffect, useRef } from "react";
 
 var uid = function () { return Math.random().toString(36).slice(2, 9); };
@@ -18,9 +15,9 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v7.1", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v7.3", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
-    planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration", vibSettings: "Vibrations-Einstellungen",
+    planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne", vibration: "Vibration",
     vibOnPartChange: "Bei Teilwechsel", vibOnPreAnn: "Bei Vorankündigung",
     vibOnWarning1: "Erste Warnung", vibOnWarning2: "Zweite Warnung",
     vibOnCountdown: "Countdown (jede Sek)",
@@ -49,12 +46,14 @@ var T = {
     showModeSize: "Anzeigegröße im Show-Modus", sizeSmall: "Klein", sizeLarge: "Groß",
     targetEnd: "Ziel-Endzeit", onSchedule: "Im Zeitplan", behind: "Überzogen", ahead: "Voraus",
     targetEndHint: "Gewünschtes Show-Ende (HH:MM)",
-    circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil"
+    circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil",
+    blinkLast10: "Blinken in letzten 10 Sek",
+    newGroup: "Neuer Akt"
   },
   en: {
-    title: "Magic Showrunner", ver: "v7.1", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v7.3", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
-    planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration", vibSettings: "Vibration Settings",
+    planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps", vibration: "Vibration",
     vibOnPartChange: "On Part Change", vibOnPreAnn: "On Pre-Announce",
     vibOnWarning1: "First Warning", vibOnWarning2: "Second Warning",
     vibOnCountdown: "Countdown (every sec)",
@@ -83,7 +82,9 @@ var T = {
     showModeSize: "Display size in Show Mode", sizeSmall: "Small", sizeLarge: "Large",
     targetEnd: "Target End Time", onSchedule: "On schedule", behind: "Behind", ahead: "Ahead",
     targetEndHint: "Desired show end (HH:MM)",
-    circleTimer: "Circle Timer", barTimer: "Bar Timer", timerStyle: "Timer Style"
+    circleTimer: "Circle Timer", barTimer: "Bar Timer", timerStyle: "Timer Style",
+    blinkLast10: "Blink in last 10 sec",
+    newGroup: "New Act"
   }
 };
 
@@ -118,25 +119,6 @@ var DEMO_DATA = {
     { title: "Final", duration: 120, intro: "The finale!", preAnn: 10, preAnnText: "", notes: "Confetti", color: COLORS[3] }
   ]
 };
-
-function GroupEditor(props) {
-  var open = props.open, group = props.group, onSave = props.onSave, onClose = props.onClose, th = props.th, t = props.t;
-  var blank = { title: "", type: "group" };
-  var _f = useState(group || blank); var f = _f[0], setF = _f[1];
-  useEffect(function () { setF(group || blank); }, [group, open]);
-  var is = { width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginBottom: 8, boxSizing: "border-box" };
-  if (!open) return null;
-  return (
-    <Modal open={open} onClose={onClose} title={group ? "Akt bearbeiten" : t.newGroup} th={th}>
-      <label style={{ fontSize: 12, color: th.sub }}>{t.titleL}</label>
-      <input style={is} value={f.title} onChange={function (e) { setF(function (p) { return Object.assign({}, p, { title: e.target.value }); }); }} />
-      <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-        <button onClick={function () { if (!f.title) return; onSave(Object.assign({}, f, { id: f.id || uid(), type: "group" })); onClose(); }} style={{ flex: 1, padding: 10, borderRadius: 10, border: "none", background: th.acc, color: "#fff", fontWeight: 700, cursor: "pointer" }}>{t.saveBtn}</button>
-        <button onClick={onClose} style={{ flex: 1, padding: 10, borderRadius: 10, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer" }}>{t.cancel}</button>
-      </div>
-    </Modal>
-  );
-}
 
 var makeDemo = function (lang) {
   var data = DEMO_DATA[lang] || DEMO_DATA.de;
@@ -180,8 +162,6 @@ var DEFAULT_VIB_CFG = {
   countdownStartSec: 5
 };
 
-function doVibrate(ms) { try { if (navigator.vibrate) navigator.vibrate(ms || 200); } catch (e) {} }
-
 function doVibratePattern(patternKey) {
   try {
     if (!navigator.vibrate) return;
@@ -202,7 +182,6 @@ function getAutoSave() { try { return JSON.parse(localStorage.getItem("ms3_autos
 function setAutoSave(data) { try { localStorage.setItem("ms3_autosave", JSON.stringify(data)); } catch (e) {} }
 function getAutoSaveMeta() { try { return JSON.parse(localStorage.getItem("ms3_autosave_meta") || "null"); } catch (e) { return null; } }
 function setAutoSaveMeta(meta) { try { localStorage.setItem("ms3_autosave_meta", JSON.stringify(meta)); } catch (e) {} }
-
 function getTemplates() { try { return JSON.parse(localStorage.getItem("ms3_templates") || "[]"); } catch (e) { return []; } }
 function saveTemplates(arr) { localStorage.setItem("ms3_templates", JSON.stringify(arr)); }
 function getCustomTheme() { try { return JSON.parse(localStorage.getItem("ms3_custom_theme")) || DEFAULT_CUSTOM; } catch (e) { return DEFAULT_CUSTOM; } }
@@ -253,6 +232,25 @@ function TemplateModal(props) {
           </div>
         );
       })}
+    </Modal>
+  );
+}
+
+function GroupEditor(props) {
+  var open = props.open, group = props.group, onSave = props.onSave, onClose = props.onClose, th = props.th, t = props.t;
+  var blank = { title: "", type: "group" };
+  var _f = useState(group || blank); var f = _f[0], setF = _f[1];
+  useEffect(function () { setF(group || blank); }, [group, open]);
+  var is = { width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginBottom: 8, boxSizing: "border-box" };
+  if (!open) return null;
+  return (
+    <Modal open={open} onClose={onClose} title={group ? "Akt bearbeiten" : t.newGroup} th={th}>
+      <label style={{ fontSize: 12, color: th.sub }}>{t.titleL}</label>
+      <input style={is} value={f.title} onChange={function (e) { setF(function (p) { return Object.assign({}, p, { title: e.target.value }); }); }} />
+      <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+        <button onClick={function () { if (!f.title) return; onSave(Object.assign({}, f, { id: f.id || uid(), type: "group" })); onClose(); }} style={{ flex: 1, padding: 10, borderRadius: 10, border: "none", background: th.acc, color: "#fff", fontWeight: 700, cursor: "pointer" }}>{t.saveBtn}</button>
+        <button onClick={onClose} style={{ flex: 1, padding: 10, borderRadius: 10, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer" }}>{t.cancel}</button>
+      </div>
     </Modal>
   );
 }
@@ -336,22 +334,22 @@ function LoadModal(props) {
   var open = props.open, onClose = props.onClose, onLoad = props.onLoad, t = props.t, th = props.th;
   var _sv = useState([]); var saves = _sv[0], setSaves = _sv[1];
   var _tab = useState("manual"); var tab = _tab[0], setTab = _tab[1];
-  var _as = useState(null); var autoSave = _as[0], setAutoSave2 = _as[1];
+  var _as = useState(null); var autoSaveData = _as[0], setAutoSaveData = _as[1];
   var _asMeta = useState(null); var autoSaveMeta = _asMeta[0], setAutoSaveMeta2 = _asMeta[1];
   useEffect(function () {
     if (open) {
       setSaves(JSON.parse(localStorage.getItem("ms3_shows") || "[]"));
-      setAutoSave2(getAutoSave());
+      setAutoSaveData(getAutoSave());
       setAutoSaveMeta2(getAutoSaveMeta());
     }
   }, [open]);
   if (!open) return null;
-  var tabStyle = function(active) { return { flex: 1, padding: "8px 4px", borderRadius: 8, border: active ? "2px solid " + th.acc : "2px solid transparent", background: active ? th.acc + "22" : "transparent", color: th.text, cursor: "pointer", fontSize: 13, fontWeight: active ? 700 : 400 }; };
+  var tabStyle = function (active) { return { flex: 1, padding: "8px 4px", borderRadius: 8, border: active ? "2px solid " + th.acc : "2px solid transparent", background: active ? th.acc + "22" : "transparent", color: th.text, cursor: "pointer", fontSize: 13, fontWeight: active ? 700 : 400 }; };
   return (
     <Modal open={open} onClose={onClose} title={t.load} th={th}>
       <div style={{ display: "flex", gap: 4, marginBottom: 14 }}>
-        <button style={tabStyle(tab === "manual")} onClick={function() { setTab("manual"); }}>{t.lang === "en" ? "Manual saves" : "Manuell gespeichert"}</button>
-        <button style={tabStyle(tab === "auto")} onClick={function() { setTab("auto"); }}>Autosave</button>
+        <button style={tabStyle(tab === "manual")} onClick={function () { setTab("manual"); }}>{t.lang === "en" ? "Manual saves" : "Manuell gespeichert"}</button>
+        <button style={tabStyle(tab === "auto")} onClick={function () { setTab("auto"); }}>Autosave</button>
       </div>
       {tab === "manual" && (
         <div>
@@ -371,17 +369,17 @@ function LoadModal(props) {
       )}
       {tab === "auto" && (
         <div>
-          {!autoSave && <p style={{ color: th.sub, fontSize: 13 }}>{t.lang === "en" ? "No autosave found." : "Kein Autosave vorhanden."}</p>}
-          {autoSave && (
+          {!autoSaveData && <p style={{ color: th.sub, fontSize: 13 }}>{t.lang === "en" ? "No autosave found." : "Kein Autosave vorhanden."}</p>}
+          {autoSaveData && (
             <div style={{ padding: "12px 14px", borderRadius: 10, background: th.inp, border: "1px solid " + th.acc + "55" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                 <div style={{ fontSize: 20 }}>💾</div>
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 14 }}>{t.lang === "en" ? "Last Autosave" : "Letzter Autosave"}</div>
-                  {autoSaveMeta && <div style={{ fontSize: 11, color: th.sub }}>{autoSave.length} {t.parts} &nbsp;·&nbsp; {new Date(autoSaveMeta.date).toLocaleString()}</div>}
+                  {autoSaveMeta && <div style={{ fontSize: 11, color: th.sub }}>{autoSaveData.length} {t.parts} &nbsp;·&nbsp; {new Date(autoSaveMeta.date).toLocaleString()}</div>}
                 </div>
               </div>
-              <button onClick={function () { onLoad(autoSave); onClose(); }} style={{ width: "100%", padding: "10px", borderRadius: 10, border: "none", background: th.acc, color: "#fff", fontWeight: 700, cursor: "pointer" }}>{t.load}</button>
+              <button onClick={function () { onLoad(autoSaveData); onClose(); }} style={{ width: "100%", padding: "10px", borderRadius: 10, border: "none", background: th.acc, color: "#fff", fontWeight: 700, cursor: "pointer" }}>{t.load}</button>
             </div>
           )}
         </div>
@@ -413,12 +411,6 @@ function CustomThemeEditor(props) {
           );
         })}
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, padding: "8px 12px", borderRadius: 8, background: ct.bg, border: "1px solid " + ct.brd }}>
-        <div style={{ width: 20, height: 20, borderRadius: 6, background: ct.card, border: "1px solid " + ct.brd }} />
-        <span style={{ color: ct.text, fontSize: 12, fontWeight: 600 }}>Preview</span>
-        <span style={{ color: ct.sub, fontSize: 11 }}>sub</span>
-        <div style={{ width: 16, height: 16, borderRadius: 4, background: ct.acc }} />
-      </div>
       <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
         <button onClick={function () { saveCustomTheme(ct); onApply(ct); }} style={{ flex: 1, padding: 8, borderRadius: 8, border: "none", background: ct.acc, color: "#fff", cursor: "pointer", fontWeight: 600, fontSize: 12 }}>{t.applyCustom}</button>
         <button onClick={function () { var d = DEFAULT_CUSTOM; setCt(d); saveCustomTheme(d); }} style={{ padding: 8, borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>{t.resetCustom}</button>
@@ -429,7 +421,7 @@ function CustomThemeEditor(props) {
 
 function SettingsModal(props) {
   var open = props.open, onClose = props.onClose, cfg = props.cfg, setCfg = props.setCfg, t = props.t, th = props.th, onApplyCustom = props.onApplyCustom, onLangChange = props.onLangChange;
-  var _t = useState("design"); var tab = _t[0], setTab = _t[1];
+  var _tab = useState("design"); var tab = _tab[0], setTab = _tab[1];
   var _v = useState([]); var voices = _v[0], setVoices = _v[1];
   useEffect(function () {
     var ld = function () { setVoices((speechSynthesis && speechSynthesis.getVoices()) || []); };
@@ -439,8 +431,9 @@ function SettingsModal(props) {
   var is = { width: "100%", padding: 8, borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginBottom: 8, boxSizing: "border-box" };
   if (!open) return null;
   var upCfg = function (k, v) { setCfg(function (c) { var o = {}; o[k] = v; return Object.assign({}, c, o); }); };
-  var tabs = ["design", "audio", "vibration", "voice", "font", "lang", "tutorial"];
-  var icons = { design: "Design", audio: "Audio", vibration: cfg.lang === "de" ? "Vibration" : "Vibration", voice: cfg.lang === "de" ? "Stimme" : "Voice", font: cfg.lang === "de" ? "Schrift" : "Font", lang: cfg.lang === "de" ? "Sprache" : "Language", tutorial: cfg.lang === "de" ? "Anleitung" : "Tutorial" };
+  var tabs = ["design", "audio", "vibration", "voice", "font", "lang"];
+  var icons = { design: "Design", audio: "Audio", vibration: cfg.lang === "de" ? "Vibration" : "Vibration", voice: cfg.lang === "de" ? "Stimme" : "Voice", font: cfg.lang === "de" ? "Schrift" : "Font", lang: cfg.lang === "de" ? "Sprache" : "Language" };
+  var tiMap2 = { design: "🎨", audio: "🔊", vibration: "📳", voice: "🗣️", font: "🔤", lang: "🌐" };
   var content = null;
 
   if (tab === "design") {
@@ -463,12 +456,15 @@ function SettingsModal(props) {
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", marginBottom: 8 }}>
           <input type="checkbox" checked={cfg.animations} onChange={function (e) { upCfg("animations", e.target.checked); }} /> {t.animations}
         </label>
-        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer" }}>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", marginBottom: 8 }}>
           <input type="checkbox" checked={cfg.colorTransitions !== false} onChange={function (e) { upCfg("colorTransitions", e.target.checked); }} /> {t.colorTrans}
         </label>
-        <label style={{ fontSize: 12, color: th.sub, marginTop: 12, display: "block" }}>{t.timerStyle}</label>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", marginBottom: 12 }}>
+          <input type="checkbox" checked={cfg.blinkLast10 !== false} onChange={function (e) { upCfg("blinkLast10", e.target.checked); }} /> {t.blinkLast10}
+        </label>
+        <label style={{ fontSize: 12, color: th.sub, display: "block" }}>{t.timerStyle}</label>
         <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
-          <button onClick={function () { upCfg("timerStyle", "bar"); }} style={{ padding: "8px 14px", borderRadius: 8, border: cfg.timerStyle === "bar" || !cfg.timerStyle ? "2px solid " + th.acc : "2px solid transparent", background: th.inp, color: th.text, cursor: "pointer", fontSize: 12 }}>{t.barTimer}</button>
+          <button onClick={function () { upCfg("timerStyle", "bar"); }} style={{ padding: "8px 14px", borderRadius: 8, border: (cfg.timerStyle === "bar" || !cfg.timerStyle) ? "2px solid " + th.acc : "2px solid transparent", background: th.inp, color: th.text, cursor: "pointer", fontSize: 12 }}>{t.barTimer}</button>
           <button onClick={function () { upCfg("timerStyle", "circle"); }} style={{ padding: "8px 14px", borderRadius: 8, border: cfg.timerStyle === "circle" ? "2px solid " + th.acc : "2px solid transparent", background: th.inp, color: th.text, cursor: "pointer", fontSize: 12 }}>{t.circleTimer}</button>
         </div>
       </div>
@@ -478,9 +474,6 @@ function SettingsModal(props) {
       <div>
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, marginBottom: 8, cursor: "pointer" }}>
           <input type="checkbox" checked={cfg.beeps} onChange={function (e) { upCfg("beeps", e.target.checked); }} /> {t.beeps}
-        </label>
-        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, marginBottom: 8, cursor: "pointer" }}>
-          <input type="checkbox" checked={cfg.vibrate} onChange={function (e) { upCfg("vibrate", e.target.checked); }} /> {t.vibration}
         </label>
         <label style={{ fontSize: 12, color: th.sub }}>{t.volume}</label>
         <input type="range" min={0} max={1} step={0.1} value={cfg.volume} onChange={function (e) { upCfg("volume", +e.target.value); }} style={{ width: "100%", marginBottom: 8 }} />
@@ -586,66 +579,6 @@ function SettingsModal(props) {
         </select>
       </div>
     );
-  } else if (tab === "tutorial") {
-    var tutItems = cfg.lang === "de" ? [
-      { icon: "➕", title: "Neuer Teil", desc: "Klicke auf '+ Neuer Teil', um einen Programmteil hinzuzufügen. Gib Titel, Dauer, Intro-Ansage und Notizen ein." },
-      { icon: "✏️", title: "Teil bearbeiten", desc: "Klicke auf das Stift-Symbol neben einem Teil, um ihn zu bearbeiten." },
-      { icon: "⧉", title: "Teil duplizieren", desc: "Das ⧉-Symbol kopiert einen Teil inklusive aller Einstellungen." },
-      { icon: "🗑️", title: "Teil löschen", desc: "Das Mülleimer-Symbol löscht einen Teil permanent." },
-      { icon: "▶", title: "Show starten", desc: "Startet die Show im Vollbild-Perform-Modus. Der Timer läuft automatisch durch alle Teile." },
-      { icon: "⏸", title: "Pause", desc: "Im Show-Modus pausiert dieser Button den Timer. Drücke 'Weiter', um fortzufahren." },
-      { icon: "🚨", title: "Notfallpause", desc: "Stoppt die Show sofort mit einem Vollbild-Overlay. Zeigt Stoppuhr und Optionen zum Fortsetzen oder Beenden." },
-      { icon: "⏭", title: "Vor / Zurück", desc: "Wechsle manuell zum nächsten oder vorherigen Programmteil." },
-      { icon: "⏳", title: "Countdown", desc: "Starte die Show mit 'Start mit Countdown' für einen automatischen Countdown vor dem ersten Teil. Im Show-Modus kann auch der Bildschirm geschwärzt werden (Blackout) – tippe darauf, um ihn zu beenden." },
-      { icon: "📋", title: "Setlist", desc: "Zeigt alle Teile als Übersicht. Klicke auf einen Teil, um direkt dorthin zu springen." },
-      { icon: "📝", title: "Notizen", desc: "Blendet die Notizen des aktuellen Teils im Show-Modus ein." },
-      { icon: "💾", title: "Speichern & Laden", desc: "Speichere deine Show unter einem Namen und lade sie später wieder. Es gibt auch einen Autosave." },
-      { icon: "⭐", title: "Vorlagen", desc: "Speichere Teile als Vorlage und verwende sie in anderen Shows wieder." },
-      { icon: "📊", title: "CSV-Export", desc: "Exportiert die Setlist als CSV-Datei für Excel oder zur Weitergabe." },
-      { icon: "🎯", title: "Ziel-Endzeit", desc: "Gib eine gewünschte Endzeit ein. Die App zeigt ob du im Zeitplan liegst." },
-      { icon: "🔊", title: "Signaltöne", desc: "Automatische Töne bei Vorankündigungen und Teilwechseln." },
-      { icon: "🗣️", title: "Text-to-Speech", desc: "Die App liest Intro-Texte automatisch vor. Stimme, Tempo und Tonhöhe sind einstellbar." },
-      { icon: "🎨", title: "Design", desc: "Wähle zwischen Light, Dark, Midnight, Ember oder erstelle ein eigenes Farbschema. Auch Timer-Stil und Farb-Übergänge sind hier einstellbar." },
-      { icon: "⏱️", title: "Timer-Stil", desc: "Wähle zwischen Balken-Timer und Kreis-Timer im Reiter 'Design'." },
-      { icon: "🔤", title: "Schrift & Größe", desc: "Passe die Anzeigegröße im Show-Modus stufenlos an, mit Live-Vorschau." }
-    ] : [
-      { icon: "➕", title: "New Part", desc: "Click '+ New Part' to add a program segment. Enter title, duration, intro and notes." },
-      { icon: "✏️", title: "Edit Part", desc: "Click the pencil icon next to a part to edit it." },
-      { icon: "⧉", title: "Duplicate Part", desc: "The ⧉ icon copies a part including all settings." },
-      { icon: "🗑️", title: "Delete Part", desc: "The trash icon permanently deletes a part." },
-      { icon: "▶", title: "Start Show", desc: "Starts the show in fullscreen Perform Mode. The timer runs through all parts automatically." },
-      { icon: "⏸", title: "Pause", desc: "In Show Mode, this button pauses the timer. Press 'Resume' to continue." },
-      { icon: "🚨", title: "Emergency Pause", desc: "Stops the show immediately with a fullscreen overlay. Shows a stopwatch and options to resume or end." },
-      { icon: "⏭", title: "Prev / Next", desc: "Manually switch to the next or previous program part." },
-      { icon: "⏳", title: "Countdown", desc: "Use 'Start with Countdown' to begin the show with an automatic countdown before the first part. In Show Mode the screen can also be blacked out – tap it to exit." },
-      { icon: "📋", title: "Setlist", desc: "Shows all parts as overview. Click a part to jump directly to it." },
-      { icon: "📝", title: "Notes", desc: "Displays the current part's notes in Show Mode." },
-      { icon: "💾", title: "Save & Load", desc: "Save your show under a name and reload it later. There is also an autosave." },
-      { icon: "⭐", title: "Templates", desc: "Save parts as templates and reuse them in other shows." },
-      { icon: "📊", title: "CSV Export", desc: "Exports the setlist as a CSV file for Excel or sharing." },
-      { icon: "🎯", title: "Target End Time", desc: "Enter a desired end time. The app shows if you are on schedule, ahead or behind." },
-      { icon: "🔊", title: "Alert Sounds", desc: "Automatic tones for pre-announcements and part changes." },
-      { icon: "🗣️", title: "Text-to-Speech", desc: "The app reads intro texts automatically. Voice, speed and pitch are configurable." },
-      { icon: "🎨", title: "Design", desc: "Choose between Light, Dark, Midnight, Ember or create a custom color scheme. Timer style and color transitions are also configurable here." },
-      { icon: "⏱️", title: "Timer Style", desc: "Choose between bar timer and circle timer in the 'Design' tab." },
-      { icon: "🔤", title: "Font & Size", desc: "Adjust the display size in Show Mode steplessly, with live preview." }
-    ];
-    content = (
-      <div style={{ maxHeight: 400, overflowY: "auto", paddingRight: 4 }}>
-        <div style={{ fontSize: 13, color: th.sub, marginBottom: 12 }}>{cfg.lang === "de" ? "Kurze Erklärung aller Funktionen:" : "Quick overview of all features:"}</div>
-        {tutItems.map(function (item, i) {
-          return (
-            <div key={i} style={{ display: "flex", gap: 10, padding: "10px 12px", borderRadius: 10, marginBottom: 6, background: th.inp, border: "1px solid " + th.brd }}>
-              <div style={{ fontSize: 20, flexShrink: 0, width: 28, textAlign: "center" }}>{item.icon}</div>
-              <div>
-                <div style={{ fontWeight: 700, fontSize: 13, color: th.text, marginBottom: 2 }}>{item.title}</div>
-                <div style={{ fontSize: 12, color: th.sub, lineHeight: 1.5 }}>{item.desc}</div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    );
   } else if (tab === "lang") {
     content = (
       <div style={{ display: "flex", gap: 8 }}>
@@ -661,11 +594,12 @@ function SettingsModal(props) {
       <div style={{ display: "flex", gap: 4, marginBottom: 16, overflowX: "auto", paddingBottom: 2 }}>
         {tabs.map(function (k) {
           var active = tab === k;
-          var tiMap2 = { design: "🎨", audio: "🔊", vibration: "📳", voice: "🗣️", font: "🔤", lang: "🌐", tutorial: "📖" };
-          return <button key={k} onClick={function () { setTab(k); }} style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "7px 10px", borderRadius: 10, border: active ? "2px solid " + th.acc : "2px solid transparent", background: active ? th.acc + "22" : th.inp, color: active ? th.acc : th.sub, cursor: "pointer", minWidth: 50 }}>
+          return (
+            <button key={k} onClick={function () { setTab(k); }} style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "7px 10px", borderRadius: 10, border: active ? "2px solid " + th.acc : "2px solid transparent", background: active ? th.acc + "22" : th.inp, color: active ? th.acc : th.sub, cursor: "pointer", minWidth: 50 }}>
               <span style={{ fontSize: 18 }}>{tiMap2[k]}</span>
               <span style={{ fontSize: 9, fontWeight: active ? 700 : 400 }}>{icons[k]}</span>
-            </button>;
+            </button>
+          );
         })}
       </div>
       {content}
@@ -687,6 +621,24 @@ function useClock() {
     return function () { clearInterval(iv); };
   }, []);
   return clock;
+}
+
+function useWakeLock() {
+  var lockRef = useRef(null);
+  useEffect(function () {
+    if (navigator.wakeLock) {
+      navigator.wakeLock.request("screen").then(function (lock) { lockRef.current = lock; }).catch(function () {});
+      var onVis = function () {
+        if (document.visibilityState === "visible" && navigator.wakeLock) {
+          navigator.wakeLock.request("screen").then(function (lock) { lockRef.current = lock; }).catch(function () {});
+        }
+      };
+      document.addEventListener("visibilitychange", onVis);
+    }
+    return function () {
+      if (lockRef.current) { lockRef.current.release().catch(function () {}); lockRef.current = null; }
+    };
+  }, []);
 }
 
 function TargetEndIndicator(props) {
@@ -719,48 +671,27 @@ function TargetEndIndicator(props) {
 }
 
 function CircleTimer(props) {
-  var pct = props.pct, rem = props.rem, timerVal = props.timerVal, timerLabel = props.timerLabel, pt = props.pt, sz = props.sz, onToggle = props.onToggle;
+  var pct = props.pct, rem = props.rem, timerVal = props.timerVal, timerLabel = props.timerLabel, pt = props.pt, sz = props.sz, onToggle = props.onToggle, blinkVisible = props.blinkVisible;
   var radius = Math.min(sz.timer * 1.2, 120);
   var stroke = Math.max(radius * 0.12, 6);
   var normalizedRadius = radius - stroke / 2;
   var circumference = 2 * Math.PI * normalizedRadius;
   var strokeDashoffset = circumference - (pct / 100) * circumference;
-  var barColor = rem <= 10 ? "#ef4444" : pt.bar;
+  var danger = rem > 0 && rem <= 10;
+  var barColor = danger ? "#ef4444" : pt.bar;
+  var visible = danger ? blinkVisible : true;
   return (
     <div onClick={onToggle} style={{ cursor: "pointer", position: "relative", display: "inline-flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
       <svg width={radius * 2} height={radius * 2} style={{ transform: "rotate(-90deg)" }}>
         <circle cx={radius} cy={radius} r={normalizedRadius} fill="none" stroke={pt.barBg} strokeWidth={stroke} />
         <circle cx={radius} cy={radius} r={normalizedRadius} fill="none" stroke={barColor} strokeWidth={stroke} strokeDasharray={circumference} strokeDashoffset={strokeDashoffset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 0.5s ease, stroke 0.3s" }} />
       </svg>
-      <div style={{ position: "absolute", textAlign: "center" }}>
-        <div style={{ fontSize: Math.round(sz.timer * 0.7), fontWeight: 800, color: rem <= 10 ? "#ef4444" : pt.timer, fontFamily: "monospace" }}>{timerVal}</div>
+      <div style={{ position: "absolute", textAlign: "center", opacity: visible ? 1 : 0, transition: "opacity 0.1s" }}>
+        <div style={{ fontSize: Math.round(sz.timer * 0.7), fontWeight: 800, color: danger ? "#ef4444" : pt.timer, fontFamily: "monospace" }}>{timerVal}</div>
         <div style={{ fontSize: 11, color: pt.text, opacity: 0.4 }}>{timerLabel}</div>
       </div>
     </div>
   );
-}
-
-function useWakeLock() {
-  var lockRef = useRef(null);
-  useEffect(function () {
-    var acquired = false;
-    if (navigator.wakeLock) {
-      navigator.wakeLock.request("screen").then(function (lock) {
-        lockRef.current = lock;
-        acquired = true;
-      }).catch(function () {});
-      var onVis = function () {
-        if (document.visibilityState === "visible" && navigator.wakeLock) {
-          navigator.wakeLock.request("screen").then(function (lock) { lockRef.current = lock; }).catch(function () {});
-        }
-      };
-      document.addEventListener("visibilitychange", onVis);
-    }
-    return function () {
-      if (lockRef.current) { lockRef.current.release().catch(function () {}); lockRef.current = null; }
-      document.removeEventListener("visibilitychange", function () {});
-    };
-  }, []);
 }
 
 function PerformMode(props) {
@@ -768,6 +699,8 @@ function PerformMode(props) {
   var pt = PTH[cfg.perfTheme] || PTH.dark;
   var t = T[cfg.lang] || T.de;
   var clock = useClock();
+  useWakeLock();
+
   var _cd = useState(cfg.countdown > 0 ? cfg.countdown : 0); var cdVal = _cd[0], setCdVal = _cd[1];
   var _cdr = useState(cfg.countdown > 0); var cdRunning = _cdr[0], setCdRunning = _cdr[1];
   var _idx = useState(0); var idx = _idx[0], setIdx = _idx[1];
@@ -781,13 +714,42 @@ function PerformMode(props) {
   var _blackout = useState(startInBlackout || false); var blackout = _blackout[0], setBlackout = _blackout[1];
   var _confirmStop = useState(false); var confirmStop = _confirmStop[0], setConfirmStop = _confirmStop[1];
   var _done = useState(false); var done = _done[0], setDone = _done[1];
+  var _blinkVisible = useState(true); var blinkVisible = _blinkVisible[0], setBlinkVisible = _blinkVisible[1];
+
   var preAnnRef = useRef({}); var introRef = useRef({}); var barRef = useRef(null);
+
   var cur = parts[idx];
   var dur = cfg.testMode ? (cfg.testDur || 10) : (cur ? cur.duration : 60);
+
+  // rem is computed BEFORE any useEffect that references it
+  var rem = Math.max(dur - elapsed, 0);
+  var pct = Math.min(elapsed / dur * 100, 100);
+
   var sizeScale = cfg.performSizeScale != null ? cfg.performSizeScale : 1.0;
   var sz = { timer: Math.round(72 * sizeScale), title: Math.round(28 * sizeScale) };
   var useCircle = cfg.timerStyle === "circle";
-  useWakeLock();
+  var useColorTrans = cfg.colorTransitions !== false;
+  var partColor = cur ? (cur.color || COLORS[0]) : COLORS[0];
+
+  // shouldBlink as outer variable so JSX can reference it
+  var shouldBlink = cfg.blinkLast10 !== false && rem > 0 && rem <= 10 && !paused && !done;
+
+  // Blink effect: only active when rem is between 1 and 10 (inclusive) and blinkLast10 enabled
+  useEffect(function () {
+    if (!shouldBlink) {
+      setBlinkVisible(true);
+      return;
+    }
+    var iv = setInterval(function () {
+      setBlinkVisible(function (v) { return !v; });
+    }, 500);
+    return function () { clearInterval(iv); };
+  }, [rem <= 10 && rem > 0, cfg.blinkLast10]);
+
+  // Reset blink when part changes
+  useEffect(function () {
+    setBlinkVisible(true);
+  }, [idx]);
 
   useEffect(function () {
     if (!cdRunning) return;
@@ -819,15 +781,9 @@ function PerformMode(props) {
         var vibCfg = cfg.vibCfg || DEFAULT_VIB_CFG;
         var vibEnabled = vibCfg.enabled !== false;
         var remSec = dur - ne;
-        if (vibEnabled && vibCfg.onWarning1 !== "off" && remSec === vibCfg.warning1Sec) {
-          doVibratePattern(vibCfg.onWarning1);
-        }
-        if (vibEnabled && vibCfg.onWarning2 !== "off" && remSec === vibCfg.warning2Sec) {
-          doVibratePattern(vibCfg.onWarning2);
-        }
-        if (vibEnabled && vibCfg.onCountdown !== "off" && remSec > 0 && remSec <= vibCfg.countdownStartSec) {
-          doVibratePattern(vibCfg.onCountdown);
-        }
+        if (vibEnabled && vibCfg.onWarning1 !== "off" && remSec === vibCfg.warning1Sec) doVibratePattern(vibCfg.onWarning1);
+        if (vibEnabled && vibCfg.onWarning2 !== "off" && remSec === vibCfg.warning2Sec) doVibratePattern(vibCfg.onWarning2);
+        if (vibEnabled && vibCfg.onCountdown !== "off" && remSec > 0 && remSec <= vibCfg.countdownStartSec) doVibratePattern(vibCfg.onCountdown);
         if (cur && cur.preAnn && ne === dur - cur.preAnn && !preAnnRef.current[idx]) {
           preAnnRef.current[idx] = true;
           if (cur.preAnnText) doSpeak(cur.preAnnText, cfg.ttsRate, cfg.ttsPitch, cfg.ttsVoice);
@@ -839,8 +795,7 @@ function PerformMode(props) {
           if (vibEnabled && vibCfg.onPartChange !== "off") doVibratePattern(vibCfg.onPartChange);
           if (idx < parts.length - 1) {
             setIdx(function (i) { return i + 1; });
-            introRef.current = {};
-            preAnnRef.current = {};
+            introRef.current = {}; preAnnRef.current = {};
             return 0;
           } else { setDone(true); return dur; }
         }
@@ -859,12 +814,9 @@ function PerformMode(props) {
   }, [idx, cdRunning, done]);
 
   if (!cur) return null;
-  var pct = Math.min(elapsed / dur * 100, 100);
-  var rem = Math.max(dur - elapsed, 0);
+
   var timerVal = showElapsed ? fmt(elapsed) : fmt(rem);
   var timerLabel = showElapsed ? t.elapsed : t.remaining;
-  var partColor = cur.color || COLORS[0];
-  var useColorTrans = cfg.colorTransitions !== false;
 
   var handleSeek = function (e) {
     if (!barRef.current) return;
@@ -874,10 +826,26 @@ function PerformMode(props) {
     setElapsed(Math.min(newElapsed, dur - 1));
   };
 
+  var handleBarMouseDown = function (e) {
+    handleSeek(e);
+    var onMove = function (ev) { handleSeek(ev); };
+    var onUp = function () {
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  };
+
+  var danger = rem > 0 && rem <= 10;
+  var timerColor = danger ? "#ef4444" : pt.timer;
+  var barColor = danger ? "#ef4444" : pt.bar;
+  var timerOpacity = (danger && cfg.blinkLast10 !== false) ? (blinkVisible ? 1 : 0) : 1;
+
   if (blackout) {
     return (
       <div style={{ position: "fixed", inset: 0, background: "#000", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", zIndex: 999, cursor: "pointer" }} onClick={function () { setBlackout(false); }}>
-        <div style={{ fontSize: sz.timer, fontWeight: 800, color: rem <= 10 ? "#ef4444" : "#ffffff", fontFamily: "monospace" }}>{timerVal}</div>
+        <div style={{ fontSize: sz.timer, fontWeight: 800, color: danger ? "#ef4444" : "#ffffff", fontFamily: "monospace", opacity: timerOpacity, transition: "opacity 0.1s" }}>{timerVal}</div>
         <div style={{ fontSize: 14, color: "#666", marginTop: 8 }}>{timerLabel}</div>
         <div style={{ position: "absolute", bottom: 40, fontSize: 12, color: "#444" }}>{t.blackout} – {cfg.lang === "de" ? "tippen zum Beenden" : "tap to exit"}</div>
       </div>
@@ -924,7 +892,7 @@ function PerformMode(props) {
   var bgStyle = useColorTrans ? "radial-gradient(ellipse at center, " + partColor + "22 0%, " + pt.bg + " 70%)" : pt.bg;
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: bgStyle, display: "flex", flexDirection: "column", zIndex: 999, transition: useColorTrans ? "background 1.5s ease" : "none" }}>
+    <div style={{ position: "fixed", inset: 0, background: bgStyle, display: "flex", flexDirection: "column", zIndex: 999, transition: useColorTrans ? "background 1.5s ease" : "none", opacity: shouldBlink ? (blinkVisible ? 1 : 0.35) : 1 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", gap: 8, flexWrap: "wrap" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <div style={{ fontSize: 14, fontFamily: "monospace", color: pt.text, opacity: 0.6, fontWeight: 600 }}>{clock}</div>
@@ -940,37 +908,48 @@ function PerformMode(props) {
         <button onClick={function () { setBlackout(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: "transparent", color: pt.text, cursor: "pointer", fontSize: 12 }}>🌑</button>
         <button onClick={function () { setConfirmStop(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "none", background: "#ef4444", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 12 }}>{t.stop}</button>
       </div>
+
       <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px" }}>
         <div style={{ fontSize: sz.title, fontWeight: 700, color: pt.text, marginBottom: 8, textAlign: "center" }}>{cur.title}</div>
         <div style={{ fontSize: 14, color: pt.text, opacity: 0.5, marginBottom: 16 }}>{t.partOf} {idx + 1} {t.of} {parts.length}</div>
+
         {useCircle ? (
-          <CircleTimer pct={pct} rem={rem} timerVal={timerVal} timerLabel={timerLabel} pt={pt} sz={sz} onToggle={function () { setShowElapsed(!showElapsed); }} />
+          <CircleTimer pct={pct} rem={rem} timerVal={timerVal} timerLabel={timerLabel} pt={pt} sz={sz} onToggle={function () { setShowElapsed(!showElapsed); }} blinkVisible={blinkVisible} />
         ) : (
-          <div onClick={function () { setShowElapsed(!showElapsed); }} style={{ cursor: "pointer", textAlign: "center", marginBottom: 8 }}>
-            <div style={{ fontSize: sz.timer, fontWeight: 800, color: rem <= 10 ? "#ef4444" : pt.timer, fontFamily: "monospace", transition: "color 0.3s" }}>{timerVal}</div>
+          <div onClick={function () { setShowElapsed(!showElapsed); }} style={{ cursor: "pointer", textAlign: "center", marginBottom: 8, opacity: timerOpacity, transition: "opacity 0.1s" }}>
+            <div style={{ fontSize: sz.timer, fontWeight: 800, color: timerColor, fontFamily: "monospace", transition: "color 0.3s" }}>{timerVal}</div>
             <div style={{ fontSize: 12, color: pt.text, opacity: 0.4 }}>{timerLabel}</div>
           </div>
         )}
+
         {!useCircle && (
-          <div ref={barRef} onClick={handleSeek} style={{ width: "100%", maxWidth: 400, height: 12, background: pt.barBg, borderRadius: 6, cursor: "pointer", position: "relative", marginBottom: 16 }}>
-            <div style={{ width: pct + "%", height: "100%", background: rem <= 10 ? "#ef4444" : pt.bar, borderRadius: 6, transition: "width 0.3s" }} />
-            <div style={{ position: "absolute", top: -4, left: "calc(" + pct + "% - 10px)", width: 20, height: 20, borderRadius: "50%", background: rem <= 10 ? "#ef4444" : pt.bar, border: "3px solid " + pt.bg, cursor: "grab", boxShadow: "0 2px 6px rgba(0,0,0,0.3)" }} />
+          <div
+            ref={barRef}
+            onMouseDown={handleBarMouseDown}
+            style={{ width: "100%", maxWidth: 400, height: 16, background: pt.barBg, borderRadius: 8, cursor: "pointer", position: "relative", marginBottom: 16, userSelect: "none" }}
+          >
+            <div style={{ width: pct + "%", height: "100%", background: barColor, borderRadius: 8, transition: "width 0.5s, background 0.3s", pointerEvents: "none" }} />
+            <div style={{ position: "absolute", top: "50%", left: "calc(" + pct + "% - 10px)", transform: "translateY(-50%)", width: 20, height: 20, borderRadius: "50%", background: barColor, border: "3px solid " + pt.bg, cursor: "grab", boxShadow: "0 2px 8px rgba(0,0,0,0.4)", pointerEvents: "none", transition: "background 0.3s" }} />
           </div>
         )}
+
         {useCircle && (
           <div style={{ width: "100%", maxWidth: 400, height: 4, background: pt.barBg, borderRadius: 2, marginBottom: 16, marginTop: 8 }}>
-            <div style={{ width: pct + "%", height: "100%", background: rem <= 10 ? "#ef4444" : pt.bar, borderRadius: 2, transition: "width 0.3s" }} />
+            <div style={{ width: pct + "%", height: "100%", background: barColor, borderRadius: 2, transition: "width 0.5s, background 0.3s" }} />
           </div>
         )}
+
         <div style={{ display: "flex", gap: 12 }}>
           <button onClick={function () { if (idx > 0) { setIdx(idx - 1); setElapsed(0); preAnnRef.current = {}; introRef.current = {}; } }} disabled={idx === 0} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: pt.barBg, color: pt.text, fontWeight: 600, cursor: idx > 0 ? "pointer" : "default", opacity: idx === 0 ? 0.3 : 1 }}>{t.prev}</button>
           <button onClick={function () { setPaused(!paused); setPauseElapsed(0); }} style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: paused ? (pausePulse ? "#ef4444" : "#b91c1c") : pt.bar, color: "#fff", fontWeight: 700, cursor: "pointer", minWidth: 120, transition: "background 0.5s ease", boxShadow: paused ? (pausePulse ? "0 0 16px #ef4444" : "0 0 6px #7f1d1d") : "none" }}>{paused ? ("⏸ " + fmt(pauseElapsed)) : t.pause}</button>
           <button onClick={function () { if (idx < parts.length - 1) { setIdx(idx + 1); setElapsed(0); preAnnRef.current = {}; introRef.current = {}; } }} disabled={idx >= parts.length - 1} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: pt.barBg, color: pt.text, fontWeight: 600, cursor: idx < parts.length - 1 ? "pointer" : "default", opacity: idx >= parts.length - 1 ? 0.3 : 1 }}>{t.next}</button>
         </div>
+
         {showNotes && cur.notes && (
           <div style={{ marginTop: 16, padding: 12, background: pt.barBg, borderRadius: 10, maxWidth: 400, width: "100%", fontSize: 14, color: pt.text }}>{cur.notes}</div>
         )}
       </div>
+
       {showSetlist && (
         <div style={{ position: "absolute", right: 0, top: 50, bottom: 0, width: 200, background: pt.bg, borderLeft: "1px solid " + pt.barBg, padding: 12, overflowY: "auto" }}>
           <div style={{ fontSize: 14, fontWeight: 700, color: pt.text, marginBottom: 8 }}>{t.setlist}</div>
@@ -987,9 +966,17 @@ function PerformMode(props) {
   );
 }
 
+function exportCSV(parts) {
+  var header = "Title,Duration,Intro,PreAnn,PreAnnText,Notes,Color\n";
+  var rows = parts.map(function (p) {
+    return [p.title, p.duration, p.intro, p.preAnn, p.preAnnText, p.notes, p.color].map(function (v) { return '"' + String(v || "").replace(/"/g, '""') + '"'; }).join(",");
+  }).join("\n");
+  var blob = new Blob([header + rows], { type: "text/csv" });
+  var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "showrunner.csv"; a.click();
+}
+
 function exportJSON(parts) {
-  var data = { version: "ms3", date: new Date().toISOString(), parts: parts };
-  var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  var blob = new Blob([JSON.stringify({ version: "ms3", date: new Date().toISOString(), parts: parts }, null, 2)], { type: "application/json" });
   var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "showrunner_backup.json"; a.click();
 }
 
@@ -1010,53 +997,19 @@ function importJSON(onLoad, onToast) {
   inp.click();
 }
 
-function exportCSV(parts) {
-  var header = "Title,Duration,Intro,PreAnn,PreAnnText,Notes,Color\n";
-  var rows = parts.map(function (p) {
-    return [p.title, p.duration, p.intro, p.preAnn, p.preAnnText, p.notes, p.color].map(function (v) { return '"' + String(v || "").replace(/"/g, '""') + '"'; }).join(",");
-  }).join("\n");
-  var blob = new Blob([header + rows], { type: "text/csv" });
-  var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "showrunner.csv"; a.click();
-}
-
-function exportPDF(parts) {
-  var totalDur = parts.reduce(function (a, p) { return a + p.duration; }, 0);
-  var safe = function (s) { return String(s || "").replace(/[()\\]/g, function (c) { return "\\" + c; }).substring(0, 60); };
-  var y = 750;
-  var contentLines = [];
-  contentLines.push("BT /F1 18 Tf 50 " + y + " Td (Magic Showrunner - Setlist) Tj ET");
-  y -= 30;
-  contentLines.push("BT /F1 11 Tf 50 " + y + " Td (Gesamt: " + fmt(totalDur) + "  |  " + parts.length + " Teile) Tj ET");
-  y -= 20;
-  contentLines.push("50 " + y + " m 545 " + y + " l S");
-  y -= 20;
-  parts.forEach(function (p, i) {
-    contentLines.push("BT /F1 12 Tf 50 " + y + " Td (" + (i + 1) + ". " + safe(p.title) + ") Tj ET");
-    y -= 16;
-    contentLines.push("BT /F1 10 Tf 65 " + y + " Td (Dauer: " + fmt(p.duration) + (p.notes ? "   Notiz: " + safe(p.notes) : "") + ") Tj ET");
-    y -= 22;
-    if (y < 80) y = 750;
-  });
-  var content = contentLines.join("\n");
-  var page = "3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 595 842]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj";
-  var stream = "4 0 obj<</Length " + content.length + ">>\nstream\n" + content + "\nendstream\nendobj";
-  var font = "5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj";
-  var body = "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n" + page + "\n" + stream + "\n" + font;
-  var blob = new Blob([body], { type: "application/pdf" });
-  var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "setlist.pdf"; a.click();
-}
-
-function shareShow(parts, onToast, t) {
-  var data = { parts: parts.map(function (p) { return { title: p.title, duration: p.duration, intro: p.intro, preAnn: p.preAnn, preAnnText: p.preAnnText, notes: p.notes, color: p.color }; }) };
-  var json = JSON.stringify(data);
-  var encoded = btoa(unescape(encodeURIComponent(json)));
-  var url = window.location.origin + window.location.pathname + "#show=" + encoded;
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(url).then(function () { onToast(t.shareLink); });
-  } else {
-    var ta = document.createElement("textarea"); ta.value = url; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta);
-    onToast(t.shareLink);
-  }
+function Banner(props) {
+  var th = props.th;
+  return (
+    <div style={{ position: "relative", background: "transparent", borderRadius: 14, padding: "14px 20px", border: "1px solid " + (th ? th.brd : "#333"), overflow: "hidden", display: "flex", alignItems: "center", gap: 16, width: "100%", boxSizing: "border-box" }}>
+      <div style={{ flex: 1, textAlign: "center", position: "relative", zIndex: 1 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 2 }}>
+          <span style={{ fontSize: 20, fontWeight: 800, color: "#f5c842", letterSpacing: 2, fontFamily: "Georgia, serif", textShadow: "0 0 8px rgba(245,200,66,0.3)" }}>🎩 Magic Showrunner</span>
+        </div>
+        <div style={{ height: 1, background: "linear-gradient(90deg, transparent, #c9a84c, transparent)", margin: "4px 32px" }} />
+        <div style={{ fontSize: 9, color: "#c9a84c", letterSpacing: 5, opacity: 0.7 }}>SHOW MANAGEMENT v7.3</div>
+      </div>
+    </div>
+  );
 }
 
 function loadSharedShow() {
@@ -1073,66 +1026,37 @@ function loadSharedShow() {
   return null;
 }
 
-function Banner(props) {
-  var th = props.th;
-  return (
-    <div style={{ position: "relative", background: "transparent", borderRadius: 14, padding: "14px 20px", border: "1px solid " + (th ? th.brd : "#333"), overflow: "hidden", display: "flex", alignItems: "center", gap: 16, width: "100%", boxSizing: "border-box" }}>
-      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 28, overflow: "hidden" }}>
-        <svg width="28" height="100%" viewBox="0 0 28 80" preserveAspectRatio="none">
-          <path d="M0 0 L20 0 Q12 20 18 40 Q12 60 20 80 L0 80 Z" fill="#8b0000" opacity="0.7" />
-          <path d="M4 0 L20 0 Q14 20 18 40 Q14 60 20 80 L4 80 Z" fill="#a00" opacity="0.3" />
-        </svg>
-      </div>
-      <div style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: 28, overflow: "hidden", transform: "scaleX(-1)" }}>
-        <svg width="28" height="100%" viewBox="0 0 28 80" preserveAspectRatio="none">
-          <path d="M0 0 L20 0 Q12 20 18 40 Q12 60 20 80 L0 80 Z" fill="#8b0000" opacity="0.7" />
-          <path d="M4 0 L20 0 Q14 20 18 40 Q14 60 20 80 L4 80 Z" fill="#a00" opacity="0.3" />
-        </svg>
-      </div>
-      <div style={{ flex: 1, textAlign: "center", position: "relative", zIndex: 1 }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginBottom: 2 }}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect x="4" y="6" width="16" height="14" rx="2" stroke="#c9a84c" strokeWidth="1.5" fill="none" />
-            <rect x="7" y="3" width="10" height="4" rx="1" stroke="#c9a84c" strokeWidth="1.2" fill="none" />
-            <line x1="4" y1="10" x2="20" y2="10" stroke="#c9a84c" strokeWidth="1" opacity="0.4" />
-            <line x1="9" y1="6" x2="9" y2="10" stroke="#c9a84c" strokeWidth="1" opacity="0.3" />
-            <line x1="15" y1="6" x2="15" y2="10" stroke="#c9a84c" strokeWidth="1" opacity="0.3" />
-            <path d="M14 14 L16 11 L16.5 13.5 L18 13 L15 17 L14.5 14.5 L13 15 Z" fill="#c9a84c" opacity="0.9" />
-          </svg>
-          <span style={{ fontSize: 20, fontWeight: 800, color: "#f5c842", letterSpacing: 2, fontFamily: "Georgia, serif", textShadow: "0 0 8px rgba(245,200,66,0.3)" }}>Magic Showrunner</span>
-        </div>
-        <div style={{ height: 1, background: "linear-gradient(90deg, transparent, #c9a84c, transparent)", margin: "4px 32px" }} />
-        <div style={{ fontSize: 9, color: "#c9a84c", letterSpacing: 5, opacity: 0.7 }}>SHOW MANAGEMENT</div>
-      </div>
-    </div>
-  );
-}
-
 export default function App() {
-  var _exportOpen = useState(false); var exportOpen = _exportOpen[0], setExportOpen = _exportOpen[1];
   var _cfg = useState({
     theme: "dark", perfTheme: "dark", lang: "de", beeps: true, vibrate: true, volume: 0.5,
     beepSound: "beep", ttsVoice: "", ttsRate: 1, ttsPitch: 1, fontSize: 16, fontFamily: "System",
-    performSize: "XL", performSizeScale: 1.0, animations: true, colorTransitions: true,
+    performSizeScale: 1.0, animations: true, colorTransitions: true, blinkLast10: true,
     testMode: false, testDur: 10, countdown: 0, timerStyle: "bar"
   });
   var cfg = _cfg[0], setCfg = _cfg[1];
+
   var _customTh = useState(getCustomTheme()); var customTh = _customTh[0], setCustomTh = _customTh[1];
+  var _lastSaved = useState(""); var lastSaved = _lastSaved[0], setLastSaved = _lastSaved[1];
   var _autoSaveMsg = useState(""); var autoSaveMsg = _autoSaveMsg[0], setAutoSaveMsg = _autoSaveMsg[1];
-  var _lastSaved = useState(function () { try { var ls = localStorage.getItem("ms3_last_saved"); if (ls) { var d = new Date(ls); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); } } catch(e){} return ""; }); var lastSaved = _lastSaved[0], setLastSaved = _lastSaved[1];
   var _history = useState([]); var history = _history[0], setHistory = _history[1];
   var _redoStack = useState([]); var redoStack = _redoStack[0], setRedoStack = _redoStack[1];
+
   var _parts = useState(function () {
     var shared = loadSharedShow();
     if (shared) { window.location.hash = ""; return shared; }
     return makeDemo("de");
   });
   var parts = _parts[0], setPartsRaw = _parts[1];
-  var setParts = function (np) { var r = typeof np === 'function' ? np(parts) : np; setHistory(function (h) { return h.concat([parts]); }); setRedoStack([]); setPartsRaw(r); };
 
+  var setParts = function (np) {
+    var r = typeof np === "function" ? np(parts) : np;
+    setHistory(function (h) { return h.concat([parts]); });
+    setRedoStack([]);
+    setPartsRaw(r);
+  };
+  var doUndo = function () { if (!history.length) return; var p = history[history.length - 1]; setRedoStack(function (rs) { return rs.concat([parts]); }); setPartsRaw(p); setHistory(function (h) { return h.slice(0, -1); }); };
+  var doRedo = function () { if (!redoStack.length) return; var n = redoStack[redoStack.length - 1]; setHistory(function (h) { return h.concat([parts]); }); setPartsRaw(n); setRedoStack(function (rs) { return rs.slice(0, -1); }); };
 
-  var doUndo = function () { if (!history.length) return; var p = history[history.length-1]; setRedoStack(function(rs){return rs.concat([parts]);}); setPartsRaw(p); setHistory(function(h){return h.slice(0,-1);}); };
-  var doRedo = function () { if (!redoStack.length) return; var n = redoStack[redoStack.length-1]; setHistory(function(h){return h.concat([parts]);}); setPartsRaw(n); setRedoStack(function(rs){return rs.slice(0,-1);}); };
   var _perf = useState(false); var perf = _perf[0], setPerf = _perf[1];
   var _startBlackout = useState(false); var startBlackout = _startBlackout[0], setStartBlackout = _startBlackout[1];
   var _targetEnd = useState(""); var targetEnd = _targetEnd[0], setTargetEnd = _targetEnd[1];
@@ -1142,14 +1066,7 @@ export default function App() {
   var _loadOpen = useState(false); var loadOpen = _loadOpen[0], setLoadOpen = _loadOpen[1];
   var _settOpen = useState(false); var settOpen = _settOpen[0], setSettOpen = _settOpen[1];
   var _tplOpen = useState(false); var tplOpen = _tplOpen[0], setTplOpen = _tplOpen[1];
-  useEffect(function () {
-    var iv = setInterval(function () {
-      setAutoSave(parts);
-      setAutoSaveMeta({ date: new Date().toISOString() });
-    }, 60000);
-    return function () { clearInterval(iv); };
-  }, [parts]);
-  useEffect(function () { var iv = setInterval(function () { setAutoSave(parts); setAutoSaveMeta({ date: new Date().toISOString() }); }, 60000); return function () { clearInterval(iv); }; }, [parts]);
+  var _showExport = useState(false); var showExport = _showExport[0], setShowExport = _showExport[1];
   var _toast = useState(""); var toast = _toast[0], setToast = _toast[1];
   var _dragIdx = useState(null); var dragIdx = _dragIdx[0], setDragIdx = _dragIdx[1];
   var _dragOver = useState(null); var dragOver = _dragOver[0], setDragOver = _dragOver[1];
@@ -1159,19 +1076,17 @@ export default function App() {
   useEffect(function () {
     if (!parts || parts.length === 0) return;
     setAutoSave(parts);
+    setAutoSaveMeta({ date: new Date().toISOString() });
     var now = new Date();
-    var timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    localStorage.setItem("ms3_last_saved", now.toISOString());
-    setLastSaved(timeStr);
+    setLastSaved(String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0"));
     setAutoSaveMsg("✓");
     var t2 = setTimeout(function () { setAutoSaveMsg(""); }, 2000);
     return function () { clearTimeout(t2); };
   }, [parts]);
-  var _showExport = useState(false); var showExport = _showExport[0], setShowExport = _showExport[1];
 
   var t = T[cfg.lang] || T.de;
   var th = cfg.theme === "custom" ? customTh : (TH[cfg.theme] || TH.dark);
-  var totalDur = parts.reduce(function (a, p) { return a + p.duration; }, 0);
+  var totalDur = parts.filter(function (p) { return p.type !== "group"; }).reduce(function (a, p) { return a + (p.duration || 0); }, 0);
   var ff = cfg.fontFamily === "System" ? "-apple-system, BlinkMacSystemFont, sans-serif" : cfg.fontFamily;
 
   var handleLangChange = function (lang) {
@@ -1193,10 +1108,7 @@ export default function App() {
   var handleDragOver = function (e, i) { e.preventDefault(); setDragOver(i); };
   var handleDragEnd = function () {
     if (dragIdx !== null && dragOver !== null && dragIdx !== dragOver) {
-      var next = parts.slice();
-      var item = next.splice(dragIdx, 1)[0];
-      next.splice(dragOver, 0, item);
-      setParts(next);
+      var next = parts.slice(); var item = next.splice(dragIdx, 1)[0]; next.splice(dragOver, 0, item); setParts(next);
     }
     setDragIdx(null); setDragOver(null);
   };
@@ -1204,7 +1116,8 @@ export default function App() {
   if (perf) {
     return (
       <PerformMode
-        parts={parts} cfg={cfg}
+        parts={parts.filter(function (p) { return p.type !== "group"; })}
+        cfg={cfg}
         onExit={function () { setPerf(false); }}
         startInBlackout={startBlackout}
         onSizeChange={function (v) { setCfg(function (c) { return Object.assign({}, c, { performSizeScale: v }); }); }}
@@ -1217,25 +1130,27 @@ export default function App() {
     <div style={{ minHeight: "100vh", background: th.bg, color: th.text, fontFamily: ff, fontSize: cfg.fontSize, transition: "background 0.3s" }}>
       <div style={{ maxWidth: 600, margin: "0 auto", padding: 16 }}>
         <Banner th={th} />
+
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 12, marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
-          <span style={{ fontSize: 11, color: th.sub }}>{t.ver}</span>
-          {autoSaveMsg && <span style={{ fontSize: 11, color: "#10b981", marginLeft: 8 }}>{autoSaveMsg}</span>}
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span style={{ fontSize: 11, color: th.sub }}>{t.ver}</span>
+            {autoSaveMsg && <span style={{ fontSize: 11, color: "#10b981" }}>{autoSaveMsg}</span>}
+            {lastSaved && <span style={{ fontSize: 11, color: th.sub }}>💾 {lastSaved}</span>}
+          </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            {lastSaved && <span style={{ fontSize: 11, color: th.sub, alignSelf: "center" }}>💾 {lastSaved}</span>}
-            <button onClick={function () { setSaveOpen(true); }} onMouseEnter={function () { var ls = localStorage.getItem("ms3_last_saved"); if (ls) { var d = new Date(ls); setLastSaved(String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")); } }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>{t.save}</button>
+            <button onClick={function () { setSaveOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>{t.save}</button>
             <button onClick={function () { setLoadOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>{t.load}</button>
-<div style={{ position: "relative" }}>
-              <button onClick={function () { setShowExport(!showExport); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: showExport ? th.acc + "22" : "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>📦 Export ▾</button>
+            <div style={{ position: "relative" }}>
+              <button onClick={function () { setShowExport(!showExport); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: showExport ? th.acc + "22" : "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>📦 ▾</button>
               {showExport && (
                 <div style={{ position: "absolute", top: "110%", right: 0, background: th.card, border: "1px solid " + th.brd, borderRadius: 10, boxShadow: "0 6px 24px rgba(0,0,0,0.3)", zIndex: 500, minWidth: 170, overflow: "hidden" }}>
                   {[
                     { label: "⬇ JSON exportieren", fn: function () { exportJSON(parts); } },
                     { label: "⬆ JSON importieren", fn: function () { importJSON(setParts, setToast); } },
-                    { label: "📊 CSV exportieren", fn: function () { exportCSV(parts); } },
-                    { label: "📄 PDF exportieren", fn: function () { exportPDF(parts); } }
-                  ].map(function (item, idx) {
+                    { label: "📊 CSV exportieren", fn: function () { exportCSV(parts); } }
+                  ].map(function (item, i) {
                     return (
-                      <div key={idx} onClick={function () { item.fn(); setShowExport(false); }} style={{ padding: "10px 16px", cursor: "pointer", fontSize: 13, color: th.text, borderBottom: idx < 3 ? "1px solid " + th.brd : "none" }}
+                      <div key={i} onClick={function () { item.fn(); setShowExport(false); }} style={{ padding: "10px 16px", cursor: "pointer", fontSize: 13, color: th.text, borderBottom: i < 2 ? "1px solid " + th.brd : "none" }}
                         onMouseEnter={function (e) { e.currentTarget.style.background = th.inp; }}
                         onMouseLeave={function (e) { e.currentTarget.style.background = "transparent"; }}>
                         {item.label}
@@ -1245,19 +1160,15 @@ export default function App() {
                 </div>
               )}
             </div>
-            
-            
-            
-            
             <button onClick={function () { setSettOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>⚙️</button>
           </div>
         </div>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-          <div style={{ fontSize: 14, fontWeight: 700 }}>{parts.length} {t.parts} · {fmt(totalDur)} {t.total}</div>
+          <div style={{ fontSize: 14, fontWeight: 700 }}>{parts.filter(function (p) { return p.type !== "group"; }).length} {t.parts} · {fmt(totalDur)} {t.total}</div>
           <div style={{ display: "flex", gap: 6 }}>
-            <button onClick={doUndo} disabled={history.length === 0} title="Rückgängig" style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: history.length === 0 ? th.sub : th.text, cursor: history.length === 0 ? "default" : "pointer", fontSize: 14, opacity: history.length === 0 ? 0.35 : 1 }}>↩</button>
-            <button onClick={doRedo} disabled={redoStack.length === 0} title="Wiederholen" style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: redoStack.length === 0 ? th.sub : th.text, cursor: redoStack.length === 0 ? "default" : "pointer", fontSize: 14, opacity: redoStack.length === 0 ? 0.35 : 1 }}>↪</button>
+            <button onClick={doUndo} disabled={history.length === 0} title="Rückgängig" style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: history.length === 0 ? "default" : "pointer", fontSize: 14, opacity: history.length === 0 ? 0.35 : 1 }}>↩</button>
+            <button onClick={doRedo} disabled={redoStack.length === 0} title="Wiederholen" style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: redoStack.length === 0 ? "default" : "pointer", fontSize: 14, opacity: redoStack.length === 0 ? 0.35 : 1 }}>↪</button>
             <button onClick={function () { setEditGroup(null); setShowGroupEditor(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.acc, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>🎭 {t.newGroup}</button>
             <button onClick={function () { setTplOpen(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>⭐ {t.templates}</button>
             <button onClick={function () { setEditPart(null); setShowEditor(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 12 }}>+ {t.newPart}</button>
@@ -1268,13 +1179,8 @@ export default function App() {
           var isDragTarget = dragOver === i && dragIdx !== i;
           if (p.type === "group") {
             return (
-              <div key={p.id}
-                draggable
-                onDragStart={function () { handleDragStart(i); }}
-                onDragOver={function (e) { handleDragOver(e, i); }}
-                onDragEnd={handleDragEnd}
-                style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 8, marginBottom: 6, marginTop: 4, border: "1px dashed " + th.acc + "88", background: th.acc + "11", cursor: "grab" }}
-              >
+              <div key={p.id} draggable onDragStart={function () { handleDragStart(i); }} onDragOver={function (e) { handleDragOver(e, i); }} onDragEnd={handleDragEnd}
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 8, marginBottom: 6, marginTop: 4, border: "1px dashed " + th.acc + "88", background: th.acc + "11", cursor: "grab" }}>
                 <div style={{ cursor: "grab", color: th.sub, fontSize: 14, userSelect: "none" }}>☰</div>
                 <div style={{ fontSize: 13, fontWeight: 700, color: th.acc, flex: 1, letterSpacing: 1 }}>🎭 {p.title}</div>
                 <button onClick={function () { setEditGroup(p); setShowGroupEditor(true); }} style={{ padding: "3px 8px", borderRadius: 6, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 11 }}>{t.edit}</button>
@@ -1283,19 +1189,8 @@ export default function App() {
             );
           }
           return (
-            <div
-              key={p.id}
-              draggable
-              onDragStart={function () { handleDragStart(i); }}
-              onDragOver={function (e) { handleDragOver(e, i); }}
-              onDragEnd={handleDragEnd}
-              style={{
-                display: "flex", alignItems: "center", gap: 10, padding: "10px 12px",
-                background: isDragTarget ? th.acc + "22" : th.card, borderRadius: 10,
-                marginBottom: 6, border: "1px solid " + (isDragTarget ? th.acc : th.brd),
-                transition: "background 0.2s, border 0.2s", cursor: "grab"
-              }}
-            >
+            <div key={p.id} draggable onDragStart={function () { handleDragStart(i); }} onDragOver={function (e) { handleDragOver(e, i); }} onDragEnd={handleDragEnd}
+              style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", background: isDragTarget ? th.acc + "22" : th.card, borderRadius: 10, marginBottom: 6, border: "1px solid " + (isDragTarget ? th.acc : th.brd), transition: "background 0.2s, border 0.2s", cursor: "grab" }}>
               <div style={{ cursor: "grab", color: th.sub, fontSize: 16, userSelect: "none", flexShrink: 0 }}>☰</div>
               <div style={{ width: 10, height: 10, borderRadius: 5, background: p.color || COLORS[0], flexShrink: 0 }} />
               <div style={{ flex: 1 }}>
@@ -1303,10 +1198,7 @@ export default function App() {
                 <div style={{ fontSize: 12, color: th.sub }}>{fmt(p.duration)}</div>
               </div>
               <button onClick={function () { setEditPart(p); setShowEditor(true); }} style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 11 }}>{t.edit}</button>
-              <button onClick={function () {
-                var np = Object.assign({}, p, { id: uid(), title: p.title + " (2)" });
-                setParts(parts.slice(0, i + 1).concat([np]).concat(parts.slice(i + 1)));
-              }} style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 11 }}>{t.dup}</button>
+              <button onClick={function () { var np = Object.assign({}, p, { id: uid(), title: p.title + " (2)" }); setParts(parts.slice(0, i + 1).concat([np]).concat(parts.slice(i + 1))); }} style={{ padding: "4px 10px", borderRadius: 6, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 11 }}>{t.dup}</button>
               <button onClick={function () { setParts(parts.filter(function (x) { return x.id !== p.id; })); }} style={{ padding: "4px 10px", borderRadius: 6, border: "none", background: "#ef4444", color: "#fff", cursor: "pointer", fontSize: 11 }}>🗑️</button>
             </div>
           );
@@ -1335,23 +1227,21 @@ export default function App() {
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", marginBottom: 8 }}>
             <input type="checkbox" checked={startBlackout} onChange={function (e) { setStartBlackout(e.target.checked); }} /> {t.startBlackout}
           </label>
-          <div style={{ marginBottom: 8 }}>
+          <div style={{ marginBottom: 12 }}>
             <label style={{ fontSize: 12, color: th.sub }}>{t.targetEnd}</label>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 4 }}>
               <input type="time" value={targetEnd} onChange={function (e) { setTargetEnd(e.target.value); }} style={{ padding: 6, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text }} />
-              {targetEnd && (
-                <button onClick={function () { setTargetEnd(""); }} style={{ padding: "4px 8px", borderRadius: 6, border: "1px solid " + th.brd, background: "transparent", color: th.sub, cursor: "pointer", fontSize: 12 }}>✕</button>
-              )}
+              {targetEnd && <button onClick={function () { setTargetEnd(""); }} style={{ padding: "4px 8px", borderRadius: 6, border: "1px solid " + th.brd, background: "transparent", color: th.sub, cursor: "pointer", fontSize: 12 }}>✕</button>}
             </div>
             <div style={{ fontSize: 11, color: th.sub, marginTop: 2 }}>{t.targetEndHint}</div>
           </div>
-          <button onClick={function () { if (parts.length > 0) setPerf(true); }} style={{ width: "100%", padding: 14, borderRadius: 12, border: "none", background: "linear-gradient(135deg, " + th.acc + ", #8b5cf6)", color: "#fff", fontWeight: 700, fontSize: 16, cursor: "pointer" }}>{cfg.testMode ? "🧪 " + t.test : "🎩 " + t.start}</button>
+          <button onClick={function () { if (parts.filter(function (p) { return p.type !== "group"; }).length > 0) setPerf(true); }} style={{ width: "100%", padding: 14, borderRadius: 12, border: "none", background: "linear-gradient(135deg, " + th.acc + ", #8b5cf6)", color: "#fff", fontWeight: 700, fontSize: 16, cursor: "pointer" }}>{cfg.testMode ? "🧪 " + t.test : "🎩 " + t.start}</button>
         </div>
       </div>
 
       <GroupEditor open={showGroupEditor} group={editGroup} onSave={addGroup} onClose={function () { setShowGroupEditor(false); setEditGroup(null); }} t={t} th={th} />
       <PartEditor open={showEditor} part={editPart} onSave={addPart} onClose={function () { setShowEditor(false); setEditPart(null); }} t={t} th={th} onToast={setToast} />
-      <SaveModal open={saveOpen} onClose={function () { setSaveOpen(false); }} parts={parts} t={t} th={th} onToast={setToast} onSetLastSaved={setLastSaved} />
+      <SaveModal open={saveOpen} onClose={function () { setSaveOpen(false); }} parts={parts} t={t} th={th} onToast={setToast} />
       <LoadModal open={loadOpen} onClose={function () { setLoadOpen(false); }} onLoad={function (p) { setParts(p); }} t={t} th={th} />
       <SettingsModal open={settOpen} onClose={function () { setSettOpen(false); }} cfg={cfg} setCfg={setCfg} t={t} th={th} onApplyCustom={setCustomTh} onLangChange={handleLangChange} />
       <TemplateModal open={tplOpen} onClose={function () { setTplOpen(false); }} onUse={function (tpl) { setParts(parts.concat([Object.assign({}, tpl, { id: uid() })])); }} t={t} th={th} />
