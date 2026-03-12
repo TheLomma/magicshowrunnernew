@@ -15,7 +15,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v7.4", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v7.5", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -45,7 +45,7 @@ var T = {
     newGroup: "Neuer Akt"
   },
   en: {
-    title: "Magic Showrunner", ver: "v7.4", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v7.5", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -445,54 +445,6 @@ function SettingsModal(props) {
         <button onClick={function () { doBeep(cfg.volume, null, null, cfg.beepSound); }} style={{ padding: "8px 16px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", cursor: "pointer" }}>{t.testTone}</button>
       </div>
     );
-  } else if (tab === "vibration") {
-    var vibCfg = cfg.vibCfg || DEFAULT_VIB_CFG;
-    var upVib = function (k, v) { var nv = Object.assign({}, vibCfg); nv[k] = v; upCfg("vibCfg", nv); };
-    var patternSelect = function (label, key, value) {
-      return (
-        <div style={{ marginBottom: 10, padding: "10px 12px", background: th.inp, borderRadius: 10, border: "1px solid " + th.brd }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-            <span style={{ fontSize: 13, fontWeight: 600 }}>{label}</span>
-            <button onClick={function () { if (value && value !== "off") doVibratePattern(value); }} style={{ padding: "3px 10px", borderRadius: 6, border: "1px solid " + th.brd, background: "transparent", color: th.acc, cursor: "pointer", fontSize: 11 }}>{t.vibTest}</button>
-          </div>
-          <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-            <button onClick={function () { upVib(key, "off"); }} style={{ padding: "5px 10px", borderRadius: 6, border: value === "off" ? "2px solid " + th.acc : "2px solid transparent", background: value === "off" ? th.acc + "22" : th.card, color: th.text, cursor: "pointer", fontSize: 11 }}>{t.vibOff}</button>
-            {Object.keys(VIB_PATTERNS).map(function (pk) {
-              var pl = VIB_PATTERNS[pk].label[cfg.lang] || VIB_PATTERNS[pk].label.de;
-              return <button key={pk} onClick={function () { upVib(key, pk); doVibratePattern(pk); }} style={{ padding: "5px 10px", borderRadius: 6, border: value === pk ? "2px solid " + th.acc : "2px solid transparent", background: value === pk ? th.acc + "22" : th.card, color: th.text, cursor: "pointer", fontSize: 11 }}>{pl}</button>;
-            })}
-          </div>
-        </div>
-      );
-    };
-    content = (
-      <div>
-        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, marginBottom: 12, cursor: "pointer" }}>
-          <input type="checkbox" checked={vibCfg.enabled !== false} onChange={function (e) { upVib("enabled", e.target.checked); }} /> {t.vibration}
-        </label>
-        {vibCfg.enabled !== false && (
-          <div>
-            {patternSelect(t.vibOnPartChange, "onPartChange", vibCfg.onPartChange)}
-            {patternSelect(t.vibOnPreAnn, "onPreAnnounce", vibCfg.onPreAnnounce)}
-            {patternSelect(t.vibOnWarning1, "onWarning1", vibCfg.onWarning1)}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, paddingLeft: 12 }}>
-              <label style={{ fontSize: 12, color: th.sub }}>{t.vibWarning1Sec}</label>
-              <input type="number" min={1} max={300} value={vibCfg.warning1Sec} onChange={function (e) { upVib("warning1Sec", +e.target.value); }} style={{ width: 60, padding: 4, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, textAlign: "center" }} />
-            </div>
-            {patternSelect(t.vibOnWarning2, "onWarning2", vibCfg.onWarning2)}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, paddingLeft: 12 }}>
-              <label style={{ fontSize: 12, color: th.sub }}>{t.vibWarning2Sec}</label>
-              <input type="number" min={1} max={300} value={vibCfg.warning2Sec} onChange={function (e) { upVib("warning2Sec", +e.target.value); }} style={{ width: 60, padding: 4, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, textAlign: "center" }} />
-            </div>
-            {patternSelect(t.vibOnCountdown, "onCountdown", vibCfg.onCountdown)}
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, paddingLeft: 12 }}>
-              <label style={{ fontSize: 12, color: th.sub }}>{t.vibCountdownStart}</label>
-              <input type="number" min={1} max={60} value={vibCfg.countdownStartSec} onChange={function (e) { upVib("countdownStartSec", +e.target.value); }} style={{ width: 60, padding: 4, borderRadius: 6, border: "1px solid " + th.brd, background: th.inp, color: th.text, textAlign: "center" }} />
-            </div>
-          </div>
-        )}
-      </div>
-    );
   } else if (tab === "voice") {
     content = (
       <div>
@@ -653,6 +605,54 @@ function CircleTimer(props) {
   );
 }
 
+function Confetti() {
+  var _pieces = useState([]);
+  var pieces = _pieces[0];
+  var setPieces = _pieces[1];
+  useEffect(function () {
+    var arr = [];
+    for (var i = 0; i < 150; i++) {
+      arr.push({
+        id: i,
+        x: Math.random() * 100,
+        y: -10 - Math.random() * 20,
+        rotation: Math.random() * 360,
+        color: ["#fbbf24", "#f59e0b", "#ec4899", "#8b5cf6", "#06b6d4", "#10b981"][Math.floor(Math.random() * 6)],
+        size: 8 + Math.random() * 8,
+        speedY: 2 + Math.random() * 3,
+        speedX: (Math.random() - 0.5) * 2,
+        rotationSpeed: (Math.random() - 0.5) * 10
+      });
+    }
+    setPieces(arr);
+  }, []);
+  useEffect(function () {
+    var iv = setInterval(function () {
+      setPieces(function (ps) {
+        return ps.map(function (p) {
+          var ny = p.y + p.speedY;
+          var nx = p.x + p.speedX;
+          var nr = p.rotation + p.rotationSpeed;
+          if (ny > 110) { ny = -10; nx = Math.random() * 100; }
+          if (nx < -5) nx = 105;
+          if (nx > 105) nx = -5;
+          return { id: p.id, x: nx, y: ny, rotation: nr, color: p.color, size: p.size, speedY: p.speedY, speedX: p.speedX, rotationSpeed: p.rotationSpeed };
+        });
+      });
+    }, 50);
+    return function () { clearInterval(iv); };
+  }, []);
+  return (
+    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
+      {pieces.map(function (p) {
+        return (
+          <div key={p.id} style={{ position: "absolute", left: p.x + "%", top: p.y + "%", width: p.size, height: p.size, background: p.color, transform: "rotate(" + p.rotation + "deg)", borderRadius: 2 }} />
+        );
+      })}
+    </div>
+  );
+}
+
 function PerformMode(props) {
   var parts = props.parts, cfg = props.cfg, onExit = props.onExit, startInBlackout = props.startInBlackout, onSizeChange = props.onSizeChange, targetEnd = props.targetEnd;
   var pt = PTH[cfg.perfTheme] || PTH.dark;
@@ -755,21 +755,17 @@ function PerformMode(props) {
     var iv = setInterval(function () {
       setElapsed(function (e) {
         var ne = e + 1;
-        var vibCfg = cfg.vibCfg || DEFAULT_VIB_CFG;
-        var vibEnabled = vibCfg.enabled !== false;
-        var remSec = dur - ne;
-        if (vibEnabled && vibCfg.onWarning1 !== "off" && remSec === vibCfg.warning1Sec) doVibratePattern(vibCfg.onWarning1);
-        if (vibEnabled && vibCfg.onWarning2 !== "off" && remSec === vibCfg.warning2Sec) doVibratePattern(vibCfg.onWarning2);
-        if (vibEnabled && vibCfg.onCountdown !== "off" && remSec > 0 && remSec <= vibCfg.countdownStartSec) doVibratePattern(vibCfg.onCountdown);
+        
+
         if (cur && cur.preAnn && ne === dur - cur.preAnn && !preAnnRef.current[idx]) {
           preAnnRef.current[idx] = true;
           if (cur.preAnnText) doSpeak(cur.preAnnText, cfg.ttsRate, cfg.ttsPitch, cfg.ttsVoice);
           if (cfg.beeps) doBeep(cfg.volume, 600, 100, cfg.beepSound);
-          if (vibEnabled && vibCfg.onPreAnnounce !== "off") doVibratePattern(vibCfg.onPreAnnounce);
+          
         }
         if (ne >= dur) {
           if (cfg.beeps) doBeep(cfg.volume, 880, 200, cfg.beepSound);
-          if (vibEnabled && vibCfg.onPartChange !== "off") doVibratePattern(vibCfg.onPartChange);
+          
           if (idx < parts.length - 1) {
             setIdx(function (i) { return i + 1; });
             introRef.current = {}; preAnnRef.current = {};
@@ -852,6 +848,7 @@ function PerformMode(props) {
           <button onClick={function () { setPaused(!paused); }} style={{ padding: "16px 40px", borderRadius: 16, border: "3px solid #fff", background: paused ? "#fff" : "transparent", color: paused ? "#dc2626" : "#fff", fontSize: 20, fontWeight: 800, cursor: "pointer", minWidth: 140 }}>{paused ? t.resume : t.pause}</button>
           <button onClick={onExit} style={{ padding: "16px 40px", borderRadius: 16, border: "none", background: "#fff", color: "#dc2626", fontSize: 20, fontWeight: 800, cursor: "pointer", minWidth: 140 }}>{t.stop}</button>
         </div>
+        <Confetti />
       </div>
     );
   }
@@ -999,7 +996,7 @@ function Banner(props) {
           <span style={{ fontSize: 20, fontWeight: 800, color: "#f5c842", letterSpacing: 2, fontFamily: "Georgia, serif", textShadow: "0 0 8px rgba(245,200,66,0.3)" }}>🎩 Magic Showrunner</span>
         </div>
         <div style={{ height: 1, background: "linear-gradient(90deg, transparent, #c9a84c, transparent)", margin: "4px 32px" }} />
-        <div style={{ fontSize: 9, color: "#c9a84c", letterSpacing: 5, opacity: 0.7 }}>SHOW MANAGEMENT v7.4</div>
+        <div style={{ fontSize: 9, color: "#c9a84c", letterSpacing: 5, opacity: 0.7 }}>SHOW MANAGEMENT v7.5</div>
       </div>
     </div>
   );
