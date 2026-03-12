@@ -15,7 +15,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v7.6", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v7.7", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -45,7 +45,7 @@ var T = {
     newGroup: "Neuer Akt"
   },
   en: {
-    title: "Magic Showrunner", ver: "v7.6", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v7.7", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -646,7 +646,7 @@ function Confetti() {
     return function () { clearInterval(iv); };
   }, []);
   return (
-    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
+    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden", zIndex: -1 }}>
       {pieces.map(function (p) {
         return (
           <div key={p.id} style={{ position: "absolute", left: p.x + "%", top: p.y + "%", width: p.size, height: p.size, background: p.color, transform: "rotate(" + p.rotation + "deg)", borderRadius: 2 }} />
@@ -930,8 +930,8 @@ function PerformMode(props) {
           <input type="range" min={0.4} max={4.0} step={0.05} value={sizeScale} onChange={function (e) { if (onSizeChange) onSizeChange(+e.target.value); }} style={{ width: 80, accentColor: pt.bar }} />
           <span style={{ fontSize: 14, color: pt.text, opacity: 0.5 }}>A</span>
         </div>
-        <button onClick={function () { setShowSetlist(!showSetlist); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: showSetlist ? pt.bar : "transparent", color: showSetlist ? "#fff" : pt.text, cursor: "pointer", fontSize: 12 }}>{t.setlist}</button>
-        <button onClick={function () { setShowNotes(!showNotes); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: showNotes ? pt.bar : "transparent", color: showNotes ? "#fff" : pt.text, cursor: "pointer", fontSize: 12 }}>{t.notes}</button>
+        <button onClick={function () { setShowSetlist(!showSetlist); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: showSetlist ? pt.bar : "transparent", color: showSetlist ? "#fff" : pt.text, cursor: "pointer", fontSize: 12 }}>📜 {t.setlist}</button>
+        <button onClick={function () { setShowNotes(!showNotes); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: showNotes ? pt.bar : "transparent", color: showNotes ? "#fff" : pt.text, cursor: "pointer", fontSize: 12 }}>📝 {t.notes}</button>
         {cfg.voiceControl && (
           <div style={{ padding: "8px 12px", borderRadius: 10, background: voiceActive ? "#ef4444" : "#10b981", display: "flex", alignItems: "center", gap: 6, transition: "background 0.3s", border: "2px solid #fff", pointerEvents: "none" }}>
             <div style={{ width: 8, height: 8, borderRadius: 4, background: "#fff" }} />
@@ -939,7 +939,7 @@ function PerformMode(props) {
             <span style={{ fontSize: 10, color: "#fff", fontWeight: 600, marginLeft: 2 }}>ON</span>
           </div>
         )}
-        <button onClick={function () { setBlackout(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: "transparent", color: pt.text, cursor: "pointer", fontSize: 12 }}>🌑</button>
+        <button onClick={function () { setBlackout(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + pt.barBg, background: "transparent", color: pt.text, cursor: "pointer", fontSize: 12 }}>🌙</button>
         <button onClick={function () { setConfirmStop(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "none", background: "#ef4444", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 12 }}>{t.stop}</button>
       </div>
 
@@ -1101,6 +1101,7 @@ export default function App() {
   var _settOpen = useState(false); var settOpen = _settOpen[0], setSettOpen = _settOpen[1];
   var _tplOpen = useState(false); var tplOpen = _tplOpen[0], setTplOpen = _tplOpen[1];
   var _showExport = useState(false); var showExport = _showExport[0], setShowExport = _showExport[1];
+  var _showAddMenu = useState(false); var showAddMenu = _showAddMenu[0], setShowAddMenu = _showAddMenu[1];
   var _toast = useState(""); var toast = _toast[0], setToast = _toast[1];
   var _dragIdx = useState(null); var dragIdx = _dragIdx[0], setDragIdx = _dragIdx[1];
   var _dragOver = useState(null); var dragOver = _dragOver[0], setDragOver = _dragOver[1];
@@ -1172,8 +1173,8 @@ export default function App() {
             {lastSaved && <span style={{ fontSize: 11, color: th.sub }}>💾 {lastSaved}</span>}
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            <button onClick={function () { setSaveOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>{t.save}</button>
-            <button onClick={function () { setLoadOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>{t.load}</button>
+            <button onClick={function () { setSaveOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>💾 {t.save}</button>
+            <button onClick={function () { setLoadOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>📂 {t.load}</button>
             <div style={{ position: "relative" }}>
               <button onClick={function () { setShowExport(!showExport); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: showExport ? th.acc + "22" : "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>📦 ▾</button>
               {showExport && (
@@ -1203,9 +1204,26 @@ export default function App() {
           <div style={{ display: "flex", gap: 6 }}>
             <button onClick={doUndo} disabled={history.length === 0} title="Rückgängig" style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: history.length === 0 ? "default" : "pointer", fontSize: 14, opacity: history.length === 0 ? 0.35 : 1 }}>↩</button>
             <button onClick={doRedo} disabled={redoStack.length === 0} title="Wiederholen" style={{ padding: "6px 10px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: redoStack.length === 0 ? "default" : "pointer", fontSize: 14, opacity: redoStack.length === 0 ? 0.35 : 1 }}>↪</button>
-            <button onClick={function () { setEditGroup(null); setShowGroupEditor(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.acc, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>🎭 {t.newGroup}</button>
             <button onClick={function () { setTplOpen(true); }} style={{ padding: "6px 12px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>⭐ {t.templates}</button>
-            <button onClick={function () { setEditPart(null); setShowEditor(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 12 }}>+ {t.newPart}</button>
+            <div style={{ position: "relative" }}>
+              <button onClick={function () { setShowAddMenu(!showAddMenu); }} style={{ padding: "8px 16px", borderRadius: 10, border: "none", background: th.acc, color: "#fff", fontWeight: 700, cursor: "pointer", fontSize: 20, lineHeight: 1, boxShadow: "0 2px 8px rgba(0,0,0,0.2)" }}>+</button>
+              {showAddMenu && (
+                <div style={{ position: "absolute", top: "110%", right: 0, background: th.card, border: "1px solid " + th.brd, borderRadius: 10, boxShadow: "0 6px 24px rgba(0,0,0,0.3)", zIndex: 500, minWidth: 180, overflow: "hidden" }}>
+                  <div onClick={function () { setEditPart(null); setShowEditor(true); setShowAddMenu(false); }} style={{ padding: "12px 16px", cursor: "pointer", fontSize: 14, color: th.text, borderBottom: "1px solid " + th.brd, display: "flex", alignItems: "center", gap: 10 }}
+                    onMouseEnter={function (e) { e.currentTarget.style.background = th.inp; }}
+                    onMouseLeave={function (e) { e.currentTarget.style.background = "transparent"; }}>
+                    <span style={{ fontSize: 18 }}>🎬</span>
+                    <span>{t.newPart}</span>
+                  </div>
+                  <div onClick={function () { setEditGroup(null); setShowGroupEditor(true); setShowAddMenu(false); }} style={{ padding: "12px 16px", cursor: "pointer", fontSize: 14, color: th.text, display: "flex", alignItems: "center", gap: 10 }}
+                    onMouseEnter={function (e) { e.currentTarget.style.background = th.inp; }}
+                    onMouseLeave={function (e) { e.currentTarget.style.background = "transparent"; }}>
+                    <span style={{ fontSize: 18 }}>🎭</span>
+                    <span>{t.newGroup}</span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -1240,7 +1258,7 @@ export default function App() {
 
         <div style={{ marginTop: 16, padding: 12, background: th.card, borderRadius: 10, border: "1px solid " + th.brd }}>
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", marginBottom: 8 }}>
-            <input type="checkbox" checked={cfg.testMode} onChange={function (e) { setCfg(Object.assign({}, cfg, { testMode: e.target.checked })); }} /> {t.testModeLbl}
+            <input type="checkbox" checked={cfg.testMode} onChange={function (e) { setCfg(Object.assign({}, cfg, { testMode: e.target.checked })); }} /> 🔧 {t.testModeLbl}
           </label>
           {cfg.testMode && (
             <div style={{ marginBottom: 8 }}>
@@ -1259,7 +1277,7 @@ export default function App() {
             </select>
           </div>
           <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", marginBottom: 8 }}>
-            <input type="checkbox" checked={startBlackout} onChange={function (e) { setStartBlackout(e.target.checked); }} /> {t.startBlackout}
+            <input type="checkbox" checked={startBlackout} onChange={function (e) { setStartBlackout(e.target.checked); }} /> ⏳ {t.startBlackout}
           </label>
           <div style={{ marginBottom: 12 }}>
             <label style={{ fontSize: 12, color: th.sub }}>{t.targetEnd}</label>
