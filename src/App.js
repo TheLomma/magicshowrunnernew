@@ -1135,7 +1135,7 @@ function Banner(props) {
           <span style={{ fontSize: 20, fontWeight: 800, color: "#f5c842", letterSpacing: 2, fontFamily: "Georgia, serif", textShadow: "0 0 8px rgba(245,200,66,0.3)" }}>🎩 Magic Showrunner</span>
         </div>
         <div style={{ height: 1, background: "linear-gradient(90deg, transparent, #c9a84c, transparent)", margin: "4px 32px" }} />
-        <div style={{ fontSize: 9, color: "#c9a84c", letterSpacing: 5, opacity: 0.7 }}>SHOW MANAGEMENT v7.5</div>
+        <div style={{ fontSize: 9, color: "#c9a84c", letterSpacing: 5, opacity: 0.7 }}>SHOW MANAGEMENT</div>
       </div>
     </div>
   );
