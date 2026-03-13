@@ -1,5 +1,90 @@
 import React, { useState, useEffect, useRef } from "react";
 
+/* ─── Touch Drag & Drop Helper ─── */
+function useTouchDragDrop(items, setItems, dragIdx, setDragIdx) {
+  var touchStartY = useRef(null);
+  var touchCurrentIdx = useRef(null);
+  var ghostRef = useRef(null);
+  var dropTargetIdx = useRef(null);
+  var containerRef = useRef(null);
+
+  var cleanupGhost = function () {
+    if (ghostRef.current && ghostRef.current.parentNode) {
+      ghostRef.current.parentNode.removeChild(ghostRef.current);
+    }
+    ghostRef.current = null;
+  };
+
+  var onTouchStart = function (e, idx) {
+    var touch = e.touches[0];
+    touchStartY.current = touch.clientY;
+    touchCurrentIdx.current = idx;
+    setDragIdx(idx);
+
+    // Create ghost element
+    var el = e.currentTarget;
+    var rect = el.getBoundingClientRect();
+    var ghost = el.cloneNode(true);
+    ghost.style.position = "fixed";
+    ghost.style.left = rect.left + "px";
+    ghost.style.top = rect.top + "px";
+    ghost.style.width = rect.width + "px";
+    ghost.style.height = rect.height + "px";
+    ghost.style.opacity = "0.85";
+    ghost.style.zIndex = "9999";
+    ghost.style.pointerEvents = "none";
+    ghost.style.transform = "scale(1.04)";
+    ghost.style.boxShadow = "0 8px 32px rgba(0,0,0,0.35)";
+    ghost.style.borderRadius = "12px";
+    ghost.style.transition = "transform 0.15s";
+    document.body.appendChild(ghost);
+    ghostRef.current = ghost;
+  };
+
+  var onTouchMove = function (e, itemRefs) {
+    if (touchCurrentIdx.current == null) return;
+    e.preventDefault();
+    var touch = e.touches[0];
+
+    // Move ghost
+    if (ghostRef.current) {
+      ghostRef.current.style.top = (touch.clientY - 30) + "px";
+    }
+
+    // Find drop target
+    dropTargetIdx.current = null;
+    if (itemRefs && itemRefs.current) {
+      for (var i = 0; i < itemRefs.current.length; i++) {
+        if (!itemRefs.current[i]) continue;
+        var r = itemRefs.current[i].getBoundingClientRect();
+        if (touch.clientY >= r.top && touch.clientY <= r.bottom) {
+          dropTargetIdx.current = i;
+          break;
+        }
+      }
+    }
+  };
+
+  var onTouchEnd = function () {
+    if (touchCurrentIdx.current != null && dropTargetIdx.current != null && touchCurrentIdx.current !== dropTargetIdx.current) {
+      var from = touchCurrentIdx.current;
+      var to = dropTargetIdx.current;
+      setItems(function (prev) {
+        var next = prev.slice();
+        var item = next.splice(from, 1)[0];
+        next.splice(to, 0, item);
+        return next;
+      });
+    }
+    touchCurrentIdx.current = null;
+    dropTargetIdx.current = null;
+    setDragIdx(null);
+    cleanupGhost();
+  };
+
+  return { onTouchStart: onTouchStart, onTouchMove: onTouchMove, onTouchEnd: onTouchEnd, containerRef: containerRef };
+}
+
 var uid = function () { return Math.random().toString(36).slice(2, 9); };
 var fmt = function (s) { var m = Math.floor(s / 60); var sec = s % 60; return m + ":" + String(sec).padStart(2, "0"); };
 
@@ -17,7 +102,7 @@ var SETLIST_COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#8b5cf6", "#0
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v8.2", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v8.3", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -56,7 +141,7 @@ var T = {
     confirmDeleteSetlist: "Setlist wirklich löschen?"
   },
   en: {
-    title: "Magic Showrunner", ver: "v8.2", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v8.3", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
