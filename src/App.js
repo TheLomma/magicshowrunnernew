@@ -17,7 +17,7 @@ var SETLIST_COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#8b5cf6", "#0
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v7.9", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v8.1", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -42,7 +42,7 @@ var T = {
     showModeSize: "Anzeigegröße im Show-Modus", sizeSmall: "Klein", sizeLarge: "Groß",
     targetEnd: "Ziel-Endzeit", onSchedule: "Im Zeitplan", behind: "Überzogen", ahead: "Voraus",
     targetEndHint: "Gewünschtes Show-Ende (HH:MM)",
-    circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil",
+    circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", hourglassTimer: "Sanduhr-Timer", waveTimer: "Wellen-Timer", timerStyle: "Timer-Stil",
     blinkLast10: "Blinken in letzten 10 Sek",
     newGroup: "Neuer Akt",
     help: "Anleitung",
@@ -56,7 +56,7 @@ var T = {
     confirmDeleteSetlist: "Setlist wirklich löschen?"
   },
   en: {
-    title: "Magic Showrunner", ver: "v7.9", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v8.1", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -81,7 +81,7 @@ var T = {
     showModeSize: "Display size in Show Mode", sizeSmall: "Small", sizeLarge: "Large",
     targetEnd: "Target End Time", onSchedule: "On schedule", behind: "Behind", ahead: "Ahead",
     targetEndHint: "Desired show end (HH:MM)",
-    circleTimer: "Circle Timer", barTimer: "Bar Timer", timerStyle: "Timer Style",
+    circleTimer: "Circle Timer", barTimer: "Bar Timer", hourglassTimer: "Hourglass Timer", waveTimer: "Wave Timer", timerStyle: "Timer Style",
     blinkLast10: "Blink in last 10 sec",
     newGroup: "New Act",
     help: "Tutorial",
@@ -93,6 +93,162 @@ var T = {
     deleteSetlist: "Delete Setlist",
     duplicateSetlist: "Duplicate Setlist",
     confirmDeleteSetlist: "Really delete setlist?"
+  },
+  fr: {
+    title: "Magic Showrunner", ver: "v8.1", save: "Enregistrer", load: "Charger", newPart: "Nouvelle Partie",
+    start: "Démarrer le Show", test: "Mode Test", parts: "Parties", total: "Total", settings: "Paramètres",
+    planTheme: "Thème Planning", perfTheme: "Thème Performance", beeps: "Bips",
+    volume: "Volume", testTone: "Son Test", testDur: "Durée test/partie", titleL: "Titre",
+    durL: "Durée (sec)", introL: "Intro (TTS)", preAnnL: "Pré-annonce (sec)",
+    preAnnTxt: "Texte pré-annonce", notesL: "Notes", colorL: "Couleur", saveBtn: "Enregistrer",
+    cancel: "Annuler", showName: "Nom du Show", overwrite: "Écraser", noSaved: "Aucun show enregistré.",
+    pause: "Pause", resume: "Continuer", prev: "Retour", next: "Suivant", partOf: "Partie", of: "/",
+    dup: "⧉", del: "Supprimer", edit: "✏️", sek: "sec", csv: "CSV",
+    fontSize: "Taille", fontFamily: "Police", ttsVoice: "Voix", ttsRate: "Vitesse",
+    ttsPitch: "Tonalité", ttsPreview: "Aperçu", animations: "Animations", notes: "Notes", voiceControl: "Contrôle Vocal",
+    stop: "Stop", setlist: "Setlist", elapsed: "Écoulé", remaining: "Restant",
+    soundLabel: "Son d'Alerte", colorTrans: "Transitions Couleur", blackout: "Blackout",
+    startBlackout: "Démarrer avec Compte à Rebours", countdown: "Compte à Rebours", countdownSek: "Compte à Rebours (sec)",
+    countdownOff: "Off", testModeLbl: "Mode Test", testDurLbl: "Durée test par partie (sec)",
+    confirmStop: "Vraiment arrêter le show?",
+    templates: "Modèles", saveAsTemplate: "Enregistrer comme Modèle", noTemplates: "Aucun modèle disponible.",
+    templateSaved: "Modèle enregistré!", useTemplate: "Utiliser", deleteTemplate: "Supprimer",
+    templateName: "Nom du Modèle",
+    customTheme: "Schéma Couleur Personnalisé", customBg: "Fond", customCard: "Carte", customText: "Texte",
+    customAcc: "Accent", customBrd: "Bordure", customSub: "Sous-texte", customInp: "Entrée",
+    resetCustom: "Réinitialiser", applyCustom: "Appliquer",
+    showModeSize: "Taille d'affichage en Mode Show", sizeSmall: "Petit", sizeLarge: "Grand",
+    targetEnd: "Heure de Fin Cible", onSchedule: "Dans les temps", behind: "En retard", ahead: "En avance",
+    targetEndHint: "Fin souhaitée du show (HH:MM)",
+    circleTimer: "Timer Circulaire", barTimer: "Timer Barre", hourglassTimer: "Timer Sablier", waveTimer: "Timer Vague", timerStyle: "Style Timer",
+    blinkLast10: "Clignoter dans les 10 dernières sec",
+    newGroup: "Nouvel Acte",
+    help: "Aide",
+    setlists: "Setlists",
+    newSetlist: "Nouvelle Setlist",
+    setlistName: "Nom de la Setlist",
+    activeSetlist: "Setlist Active",
+    switchSetlist: "Changer de Setlist",
+    deleteSetlist: "Supprimer Setlist",
+    duplicateSetlist: "Dupliquer Setlist",
+    confirmDeleteSetlist: "Vraiment supprimer la setlist?"
+  },
+  es: {
+    title: "Magic Showrunner", ver: "v8.1", save: "Guardar", load: "Cargar", newPart: "Nueva Parte",
+    start: "Iniciar Show", test: "Modo Prueba", parts: "Partes", total: "Total", settings: "Ajustes",
+    planTheme: "Tema Planificación", perfTheme: "Tema Rendimiento", beeps: "Pitidos",
+    volume: "Volumen", testTone: "Tono Prueba", testDur: "Duración prueba/parte", titleL: "Título",
+    durL: "Duración (seg)", introL: "Intro (TTS)", preAnnL: "Pre-anuncio (seg)",
+    preAnnTxt: "Texto pre-anuncio", notesL: "Notas", colorL: "Color", saveBtn: "Guardar",
+    cancel: "Cancelar", showName: "Nombre del Show", overwrite: "Sobrescribir", noSaved: "No hay shows guardados.",
+    pause: "Pausa", resume: "Continuar", prev: "Atrás", next: "Siguiente", partOf: "Parte", of: "/",
+    dup: "⧉", del: "Eliminar", edit: "✏️", sek: "seg", csv: "CSV",
+    fontSize: "Tamaño", fontFamily: "Fuente", ttsVoice: "Voz", ttsRate: "Velocidad",
+    ttsPitch: "Tono", ttsPreview: "Vista Previa", animations: "Animaciones", notes: "Notas", voiceControl: "Control por Voz",
+    stop: "Stop", setlist: "Setlist", elapsed: "Transcurrido", remaining: "Restante",
+    soundLabel: "Sonido de Alerta", colorTrans: "Transiciones de Color", blackout: "Blackout",
+    startBlackout: "Iniciar con Cuenta Regresiva", countdown: "Cuenta Regresiva", countdownSek: "Cuenta Regresiva (seg)",
+    countdownOff: "Off", testModeLbl: "Modo Prueba", testDurLbl: "Duración prueba por parte (seg)",
+    confirmStop: "¿Realmente detener el show?",
+    templates: "Plantillas", saveAsTemplate: "Guardar como Plantilla", noTemplates: "No hay plantillas disponibles.",
+    templateSaved: "¡Plantilla guardada!", useTemplate: "Usar", deleteTemplate: "Eliminar",
+    templateName: "Nombre de Plantilla",
+    customTheme: "Esquema de Color Personalizado", customBg: "Fondo", customCard: "Tarjeta", customText: "Texto",
+    customAcc: "Acento", customBrd: "Borde", customSub: "Subtexto", customInp: "Entrada",
+    resetCustom: "Restablecer", applyCustom: "Aplicar",
+    showModeSize: "Tamaño de pantalla en Modo Show", sizeSmall: "Pequeño", sizeLarge: "Grande",
+    targetEnd: "Hora de Fin Objetivo", onSchedule: "A tiempo", behind: "Atrasado", ahead: "Adelantado",
+    targetEndHint: "Fin deseado del show (HH:MM)",
+    circleTimer: "Timer Circular", barTimer: "Timer Barra", hourglassTimer: "Timer Reloj de Arena", waveTimer: "Timer Ola", timerStyle: "Estilo Timer",
+    blinkLast10: "Parpadear en los últimos 10 seg",
+    newGroup: "Nuevo Acto",
+    help: "Ayuda",
+    setlists: "Setlists",
+    newSetlist: "Nueva Setlist",
+    setlistName: "Nombre de Setlist",
+    activeSetlist: "Setlist Activa",
+    switchSetlist: "Cambiar Setlist",
+    deleteSetlist: "Eliminar Setlist",
+    duplicateSetlist: "Duplicar Setlist",
+    confirmDeleteSetlist: "¿Realmente eliminar la setlist?"
+  },
+  it: {
+    title: "Magic Showrunner", ver: "v8.1", save: "Salva", load: "Carica", newPart: "Nuova Parte",
+    start: "Avvia Show", test: "Modalità Test", parts: "Parti", total: "Totale", settings: "Impostazioni",
+    planTheme: "Tema Pianificazione", perfTheme: "Tema Performance", beeps: "Bip",
+    volume: "Volume", testTone: "Tono Test", testDur: "Durata test/parte", titleL: "Titolo",
+    durL: "Durata (sec)", introL: "Intro (TTS)", preAnnL: "Pre-annuncio (sec)",
+    preAnnTxt: "Testo pre-annuncio", notesL: "Note", colorL: "Colore", saveBtn: "Salva",
+    cancel: "Annulla", showName: "Nome dello Show", overwrite: "Sovrascrivi", noSaved: "Nessuno show salvato.",
+    pause: "Pausa", resume: "Riprendi", prev: "Indietro", next: "Avanti", partOf: "Parte", of: "/",
+    dup: "⧉", del: "Elimina", edit: "✏️", sek: "sec", csv: "CSV",
+    fontSize: "Dimensione", fontFamily: "Font", ttsVoice: "Voce", ttsRate: "Velocità",
+    ttsPitch: "Tono", ttsPreview: "Anteprima", animations: "Animazioni", notes: "Note", voiceControl: "Controllo Vocale",
+    stop: "Stop", setlist: "Setlist", elapsed: "Trascorso", remaining: "Rimanente",
+    soundLabel: "Suono di Avviso", colorTrans: "Transizioni Colore", blackout: "Blackout",
+    startBlackout: "Avvia con Conto alla Rovescia", countdown: "Conto alla Rovescia", countdownSek: "Conto alla Rovescia (sec)",
+    countdownOff: "Off", testModeLbl: "Modalità Test", testDurLbl: "Durata test per parte (sec)",
+    confirmStop: "Vuoi davvero fermare lo show?",
+    templates: "Modelli", saveAsTemplate: "Salva come Modello", noTemplates: "Nessun modello disponibile.",
+    templateSaved: "Modello salvato!", useTemplate: "Usa", deleteTemplate: "Elimina",
+    templateName: "Nome Modello",
+    customTheme: "Schema Colore Personalizzato", customBg: "Sfondo", customCard: "Scheda", customText: "Testo",
+    customAcc: "Accento", customBrd: "Bordo", customSub: "Sottotesto", customInp: "Input",
+    resetCustom: "Reimposta", applyCustom: "Applica",
+    showModeSize: "Dimensione display in Modalità Show", sizeSmall: "Piccolo", sizeLarge: "Grande",
+    targetEnd: "Ora di Fine Obiettivo", onSchedule: "In orario", behind: "In ritardo", ahead: "In anticipo",
+    targetEndHint: "Fine desiderata dello show (HH:MM)",
+    circleTimer: "Timer Circolare", barTimer: "Timer Barra", hourglassTimer: "Timer Clessidra", waveTimer: "Timer Onda", timerStyle: "Stile Timer",
+    blinkLast10: "Lampeggia negli ultimi 10 sec",
+    newGroup: "Nuovo Atto",
+    help: "Aiuto",
+    setlists: "Setlist",
+    newSetlist: "Nuova Setlist",
+    setlistName: "Nome Setlist",
+    activeSetlist: "Setlist Attiva",
+    switchSetlist: "Cambia Setlist",
+    deleteSetlist: "Elimina Setlist",
+    duplicateSetlist: "Duplica Setlist",
+    confirmDeleteSetlist: "Vuoi davvero eliminare la setlist?"
+  },
+  nl: {
+    title: "Magic Showrunner", ver: "v8.1", save: "Opslaan", load: "Laden", newPart: "Nieuw Onderdeel",
+    start: "Start Show", test: "Testmodus", parts: "Onderdelen", total: "Totaal", settings: "Instellingen",
+    planTheme: "Planning Thema", perfTheme: "Uitvoering Thema", beeps: "Pieptonen",
+    volume: "Volume", testTone: "Testtoon", testDur: "Testduur/onderdeel", titleL: "Titel",
+    durL: "Duur (sec)", introL: "Intro (TTS)", preAnnL: "Vooraankondiging (sec)",
+    preAnnTxt: "Vooraankondiging tekst", notesL: "Notities", colorL: "Kleur", saveBtn: "Opslaan",
+    cancel: "Annuleren", showName: "Show Naam", overwrite: "Overschrijven", noSaved: "Geen opgeslagen shows.",
+    pause: "Pauze", resume: "Hervatten", prev: "Terug", next: "Volgende", partOf: "Onderdeel", of: "/",
+    dup: "⧉", del: "Verwijderen", edit: "✏️", sek: "sec", csv: "CSV",
+    fontSize: "Grootte", fontFamily: "Lettertype", ttsVoice: "Stem", ttsRate: "Snelheid",
+    ttsPitch: "Toonhoogte", ttsPreview: "Voorbeeld", animations: "Animaties", notes: "Notities", voiceControl: "Spraakbesturing",
+    stop: "Stop", setlist: "Setlist", elapsed: "Verstreken", remaining: "Resterend",
+    soundLabel: "Waarschuwingsgeluid", colorTrans: "Kleurovergangen", blackout: "Blackout",
+    startBlackout: "Start met Aftelling", countdown: "Aftelling", countdownSek: "Aftelling (sec)",
+    countdownOff: "Uit", testModeLbl: "Testmodus", testDurLbl: "Testduur per onderdeel (sec)",
+    confirmStop: "Show echt stoppen?",
+    templates: "Sjablonen", saveAsTemplate: "Opslaan als Sjabloon", noTemplates: "Geen sjablonen beschikbaar.",
+    templateSaved: "Sjabloon opgeslagen!", useTemplate: "Gebruiken", deleteTemplate: "Verwijderen",
+    templateName: "Sjabloon Naam",
+    customTheme: "Aangepast Kleurenschema", customBg: "Achtergrond", customCard: "Kaart", customText: "Tekst",
+    customAcc: "Accent", customBrd: "Rand", customSub: "Subtekst", customInp: "Invoer",
+    resetCustom: "Resetten", applyCustom: "Toepassen",
+    showModeSize: "Weergavegrootte in Show Modus", sizeSmall: "Klein", sizeLarge: "Groot",
+    targetEnd: "Doel Eindtijd", onSchedule: "Op schema", behind: "Achter", ahead: "Voor",
+    targetEndHint: "Gewenste show einde (HH:MM)",
+    circleTimer: "Cirkel Timer", barTimer: "Balk Timer", hourglassTimer: "Zandloper Timer", waveTimer: "Golf Timer", timerStyle: "Timer Stijl",
+    blinkLast10: "Knipperen in laatste 10 sec",
+    newGroup: "Nieuwe Act",
+    help: "Handleiding",
+    setlists: "Setlists",
+    newSetlist: "Nieuwe Setlist",
+    setlistName: "Setlist Naam",
+    activeSetlist: "Actieve Setlist",
+    switchSetlist: "Wissel Setlist",
+    deleteSetlist: "Verwijder Setlist",
+    duplicateSetlist: "Dupliceer Setlist",
+    confirmDeleteSetlist: "Setlist echt verwijderen?"
   }
 };
 
@@ -125,6 +281,30 @@ var DEMO_DATA = {
     { title: "Card Trick", duration: 180, intro: "A card trick", preAnn: 15, preAnnText: "Next trick", notes: "Ace of spades", color: COLORS[1] },
     { title: "Mentalism", duration: 240, intro: "Mysterious", preAnn: 20, preAnnText: "Finale approaching", notes: "Envelope", color: COLORS[5] },
     { title: "Final", duration: 120, intro: "The finale!", preAnn: 10, preAnnText: "", notes: "Confetti", color: COLORS[3] }
+  ],
+  fr: [
+    { title: "Bienvenue", duration: 60, intro: "Bienvenue!", preAnn: 10, preAnnText: "À suivre", notes: "Saluer le public", color: COLORS[0] },
+    { title: "Tour de Cartes", duration: 180, intro: "Un tour de cartes", preAnn: 15, preAnnText: "Prochain tour", notes: "As de pique", color: COLORS[1] },
+    { title: "Mentalisme", duration: 240, intro: "Mystérieux", preAnn: 20, preAnnText: "Finale approche", notes: "Enveloppe", color: COLORS[5] },
+    { title: "Finale", duration: 120, intro: "Le finale!", preAnn: 10, preAnnText: "", notes: "Confettis", color: COLORS[3] }
+  ],
+  es: [
+    { title: "Bienvenida", duration: 60, intro: "¡Bienvenidos!", preAnn: 10, preAnnText: "Próximamente", notes: "Saludar al público", color: COLORS[0] },
+    { title: "Truco de Cartas", duration: 180, intro: "Un truco de cartas", preAnn: 15, preAnnText: "Siguiente truco", notes: "As de picas", color: COLORS[1] },
+    { title: "Mentalismo", duration: 240, intro: "Misterioso", preAnn: 20, preAnnText: "Se acerca el final", notes: "Sobre", color: COLORS[5] },
+    { title: "Final", duration: 120, intro: "¡El final!", preAnn: 10, preAnnText: "", notes: "Confeti", color: COLORS[3] }
+  ],
+  it: [
+    { title: "Benvenuto", duration: 60, intro: "Benvenuti!", preAnn: 10, preAnnText: "A seguire", notes: "Salutare il pubblico", color: COLORS[0] },
+    { title: "Gioco di Carte", duration: 180, intro: "Un gioco di carte", preAnn: 15, preAnnText: "Prossimo gioco", notes: "Asso di picche", color: COLORS[1] },
+    { title: "Mentalismo", duration: 240, intro: "Misterioso", preAnn: 20, preAnnText: "Finale in arrivo", notes: "Busta", color: COLORS[5] },
+    { title: "Finale", duration: 120, intro: "Il finale!", preAnn: 10, preAnnText: "", notes: "Coriandoli", color: COLORS[3] }
+  ],
+  nl: [
+    { title: "Welkom", duration: 60, intro: "Welkom!", preAnn: 10, preAnnText: "Zo meteen", notes: "Publiek begroeten", color: COLORS[0] },
+    { title: "Kaarttruc", duration: 180, intro: "Een kaarttruc", preAnn: 15, preAnnText: "Volgende truc", notes: "Schoppen aas", color: COLORS[1] },
+    { title: "Mentalisme", duration: 240, intro: "Mysterieus", preAnn: 20, preAnnText: "Finale nadert", notes: "Envelop", color: COLORS[5] },
+    { title: "Finale", duration: 120, intro: "De finale!", preAnn: 10, preAnnText: "", notes: "Confetti", color: COLORS[3] }
   ]
 };
 
@@ -461,8 +641,43 @@ function SettingsModal(props) {
   if (!open) return null;
   var upCfg = function (k, v) { setCfg(function (c) { var o = {}; o[k] = v; return Object.assign({}, c, o); }); };
   var tabs = ["design", "audio", "voice", "font", "lang", "help"];
-  var icons = { design: "Design", audio: "Audio", voice: cfg.lang === "de" ? "Stimme" : "Voice", font: cfg.lang === "de" ? "Schrift" : "Font", lang: cfg.lang === "de" ? "Sprache" : "Language", help: t.help };
   var tiMap2 = { design: "🎨", audio: "🔊", voice: "🗣️", font: "🔤", lang: "🌐", help: "❓" };
+  var icons = { design: "Design", audio: "Audio", voice: cfg.lang === "de" ? "Stimme" : "Voice", font: cfg.lang === "de" ? "Schrift" : "Font", lang: cfg.lang === "de" ? "Sprache" : "Language", help: t.help };
+  
+  var renderTimerPreview = function(style) {
+    if (style === "circle") {
+      return (
+        <svg width="60" height="60" viewBox="0 0 60 60" style={{ display: "block", margin: "0 auto" }}>
+          <circle cx="30" cy="30" r="26" fill="none" stroke={th.brd} strokeWidth="6" />
+          <circle cx="30" cy="30" r="26" fill="none" stroke={th.acc} strokeWidth="6" strokeDasharray="163.36" strokeDashoffset="40.84" transform="rotate(-90 30 30)" />
+        </svg>
+      );
+    } else if (style === "hourglass") {
+      return (
+        <svg width="60" height="80" viewBox="0 0 60 80" style={{ display: "block", margin: "0 auto" }}>
+          <path d="M10 10 L50 10 L30 40 L50 70 L10 70 L30 40 Z" fill="none" stroke={th.acc} strokeWidth="3" />
+          <rect x="15" y="15" width="30" height="15" fill={th.acc} opacity="0.6" />
+          <animate attributeName="height" values="15;5;15" dur="3s" repeatCount="indefinite" />
+        </svg>
+      );
+    } else if (style === "wave") {
+      return (
+        <svg width="80" height="40" viewBox="0 0 80 40" style={{ display: "block", margin: "0 auto" }}>
+          <path d="M0 20 Q10 10, 20 20 T40 20 T60 20 T80 20" fill="none" stroke={th.acc} strokeWidth="3">
+            <animate attributeName="d" values="M0 20 Q10 10, 20 20 T40 20 T60 20 T80 20;M0 20 Q10 30, 20 20 T40 20 T60 20 T80 20;M0 20 Q10 10, 20 20 T40 20 T60 20 T80 20" dur="2s" repeatCount="indefinite" />
+          </path>
+          <rect x="0" y="25" width="60" height="6" fill={th.acc} opacity="0.4" rx="3" />
+        </svg>
+      );
+    } else {
+      return (
+        <div style={{ width: "100%", height: 8, background: th.brd, borderRadius: 4, overflow: "hidden", margin: "0 auto" }}>
+          <div style={{ width: "65%", height: "100%", background: th.acc, borderRadius: 4 }} />
+        </div>
+      );
+    }
+  };
+
   var content = null;
 
   if (tab === "design") {
@@ -494,10 +709,18 @@ function SettingsModal(props) {
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, cursor: "pointer", marginBottom: 12 }}>
           <input type="checkbox" checked={cfg.voiceControl} onChange={function (e) { upCfg("voiceControl", e.target.checked); }} /> {t.voiceControl}
         </label>
-        <label style={{ fontSize: 12, color: th.sub, display: "block" }}>{t.timerStyle}</label>
-        <div style={{ display: "flex", gap: 6, marginBottom: 8 }}>
-          <button onClick={function () { upCfg("timerStyle", "bar"); }} style={{ padding: "8px 14px", borderRadius: 8, border: (cfg.timerStyle === "bar" || !cfg.timerStyle) ? "2px solid " + th.acc : "2px solid transparent", background: th.inp, color: th.text, cursor: "pointer", fontSize: 12 }}>{t.barTimer}</button>
-          <button onClick={function () { upCfg("timerStyle", "circle"); }} style={{ padding: "8px 14px", borderRadius: 8, border: cfg.timerStyle === "circle" ? "2px solid " + th.acc : "2px solid transparent", background: th.inp, color: th.text, cursor: "pointer", fontSize: 12 }}>{t.circleTimer}</button>
+        <label style={{ fontSize: 12, color: th.sub, display: "block", marginBottom: 8 }}>{t.timerStyle}</label>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 12 }}>
+          {["bar", "circle", "hourglass", "wave"].map(function(style) {
+            var isActive = (style === "bar" && (!cfg.timerStyle || cfg.timerStyle === "bar")) || cfg.timerStyle === style;
+            var labels = { bar: t.barTimer, circle: t.circleTimer, hourglass: t.hourglassTimer, wave: t.waveTimer };
+            return (
+              <div key={style} onClick={function() { upCfg("timerStyle", style); }} style={{ padding: 12, borderRadius: 10, border: isActive ? "2px solid " + th.acc : "2px solid " + th.brd, background: isActive ? th.acc + "11" : th.inp, cursor: "pointer", transition: "all 0.2s" }}>
+                <div style={{ fontSize: 11, fontWeight: 600, color: th.text, marginBottom: 8, textAlign: "center" }}>{labels[style]}</div>
+                {renderTimerPreview(style)}
+              </div>
+            );
+          })}
         </div>
       </div>
     );
@@ -564,10 +787,18 @@ function SettingsModal(props) {
       </div>
     );
   } else if (tab === "lang") {
+    var langOptions = [
+      { code: "de", flag: "🇩🇪", name: "Deutsch" },
+      { code: "en", flag: "🇬🇧", name: "English" },
+      { code: "fr", flag: "🇫🇷", name: "Français" },
+      { code: "es", flag: "🇪🇸", name: "Español" },
+      { code: "it", flag: "🇮🇹", name: "Italiano" },
+      { code: "nl", flag: "🇳🇱", name: "Nederlands" }
+    ];
     content = (
-      <div style={{ display: "flex", gap: 8 }}>
-        {["de", "en"].map(function (l) {
-          return <button key={l} onClick={function () { upCfg("lang", l); if (onLangChange) onLangChange(l); }} style={{ flex: 1, padding: 12, borderRadius: 10, border: cfg.lang === l ? "2px solid " + th.acc : "2px solid transparent", background: cfg.lang === l ? th.acc + "22" : "transparent", color: th.text, cursor: "pointer", fontSize: 16 }}>{l === "de" ? "🇩🇪 Deutsch" : "🇬🇧 English"}</button>;
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+        {langOptions.map(function (lang) {
+          return <button key={lang.code} onClick={function () { upCfg("lang", lang.code); if (onLangChange) onLangChange(lang.code); }} style={{ padding: 12, borderRadius: 10, border: cfg.lang === lang.code ? "2px solid " + th.acc : "2px solid transparent", background: cfg.lang === lang.code ? th.acc + "22" : "transparent", color: th.text, cursor: "pointer", fontSize: 14, fontWeight: cfg.lang === lang.code ? 700 : 400 }}>{lang.flag} {lang.name}</button>;
         })}
       </div>
     );
