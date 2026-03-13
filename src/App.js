@@ -17,7 +17,7 @@ var SETLIST_COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#8b5cf6", "#0
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v8.1", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v8.2", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -56,7 +56,7 @@ var T = {
     confirmDeleteSetlist: "Setlist wirklich löschen?"
   },
   en: {
-    title: "Magic Showrunner", ver: "v8.1", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v8.2", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -93,162 +93,6 @@ var T = {
     deleteSetlist: "Delete Setlist",
     duplicateSetlist: "Duplicate Setlist",
     confirmDeleteSetlist: "Really delete setlist?"
-  },
-  fr: {
-    title: "Magic Showrunner", ver: "v8.1", save: "Enregistrer", load: "Charger", newPart: "Nouvelle Partie",
-    start: "Démarrer le Show", test: "Mode Test", parts: "Parties", total: "Total", settings: "Paramètres",
-    planTheme: "Thème Planning", perfTheme: "Thème Performance", beeps: "Bips",
-    volume: "Volume", testTone: "Son Test", testDur: "Durée test/partie", titleL: "Titre",
-    durL: "Durée (sec)", introL: "Intro (TTS)", preAnnL: "Pré-annonce (sec)",
-    preAnnTxt: "Texte pré-annonce", notesL: "Notes", colorL: "Couleur", saveBtn: "Enregistrer",
-    cancel: "Annuler", showName: "Nom du Show", overwrite: "Écraser", noSaved: "Aucun show enregistré.",
-    pause: "Pause", resume: "Continuer", prev: "Retour", next: "Suivant", partOf: "Partie", of: "/",
-    dup: "⧉", del: "Supprimer", edit: "✏️", sek: "sec", csv: "CSV",
-    fontSize: "Taille", fontFamily: "Police", ttsVoice: "Voix", ttsRate: "Vitesse",
-    ttsPitch: "Tonalité", ttsPreview: "Aperçu", animations: "Animations", notes: "Notes", voiceControl: "Contrôle Vocal",
-    stop: "Stop", setlist: "Setlist", elapsed: "Écoulé", remaining: "Restant",
-    soundLabel: "Son d'Alerte", colorTrans: "Transitions Couleur", blackout: "Blackout",
-    startBlackout: "Démarrer avec Compte à Rebours", countdown: "Compte à Rebours", countdownSek: "Compte à Rebours (sec)",
-    countdownOff: "Off", testModeLbl: "Mode Test", testDurLbl: "Durée test par partie (sec)",
-    confirmStop: "Vraiment arrêter le show?",
-    templates: "Modèles", saveAsTemplate: "Enregistrer comme Modèle", noTemplates: "Aucun modèle disponible.",
-    templateSaved: "Modèle enregistré!", useTemplate: "Utiliser", deleteTemplate: "Supprimer",
-    templateName: "Nom du Modèle",
-    customTheme: "Schéma Couleur Personnalisé", customBg: "Fond", customCard: "Carte", customText: "Texte",
-    customAcc: "Accent", customBrd: "Bordure", customSub: "Sous-texte", customInp: "Entrée",
-    resetCustom: "Réinitialiser", applyCustom: "Appliquer",
-    showModeSize: "Taille d'affichage en Mode Show", sizeSmall: "Petit", sizeLarge: "Grand",
-    targetEnd: "Heure de Fin Cible", onSchedule: "Dans les temps", behind: "En retard", ahead: "En avance",
-    targetEndHint: "Fin souhaitée du show (HH:MM)",
-    circleTimer: "Timer Circulaire", barTimer: "Timer Barre", hourglassTimer: "Timer Sablier", waveTimer: "Timer Vague", timerStyle: "Style Timer",
-    blinkLast10: "Clignoter dans les 10 dernières sec",
-    newGroup: "Nouvel Acte",
-    help: "Aide",
-    setlists: "Setlists",
-    newSetlist: "Nouvelle Setlist",
-    setlistName: "Nom de la Setlist",
-    activeSetlist: "Setlist Active",
-    switchSetlist: "Changer de Setlist",
-    deleteSetlist: "Supprimer Setlist",
-    duplicateSetlist: "Dupliquer Setlist",
-    confirmDeleteSetlist: "Vraiment supprimer la setlist?"
-  },
-  es: {
-    title: "Magic Showrunner", ver: "v8.1", save: "Guardar", load: "Cargar", newPart: "Nueva Parte",
-    start: "Iniciar Show", test: "Modo Prueba", parts: "Partes", total: "Total", settings: "Ajustes",
-    planTheme: "Tema Planificación", perfTheme: "Tema Rendimiento", beeps: "Pitidos",
-    volume: "Volumen", testTone: "Tono Prueba", testDur: "Duración prueba/parte", titleL: "Título",
-    durL: "Duración (seg)", introL: "Intro (TTS)", preAnnL: "Pre-anuncio (seg)",
-    preAnnTxt: "Texto pre-anuncio", notesL: "Notas", colorL: "Color", saveBtn: "Guardar",
-    cancel: "Cancelar", showName: "Nombre del Show", overwrite: "Sobrescribir", noSaved: "No hay shows guardados.",
-    pause: "Pausa", resume: "Continuar", prev: "Atrás", next: "Siguiente", partOf: "Parte", of: "/",
-    dup: "⧉", del: "Eliminar", edit: "✏️", sek: "seg", csv: "CSV",
-    fontSize: "Tamaño", fontFamily: "Fuente", ttsVoice: "Voz", ttsRate: "Velocidad",
-    ttsPitch: "Tono", ttsPreview: "Vista Previa", animations: "Animaciones", notes: "Notas", voiceControl: "Control por Voz",
-    stop: "Stop", setlist: "Setlist", elapsed: "Transcurrido", remaining: "Restante",
-    soundLabel: "Sonido de Alerta", colorTrans: "Transiciones de Color", blackout: "Blackout",
-    startBlackout: "Iniciar con Cuenta Regresiva", countdown: "Cuenta Regresiva", countdownSek: "Cuenta Regresiva (seg)",
-    countdownOff: "Off", testModeLbl: "Modo Prueba", testDurLbl: "Duración prueba por parte (seg)",
-    confirmStop: "¿Realmente detener el show?",
-    templates: "Plantillas", saveAsTemplate: "Guardar como Plantilla", noTemplates: "No hay plantillas disponibles.",
-    templateSaved: "¡Plantilla guardada!", useTemplate: "Usar", deleteTemplate: "Eliminar",
-    templateName: "Nombre de Plantilla",
-    customTheme: "Esquema de Color Personalizado", customBg: "Fondo", customCard: "Tarjeta", customText: "Texto",
-    customAcc: "Acento", customBrd: "Borde", customSub: "Subtexto", customInp: "Entrada",
-    resetCustom: "Restablecer", applyCustom: "Aplicar",
-    showModeSize: "Tamaño de pantalla en Modo Show", sizeSmall: "Pequeño", sizeLarge: "Grande",
-    targetEnd: "Hora de Fin Objetivo", onSchedule: "A tiempo", behind: "Atrasado", ahead: "Adelantado",
-    targetEndHint: "Fin deseado del show (HH:MM)",
-    circleTimer: "Timer Circular", barTimer: "Timer Barra", hourglassTimer: "Timer Reloj de Arena", waveTimer: "Timer Ola", timerStyle: "Estilo Timer",
-    blinkLast10: "Parpadear en los últimos 10 seg",
-    newGroup: "Nuevo Acto",
-    help: "Ayuda",
-    setlists: "Setlists",
-    newSetlist: "Nueva Setlist",
-    setlistName: "Nombre de Setlist",
-    activeSetlist: "Setlist Activa",
-    switchSetlist: "Cambiar Setlist",
-    deleteSetlist: "Eliminar Setlist",
-    duplicateSetlist: "Duplicar Setlist",
-    confirmDeleteSetlist: "¿Realmente eliminar la setlist?"
-  },
-  it: {
-    title: "Magic Showrunner", ver: "v8.1", save: "Salva", load: "Carica", newPart: "Nuova Parte",
-    start: "Avvia Show", test: "Modalità Test", parts: "Parti", total: "Totale", settings: "Impostazioni",
-    planTheme: "Tema Pianificazione", perfTheme: "Tema Performance", beeps: "Bip",
-    volume: "Volume", testTone: "Tono Test", testDur: "Durata test/parte", titleL: "Titolo",
-    durL: "Durata (sec)", introL: "Intro (TTS)", preAnnL: "Pre-annuncio (sec)",
-    preAnnTxt: "Testo pre-annuncio", notesL: "Note", colorL: "Colore", saveBtn: "Salva",
-    cancel: "Annulla", showName: "Nome dello Show", overwrite: "Sovrascrivi", noSaved: "Nessuno show salvato.",
-    pause: "Pausa", resume: "Riprendi", prev: "Indietro", next: "Avanti", partOf: "Parte", of: "/",
-    dup: "⧉", del: "Elimina", edit: "✏️", sek: "sec", csv: "CSV",
-    fontSize: "Dimensione", fontFamily: "Font", ttsVoice: "Voce", ttsRate: "Velocità",
-    ttsPitch: "Tono", ttsPreview: "Anteprima", animations: "Animazioni", notes: "Note", voiceControl: "Controllo Vocale",
-    stop: "Stop", setlist: "Setlist", elapsed: "Trascorso", remaining: "Rimanente",
-    soundLabel: "Suono di Avviso", colorTrans: "Transizioni Colore", blackout: "Blackout",
-    startBlackout: "Avvia con Conto alla Rovescia", countdown: "Conto alla Rovescia", countdownSek: "Conto alla Rovescia (sec)",
-    countdownOff: "Off", testModeLbl: "Modalità Test", testDurLbl: "Durata test per parte (sec)",
-    confirmStop: "Vuoi davvero fermare lo show?",
-    templates: "Modelli", saveAsTemplate: "Salva come Modello", noTemplates: "Nessun modello disponibile.",
-    templateSaved: "Modello salvato!", useTemplate: "Usa", deleteTemplate: "Elimina",
-    templateName: "Nome Modello",
-    customTheme: "Schema Colore Personalizzato", customBg: "Sfondo", customCard: "Scheda", customText: "Testo",
-    customAcc: "Accento", customBrd: "Bordo", customSub: "Sottotesto", customInp: "Input",
-    resetCustom: "Reimposta", applyCustom: "Applica",
-    showModeSize: "Dimensione display in Modalità Show", sizeSmall: "Piccolo", sizeLarge: "Grande",
-    targetEnd: "Ora di Fine Obiettivo", onSchedule: "In orario", behind: "In ritardo", ahead: "In anticipo",
-    targetEndHint: "Fine desiderata dello show (HH:MM)",
-    circleTimer: "Timer Circolare", barTimer: "Timer Barra", hourglassTimer: "Timer Clessidra", waveTimer: "Timer Onda", timerStyle: "Stile Timer",
-    blinkLast10: "Lampeggia negli ultimi 10 sec",
-    newGroup: "Nuovo Atto",
-    help: "Aiuto",
-    setlists: "Setlist",
-    newSetlist: "Nuova Setlist",
-    setlistName: "Nome Setlist",
-    activeSetlist: "Setlist Attiva",
-    switchSetlist: "Cambia Setlist",
-    deleteSetlist: "Elimina Setlist",
-    duplicateSetlist: "Duplica Setlist",
-    confirmDeleteSetlist: "Vuoi davvero eliminare la setlist?"
-  },
-  nl: {
-    title: "Magic Showrunner", ver: "v8.1", save: "Opslaan", load: "Laden", newPart: "Nieuw Onderdeel",
-    start: "Start Show", test: "Testmodus", parts: "Onderdelen", total: "Totaal", settings: "Instellingen",
-    planTheme: "Planning Thema", perfTheme: "Uitvoering Thema", beeps: "Pieptonen",
-    volume: "Volume", testTone: "Testtoon", testDur: "Testduur/onderdeel", titleL: "Titel",
-    durL: "Duur (sec)", introL: "Intro (TTS)", preAnnL: "Vooraankondiging (sec)",
-    preAnnTxt: "Vooraankondiging tekst", notesL: "Notities", colorL: "Kleur", saveBtn: "Opslaan",
-    cancel: "Annuleren", showName: "Show Naam", overwrite: "Overschrijven", noSaved: "Geen opgeslagen shows.",
-    pause: "Pauze", resume: "Hervatten", prev: "Terug", next: "Volgende", partOf: "Onderdeel", of: "/",
-    dup: "⧉", del: "Verwijderen", edit: "✏️", sek: "sec", csv: "CSV",
-    fontSize: "Grootte", fontFamily: "Lettertype", ttsVoice: "Stem", ttsRate: "Snelheid",
-    ttsPitch: "Toonhoogte", ttsPreview: "Voorbeeld", animations: "Animaties", notes: "Notities", voiceControl: "Spraakbesturing",
-    stop: "Stop", setlist: "Setlist", elapsed: "Verstreken", remaining: "Resterend",
-    soundLabel: "Waarschuwingsgeluid", colorTrans: "Kleurovergangen", blackout: "Blackout",
-    startBlackout: "Start met Aftelling", countdown: "Aftelling", countdownSek: "Aftelling (sec)",
-    countdownOff: "Uit", testModeLbl: "Testmodus", testDurLbl: "Testduur per onderdeel (sec)",
-    confirmStop: "Show echt stoppen?",
-    templates: "Sjablonen", saveAsTemplate: "Opslaan als Sjabloon", noTemplates: "Geen sjablonen beschikbaar.",
-    templateSaved: "Sjabloon opgeslagen!", useTemplate: "Gebruiken", deleteTemplate: "Verwijderen",
-    templateName: "Sjabloon Naam",
-    customTheme: "Aangepast Kleurenschema", customBg: "Achtergrond", customCard: "Kaart", customText: "Tekst",
-    customAcc: "Accent", customBrd: "Rand", customSub: "Subtekst", customInp: "Invoer",
-    resetCustom: "Resetten", applyCustom: "Toepassen",
-    showModeSize: "Weergavegrootte in Show Modus", sizeSmall: "Klein", sizeLarge: "Groot",
-    targetEnd: "Doel Eindtijd", onSchedule: "Op schema", behind: "Achter", ahead: "Voor",
-    targetEndHint: "Gewenste show einde (HH:MM)",
-    circleTimer: "Cirkel Timer", barTimer: "Balk Timer", hourglassTimer: "Zandloper Timer", waveTimer: "Golf Timer", timerStyle: "Timer Stijl",
-    blinkLast10: "Knipperen in laatste 10 sec",
-    newGroup: "Nieuwe Act",
-    help: "Handleiding",
-    setlists: "Setlists",
-    newSetlist: "Nieuwe Setlist",
-    setlistName: "Setlist Naam",
-    activeSetlist: "Actieve Setlist",
-    switchSetlist: "Wissel Setlist",
-    deleteSetlist: "Verwijder Setlist",
-    duplicateSetlist: "Dupliceer Setlist",
-    confirmDeleteSetlist: "Setlist echt verwijderen?"
   }
 };
 
@@ -281,30 +125,6 @@ var DEMO_DATA = {
     { title: "Card Trick", duration: 180, intro: "A card trick", preAnn: 15, preAnnText: "Next trick", notes: "Ace of spades", color: COLORS[1] },
     { title: "Mentalism", duration: 240, intro: "Mysterious", preAnn: 20, preAnnText: "Finale approaching", notes: "Envelope", color: COLORS[5] },
     { title: "Final", duration: 120, intro: "The finale!", preAnn: 10, preAnnText: "", notes: "Confetti", color: COLORS[3] }
-  ],
-  fr: [
-    { title: "Bienvenue", duration: 60, intro: "Bienvenue!", preAnn: 10, preAnnText: "À suivre", notes: "Saluer le public", color: COLORS[0] },
-    { title: "Tour de Cartes", duration: 180, intro: "Un tour de cartes", preAnn: 15, preAnnText: "Prochain tour", notes: "As de pique", color: COLORS[1] },
-    { title: "Mentalisme", duration: 240, intro: "Mystérieux", preAnn: 20, preAnnText: "Finale approche", notes: "Enveloppe", color: COLORS[5] },
-    { title: "Finale", duration: 120, intro: "Le finale!", preAnn: 10, preAnnText: "", notes: "Confettis", color: COLORS[3] }
-  ],
-  es: [
-    { title: "Bienvenida", duration: 60, intro: "¡Bienvenidos!", preAnn: 10, preAnnText: "Próximamente", notes: "Saludar al público", color: COLORS[0] },
-    { title: "Truco de Cartas", duration: 180, intro: "Un truco de cartas", preAnn: 15, preAnnText: "Siguiente truco", notes: "As de picas", color: COLORS[1] },
-    { title: "Mentalismo", duration: 240, intro: "Misterioso", preAnn: 20, preAnnText: "Se acerca el final", notes: "Sobre", color: COLORS[5] },
-    { title: "Final", duration: 120, intro: "¡El final!", preAnn: 10, preAnnText: "", notes: "Confeti", color: COLORS[3] }
-  ],
-  it: [
-    { title: "Benvenuto", duration: 60, intro: "Benvenuti!", preAnn: 10, preAnnText: "A seguire", notes: "Salutare il pubblico", color: COLORS[0] },
-    { title: "Gioco di Carte", duration: 180, intro: "Un gioco di carte", preAnn: 15, preAnnText: "Prossimo gioco", notes: "Asso di picche", color: COLORS[1] },
-    { title: "Mentalismo", duration: 240, intro: "Misterioso", preAnn: 20, preAnnText: "Finale in arrivo", notes: "Busta", color: COLORS[5] },
-    { title: "Finale", duration: 120, intro: "Il finale!", preAnn: 10, preAnnText: "", notes: "Coriandoli", color: COLORS[3] }
-  ],
-  nl: [
-    { title: "Welkom", duration: 60, intro: "Welkom!", preAnn: 10, preAnnText: "Zo meteen", notes: "Publiek begroeten", color: COLORS[0] },
-    { title: "Kaarttruc", duration: 180, intro: "Een kaarttruc", preAnn: 15, preAnnText: "Volgende truc", notes: "Schoppen aas", color: COLORS[1] },
-    { title: "Mentalisme", duration: 240, intro: "Mysterieus", preAnn: 20, preAnnText: "Finale nadert", notes: "Envelop", color: COLORS[5] },
-    { title: "Finale", duration: 120, intro: "De finale!", preAnn: 10, preAnnText: "", notes: "Confetti", color: COLORS[3] }
   ]
 };
 
@@ -789,14 +609,10 @@ function SettingsModal(props) {
   } else if (tab === "lang") {
     var langOptions = [
       { code: "de", flag: "🇩🇪", name: "Deutsch" },
-      { code: "en", flag: "🇬🇧", name: "English" },
-      { code: "fr", flag: "🇫🇷", name: "Français" },
-      { code: "es", flag: "🇪🇸", name: "Español" },
-      { code: "it", flag: "🇮🇹", name: "Italiano" },
-      { code: "nl", flag: "🇳🇱", name: "Nederlands" }
+      { code: "en", flag: "🇬🇧", name: "English" }
     ];
     content = (
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+      <div style={{ display: "flex", gap: 8 }}>
         {langOptions.map(function (lang) {
           return <button key={lang.code} onClick={function () { upCfg("lang", lang.code); if (onLangChange) onLangChange(lang.code); }} style={{ padding: 12, borderRadius: 10, border: cfg.lang === lang.code ? "2px solid " + th.acc : "2px solid transparent", background: cfg.lang === lang.code ? th.acc + "22" : "transparent", color: th.text, cursor: "pointer", fontSize: 14, fontWeight: cfg.lang === lang.code ? 700 : 400 }}>{lang.flag} {lang.name}</button>;
         })}
@@ -824,6 +640,18 @@ function SettingsModal(props) {
       { title: "🎤 Sprachsteuerung", items: [
         { label: "Aktivieren", text: "In Einstellungen > Design > 'Sprachsteuerung' aktivieren. Im Show-Modus erscheint ein grüner Indikator (wird rot bei Erkennung)." },
         { label: "Befehle (Deutsch)", text: "'Start' oder 'Los' = fortsetzen, 'Pause' = pausieren, 'Weiter' = nächster Teil, 'Zurück' = vorheriger Teil, 'Stop' = Show beenden, 'Blackout' = Blackout ein/aus, 'Notizen' = Notizen ein/aus, 'Setlist' = Setlist ein/aus." }
+      ]},
+
+      { title: "📜 Setlists", items: [
+        { label: "Mehrere Setlists", text: "Erstelle mehrere Setlists für verschiedene Shows. Klicke auf '📜 Setlists' um neue Setlists zu erstellen, zu wechseln oder zu löschen." },
+        { label: "Setlist wechseln", text: "Wähle die aktive Setlist aus der Liste. Jede Setlist hat ihre eigenen Teile und Einstellungen." },
+        { label: "Duplizieren", text: "Dupliziere eine Setlist mit dem '⧉' Button, um eine Kopie zu erstellen." }
+      ]},
+      { title: "🎨 Timer-Designs", items: [
+        { label: "Balken-Timer", text: "Klassischer horizontaler Fortschrittsbalken." },
+        { label: "Kreis-Timer", text: "Kreisförmiger Progress-Ring." },
+        { label: "Sanduhr-Timer", text: "Animierte Sanduhr mit Sand-Animation." },
+        { label: "Wellen-Timer", text: "Wellenförmige Animation mit Fortschrittsbalken." }
       ]},
       { title: "⚙️ Einstellungen", items: [
         { label: "Design", text: "Wähle Planungs-Theme (Light/Dark/Midnight/Ember/Custom) und Perform-Theme (Light/Dark/Black). Aktiviere Animationen, Farb-Übergänge, Blinken in letzten 10 Sek. Wähle Timer-Stil (Balken/Kreis)." },
@@ -860,6 +688,18 @@ function SettingsModal(props) {
       { title: "🎤 Voice Control", items: [
         { label: "Activate", text: "In Settings > Design > 'Voice Control'. In show mode, a green indicator appears (turns red when recognizing)." },
         { label: "Commands (English)", text: "'Start' = resume, 'Pause' = pause, 'Next' = next part, 'Previous' or 'Back' = previous part, 'Stop' = end show, 'Blackout' = toggle blackout, 'Notes' = toggle notes, 'Setlist' = toggle setlist." }
+      ]},
+
+      { title: "📜 Setlists", items: [
+        { label: "Multiple Setlists", text: "Create multiple setlists for different shows. Click '📜 Setlists' to create, switch, or delete setlists." },
+        { label: "Switch Setlist", text: "Select the active setlist from the list. Each setlist has its own parts and settings." },
+        { label: "Duplicate", text: "Duplicate a setlist with the '⧉' button to create a copy." }
+      ]},
+      { title: "🎨 Timer Designs", items: [
+        { label: "Bar Timer", text: "Classic horizontal progress bar." },
+        { label: "Circle Timer", text: "Circular progress ring." },
+        { label: "Hourglass Timer", text: "Animated hourglass with sand animation." },
+        { label: "Wave Timer", text: "Wave-shaped animation with progress bar." }
       ]},
       { title: "⚙️ Settings", items: [
         { label: "Design", text: "Choose planning theme (Light/Dark/Midnight/Ember/Custom) and perform theme (Light/Dark/Black). Enable animations, color transitions, blink in last 10 sec. Choose timer style (bar/circle)." },
