@@ -15,7 +15,7 @@ var SOUNDS = {
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v7.7", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v7.8", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -42,10 +42,11 @@ var T = {
     targetEndHint: "Gewünschtes Show-Ende (HH:MM)",
     circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil",
     blinkLast10: "Blinken in letzten 10 Sek",
-    newGroup: "Neuer Akt"
+    newGroup: "Neuer Akt",
+    help: "Anleitung"
   },
   en: {
-    title: "Magic Showrunner", ver: "v7.7", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v7.8", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -72,7 +73,8 @@ var T = {
     targetEndHint: "Desired show end (HH:MM)",
     circleTimer: "Circle Timer", barTimer: "Bar Timer", timerStyle: "Timer Style",
     blinkLast10: "Blink in last 10 sec",
-    newGroup: "New Act"
+    newGroup: "New Act",
+    help: "Tutorial"
   }
 };
 
@@ -390,9 +392,9 @@ function SettingsModal(props) {
   var is = { width: "100%", padding: 8, borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginBottom: 8, boxSizing: "border-box" };
   if (!open) return null;
   var upCfg = function (k, v) { setCfg(function (c) { var o = {}; o[k] = v; return Object.assign({}, c, o); }); };
-  var tabs = ["design", "audio", "voice", "font", "lang"];
-  var icons = { design: "Design", audio: "Audio", voice: cfg.lang === "de" ? "Stimme" : "Voice", font: cfg.lang === "de" ? "Schrift" : "Font", lang: cfg.lang === "de" ? "Sprache" : "Language" };
-  var tiMap2 = { design: "🎨", audio: "🔊", voice: "🗣️", font: "🔤", lang: "🌐" };
+  var tabs = ["design", "audio", "voice", "font", "lang", "help"];
+  var icons = { design: "Design", audio: "Audio", voice: cfg.lang === "de" ? "Stimme" : "Voice", font: cfg.lang === "de" ? "Schrift" : "Font", lang: cfg.lang === "de" ? "Sprache" : "Language", help: t.help };
+  var tiMap2 = { design: "🎨", audio: "🔊", voice: "🗣️", font: "🔤", lang: "🌐", help: "❓" };
   var content = null;
 
   if (tab === "design") {
@@ -498,6 +500,99 @@ function SettingsModal(props) {
       <div style={{ display: "flex", gap: 8 }}>
         {["de", "en"].map(function (l) {
           return <button key={l} onClick={function () { upCfg("lang", l); if (onLangChange) onLangChange(l); }} style={{ flex: 1, padding: 12, borderRadius: 10, border: cfg.lang === l ? "2px solid " + th.acc : "2px solid transparent", background: cfg.lang === l ? th.acc + "22" : "transparent", color: th.text, cursor: "pointer", fontSize: 16 }}>{l === "de" ? "🇩🇪 Deutsch" : "🇬🇧 English"}</button>;
+        })}
+      </div>
+    );
+  } else if (tab === "help") {
+    var helpContent = cfg.lang === "de" ? [
+      { title: "📋 Grundlagen", items: [
+        { label: "Teile", text: "Ein Teil ist ein einzelner Programmpunkt (z.B. ein Trick). Klicke auf das '+' und wähle '🎬 Neuer Teil'. Hier kannst du Titel, Dauer, Intro-Ansage, Vorankündigung und Notizen festlegen." },
+        { label: "Akte", text: "Ein Akt ist eine Gruppierung mehrerer Teile (z.B. 'Eröffnung', 'Hauptteil'). Klicke auf das '+' und wähle '🎭 Neuer Akt'. Akte werden als Überschriften angezeigt." },
+        { label: "Vorlagen", text: "Speichere häufig verwendete Teile als Vorlage. Im Teil-Editor auf '⭐' klicken. Vorlagen findest du unter dem '⭐ Vorlagen' Button." }
+      ]},
+      { title: "💾 Speichern & Laden", items: [
+        { label: "Speichern", text: "Klicke auf '💾 Speichern', gib einen Namen ein und bestätige. Deine Show wird lokal im Browser gespeichert." },
+        { label: "Laden", text: "Klicke auf '📂 Laden'. Wähle zwischen manuell gespeicherten Shows oder dem Autosave (wird automatisch bei jeder Änderung erstellt)." },
+        { label: "Export/Import", text: "Über das '📦' Menü kannst du Shows als JSON exportieren/importieren oder als CSV-Datei herunterladen." }
+      ]},
+      { title: "🎭 Show-Modus", items: [
+        { label: "Starten", text: "Klicke auf '🎩 Show starten'. Optional: Aktiviere '🔧 Testmodus' für verkürzte Zeiten oder '⏳ Start mit Countdown' für einen Countdown-Start." },
+        { label: "Timer", text: "Zeigt verbleibende oder vergangene Zeit (klicken zum Umschalten). Fortschrittsbalken zeigt den Fortschritt. Du kannst im Balken klicken, um zu einer bestimmten Zeit zu springen." },
+        { label: "Steuerung", text: "'Pause' = Show pausieren, 'Zurück/Weiter' = zwischen Teilen wechseln, '🌙' = Blackout-Modus (nur Timer sichtbar), 'Stop' = Show beenden." },
+        { label: "Setlist & Notizen", text: "'📜 Setlist' zeigt alle Teile, '📝 Notizen' zeigt Notizen des aktuellen Teils. Klicke auf Teile in der Setlist, um direkt dorthin zu springen." },
+        { label: "Ziel-Endzeit", text: "Setze eine gewünschte Endzeit (HH:MM). Die App zeigt an, ob du im Zeitplan bist, vor- oder nachläufst." }
+      ]},
+      { title: "🎤 Sprachsteuerung", items: [
+        { label: "Aktivieren", text: "In Einstellungen > Design > 'Sprachsteuerung' aktivieren. Im Show-Modus erscheint ein grüner Indikator (wird rot bei Erkennung)." },
+        { label: "Befehle (Deutsch)", text: "'Start' oder 'Los' = fortsetzen, 'Pause' = pausieren, 'Weiter' = nächster Teil, 'Zurück' = vorheriger Teil, 'Stop' = Show beenden, 'Blackout' = Blackout ein/aus, 'Notizen' = Notizen ein/aus, 'Setlist' = Setlist ein/aus." }
+      ]},
+      { title: "⚙️ Einstellungen", items: [
+        { label: "Design", text: "Wähle Planungs-Theme (Light/Dark/Midnight/Ember/Custom) und Perform-Theme (Light/Dark/Black). Aktiviere Animationen, Farb-Übergänge, Blinken in letzten 10 Sek. Wähle Timer-Stil (Balken/Kreis)." },
+        { label: "Audio", text: "Aktiviere Signaltöne, stelle Lautstärke ein und wähle den Signalton (Beep/Glocke/Gong/etc.). Teste mit 'Testton'." },
+        { label: "Stimme", text: "Wähle TTS-Stimme, Tempo und Tonhöhe für Intro-Ansagen. Teste mit 'Vorschau'." },
+        { label: "Schrift", text: "Stelle Anzeigegröße im Show-Modus ein (Schieberegler), Schriftgröße und Schriftart für die Planungsansicht." },
+        { label: "Sprache", text: "Wähle zwischen Deutsch und English." }
+      ]},
+      { title: "✨ Tipps & Tricks", items: [
+        { label: "Rückgängig/Wiederholen", text: "Nutze die '↩' und '↪' Buttons, um Änderungen rückgängig zu machen oder wiederherzustellen." },
+        { label: "Drag & Drop", text: "Ziehe Teile und Akte mit der Maus (☰ Symbol), um die Reihenfolge zu ändern." },
+        { label: "Duplizieren", text: "Klicke auf '⧉' bei einem Teil, um ihn zu duplizieren (spart Zeit bei ähnlichen Teilen)." },
+        { label: "Farben", text: "Jeder Teil hat eine Farbe. Im Show-Modus mit Farb-Übergängen wird der Hintergrund in dieser Farbe eingefärbt." },
+        { label: "Vorankündigung", text: "Setze eine Vorankündigung (z.B. 10 Sek vor Ende). Es ertönt ein Signal und optional eine Ansage." }
+      ]}
+    ] : [
+      { title: "📋 Basics", items: [
+        { label: "Parts", text: "A part is a single program item (e.g. a trick). Click '+' and choose '🎬 New Part'. Set title, duration, intro announcement, pre-announcement, and notes." },
+        { label: "Acts", text: "An act is a grouping of multiple parts (e.g. 'Opening', 'Main Act'). Click '+' and choose '🎭 New Act'. Acts are displayed as headings." },
+        { label: "Templates", text: "Save frequently used parts as templates. In the part editor, click '⭐'. Find templates under the '⭐ Templates' button." }
+      ]},
+      { title: "💾 Save & Load", items: [
+        { label: "Save", text: "Click '💾 Save', enter a name, and confirm. Your show is saved locally in the browser." },
+        { label: "Load", text: "Click '📂 Load'. Choose between manually saved shows or autosave (created automatically with every change)." },
+        { label: "Export/Import", text: "Use the '📦' menu to export/import shows as JSON or download as CSV file." }
+      ]},
+      { title: "🎭 Show Mode", items: [
+        { label: "Start", text: "Click '🎩 Start Show'. Optional: Enable '🔧 Test Mode' for shortened times or '⏳ Start with Countdown' for a countdown start." },
+        { label: "Timer", text: "Shows remaining or elapsed time (click to toggle). Progress bar shows progress. Click in the bar to jump to a specific time." },
+        { label: "Controls", text: "'Pause' = pause show, 'Back/Next' = switch between parts, '🌙' = blackout mode (timer only), 'Stop' = end show." },
+        { label: "Setlist & Notes", text: "'📜 Setlist' shows all parts, '📝 Notes' shows current part's notes. Click parts in setlist to jump directly." },
+        { label: "Target End Time", text: "Set a desired end time (HH:MM). The app shows if you're on schedule, ahead, or behind." }
+      ]},
+      { title: "🎤 Voice Control", items: [
+        { label: "Activate", text: "In Settings > Design > 'Voice Control'. In show mode, a green indicator appears (turns red when recognizing)." },
+        { label: "Commands (English)", text: "'Start' = resume, 'Pause' = pause, 'Next' = next part, 'Previous' or 'Back' = previous part, 'Stop' = end show, 'Blackout' = toggle blackout, 'Notes' = toggle notes, 'Setlist' = toggle setlist." }
+      ]},
+      { title: "⚙️ Settings", items: [
+        { label: "Design", text: "Choose planning theme (Light/Dark/Midnight/Ember/Custom) and perform theme (Light/Dark/Black). Enable animations, color transitions, blink in last 10 sec. Choose timer style (bar/circle)." },
+        { label: "Audio", text: "Enable beeps, set volume, and choose alert sound (Beep/Bell/Gong/etc.). Test with 'Test Tone'." },
+        { label: "Voice", text: "Choose TTS voice, speed, and pitch for intro announcements. Test with 'Preview'." },
+        { label: "Font", text: "Set display size in show mode (slider), font size and font family for planning view." },
+        { label: "Language", text: "Choose between Deutsch and English." }
+      ]},
+      { title: "✨ Tips & Tricks", items: [
+        { label: "Undo/Redo", text: "Use '↩' and '↪' buttons to undo or redo changes." },
+        { label: "Drag & Drop", text: "Drag parts and acts with the mouse (☰ icon) to change order." },
+        { label: "Duplicate", text: "Click '⧉' on a part to duplicate it (saves time with similar parts)." },
+        { label: "Colors", text: "Each part has a color. In show mode with color transitions, the background is tinted in this color." },
+        { label: "Pre-announcement", text: "Set a pre-announcement (e.g. 10 sec before end). A signal sounds and optionally an announcement." }
+      ]}
+    ];
+    content = (
+      <div style={{ maxHeight: "60vh", overflowY: "auto", paddingRight: 8 }}>
+        {helpContent.map(function (section, i) {
+          return (
+            <div key={i} style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 15, fontWeight: 700, color: th.acc, marginBottom: 8 }}>{section.title}</div>
+              {section.items.map(function (item, j) {
+                return (
+                  <div key={j} style={{ marginBottom: 10, paddingLeft: 12, borderLeft: "3px solid " + th.brd }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: th.text, marginBottom: 2 }}>{item.label}</div>
+                    <div style={{ fontSize: 12, color: th.sub, lineHeight: 1.5 }}>{item.text}</div>
+                  </div>
+                );
+              })}
+            </div>
+          );
         })}
       </div>
     );
