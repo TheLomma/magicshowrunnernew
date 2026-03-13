@@ -13,9 +13,11 @@ var SOUNDS = {
   soft: { label: "Soft", freq: 660, dur: 400, type: "sine" }
 };
 
+var SETLIST_COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#8b5cf6", "#06b6d4", "#f97316", "#ef4444"];
+
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v7.8", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v7.9", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -43,10 +45,18 @@ var T = {
     circleTimer: "Kreis-Timer", barTimer: "Balken-Timer", timerStyle: "Timer-Stil",
     blinkLast10: "Blinken in letzten 10 Sek",
     newGroup: "Neuer Akt",
-    help: "Anleitung"
+    help: "Anleitung",
+    setlists: "Setlists",
+    newSetlist: "Neue Setlist",
+    setlistName: "Setlist-Name",
+    activeSetlist: "Aktive Setlist",
+    switchSetlist: "Setlist wechseln",
+    deleteSetlist: "Setlist löschen",
+    duplicateSetlist: "Setlist duplizieren",
+    confirmDeleteSetlist: "Setlist wirklich löschen?"
   },
   en: {
-    title: "Magic Showrunner", ver: "v7.8", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v7.9", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -74,7 +84,15 @@ var T = {
     circleTimer: "Circle Timer", barTimer: "Bar Timer", timerStyle: "Timer Style",
     blinkLast10: "Blink in last 10 sec",
     newGroup: "New Act",
-    help: "Tutorial"
+    help: "Tutorial",
+    setlists: "Setlists",
+    newSetlist: "New Setlist",
+    setlistName: "Setlist Name",
+    activeSetlist: "Active Setlist",
+    switchSetlist: "Switch Setlist",
+    deleteSetlist: "Delete Setlist",
+    duplicateSetlist: "Duplicate Setlist",
+    confirmDeleteSetlist: "Really delete setlist?"
   }
 };
 
@@ -147,6 +165,10 @@ function getTemplates() { try { return JSON.parse(localStorage.getItem("ms3_temp
 function saveTemplates(arr) { localStorage.setItem("ms3_templates", JSON.stringify(arr)); }
 function getCustomTheme() { try { return JSON.parse(localStorage.getItem("ms3_custom_theme")) || DEFAULT_CUSTOM; } catch (e) { return DEFAULT_CUSTOM; } }
 function saveCustomTheme(th) { localStorage.setItem("ms3_custom_theme", JSON.stringify(th)); }
+function getSetlists() { try { return JSON.parse(localStorage.getItem("ms3_setlists")) || []; } catch (e) { return []; } }
+function saveSetlists(arr) { localStorage.setItem("ms3_setlists", JSON.stringify(arr)); }
+function getActiveSetlistId() { try { return localStorage.getItem("ms3_active_setlist") || null; } catch (e) { return null; } }
+function saveActiveSetlistId(id) { localStorage.setItem("ms3_active_setlist", id); }
 
 function Modal(props) {
   if (!props.open) return null;
@@ -168,6 +190,52 @@ function Toast(props) {
   if (!props.msg) return null;
   return (
     <div style={{ position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", background: "#333", color: "#fff", padding: "10px 24px", borderRadius: 12, zIndex: 9999, fontSize: 14 }}>{props.msg}</div>
+  );
+}
+
+function SetlistModal(props) {
+  var open = props.open, onClose = props.onClose, setlists = props.setlists, activeId = props.activeId, onSwitch = props.onSwitch, onCreate = props.onCreate, onDelete = props.onDelete, onDuplicate = props.onDuplicate, t = props.t, th = props.th;
+  var _name = useState(""); var name = _name[0], setName = _name[1];
+  if (!open) return null;
+  return (
+    <Modal open={open} onClose={onClose} title={t.setlists} th={th}>
+      <div style={{ marginBottom: 16 }}>
+        <label style={{ fontSize: 12, color: th.sub, display: "block", marginBottom: 4 }}>{t.newSetlist}</label>
+        <div style={{ display: "flex", gap: 6 }}>
+          <input
+            style={{ flex: 1, padding: "8px 12px", borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, boxSizing: "border-box" }}
+            placeholder={t.setlistName}
+            value={name}
+            onChange={function (e) { setName(e.target.value); }}
+          />
+          <button
+            onClick={function () { if (name.trim()) { onCreate(name.trim()); setName(""); } }}
+            style={{ padding: "8px 16px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", cursor: "pointer", fontWeight: 600 }}
+          >+</button>
+        </div>
+      </div>
+      <div style={{ fontSize: 12, color: th.sub, marginBottom: 6, fontWeight: 600 }}>{t.activeSetlist}</div>
+      {setlists.length === 0 && <p style={{ color: th.sub, fontSize: 13 }}>{t.lang === "de" ? "Keine Setlists vorhanden." : "No setlists available."}</p>}
+      {setlists.map(function (sl, i) {
+        var isActive = sl.id === activeId;
+        return (
+          <div key={sl.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", borderRadius: 8, marginBottom: 6, background: isActive ? th.acc + "33" : th.inp, border: isActive ? "2px solid " + th.acc : "2px solid transparent" }}>
+            <div style={{ width: 10, height: 10, borderRadius: 5, background: sl.color || SETLIST_COLORS[i % SETLIST_COLORS.length], flexShrink: 0 }} />
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: isActive ? 700 : 600, fontSize: 14, color: th.text }}>{sl.name}</div>
+              <div style={{ fontSize: 11, color: th.sub }}>{sl.parts.length} {t.parts}</div>
+            </div>
+            {!isActive && (
+              <button onClick={function () { onSwitch(sl.id); }} style={{ padding: "6px 12px", borderRadius: 6, border: "none", background: th.acc, color: "#fff", cursor: "pointer", fontSize: 11, fontWeight: 600 }}>{t.switchSetlist}</button>
+            )}
+            <button onClick={function () { onDuplicate(sl.id); }} style={{ padding: "6px 10px", borderRadius: 6, border: "none", background: th.sub + "44", color: th.text, cursor: "pointer", fontSize: 11 }} title={t.duplicateSetlist}>⧉</button>
+            {setlists.length > 1 && (
+              <button onClick={function () { if (confirm(t.confirmDeleteSetlist)) onDelete(sl.id); }} style={{ padding: "6px 10px", borderRadius: 6, border: "none", background: "#ef4444", color: "#fff", cursor: "pointer", fontSize: 11 }}>🗑️</button>
+            )}
+          </div>
+        );
+      })}
+    </Modal>
   );
 }
 
@@ -1165,24 +1233,44 @@ export default function App() {
   var cfg = _cfg[0], setCfg = _cfg[1];
 
   var _customTh = useState(getCustomTheme()); var customTh = _customTh[0], setCustomTh = _customTh[1];
+  
+  var _setlists = useState(function () {
+    var saved = getSetlists();
+    if (saved.length > 0) return saved;
+    return [{ id: uid(), name: "Standard", parts: makeDemo(cfg.lang || "de"), color: SETLIST_COLORS[0] }];
+  });
+  var setlists = _setlists[0], setSetlists = _setlists[1];
+  
+  var _activeSetlistId = useState(function () {
+    var saved = getActiveSetlistId();
+    if (saved && setlists.find(function (s) { return s.id === saved; })) return saved;
+    return setlists[0].id;
+  });
+  var activeSetlistId = _activeSetlistId[0], setActiveSetlistId = _activeSetlistId[1];
+  
+  var activeSetlist = setlists.find(function (s) { return s.id === activeSetlistId; }) || setlists[0];
+  var parts = activeSetlist.parts;
+  
+  var setParts = function (newParts) {
+    setSetlists(function (prev) {
+      return prev.map(function (sl) {
+        if (sl.id === activeSetlistId) {
+          return Object.assign({}, sl, { parts: typeof newParts === "function" ? newParts(sl.parts) : newParts });
+        }
+        return sl;
+      });
+    });
+  };
+  
+  var _setlistModal = useState(false); var setlistModal = _setlistModal[0], setSetlistModal = _setlistModal[1];
   var _lastSaved = useState(""); var lastSaved = _lastSaved[0], setLastSaved = _lastSaved[1];
   var _autoSaveMsg = useState(""); var autoSaveMsg = _autoSaveMsg[0], setAutoSaveMsg = _autoSaveMsg[1];
   var _history = useState([]); var history = _history[0], setHistory = _history[1];
   var _redoStack = useState([]); var redoStack = _redoStack[0], setRedoStack = _redoStack[1];
 
-  var _parts = useState(function () {
-    var shared = loadSharedShow();
-    if (shared) { window.location.hash = ""; return shared; }
-    return makeDemo("de");
-  });
-  var parts = _parts[0], setPartsRaw = _parts[1];
 
-  var setParts = function (np) {
-    var r = typeof np === "function" ? np(parts) : np;
-    setHistory(function (h) { return h.concat([parts]); });
-    setRedoStack([]);
-    setPartsRaw(r);
-  };
+
+
   var doUndo = function () { if (!history.length) return; var p = history[history.length - 1]; setRedoStack(function (rs) { return rs.concat([parts]); }); setPartsRaw(p); setHistory(function (h) { return h.slice(0, -1); }); };
   var doRedo = function () { if (!redoStack.length) return; var n = redoStack[redoStack.length - 1]; setHistory(function (h) { return h.concat([parts]); }); setPartsRaw(n); setRedoStack(function (rs) { return rs.slice(0, -1); }); };
 
@@ -1203,6 +1291,9 @@ export default function App() {
   var _showGroupEditor = useState(false); var showGroupEditor = _showGroupEditor[0], setShowGroupEditor = _showGroupEditor[1];
   var _editGroup = useState(null); var editGroup = _editGroup[0], setEditGroup = _editGroup[1];
 
+  useEffect(function () { saveSetlists(setlists); }, [setlists]);
+  useEffect(function () { saveActiveSetlistId(activeSetlistId); }, [activeSetlistId]);
+  
   useEffect(function () {
     if (!parts || parts.length === 0) return;
     setAutoSave(parts);
@@ -1219,9 +1310,9 @@ export default function App() {
   var totalDur = parts.filter(function (p) { return p.type !== "group"; }).reduce(function (a, p) { return a + (p.duration || 0); }, 0);
   var ff = cfg.fontFamily === "System" ? "-apple-system, BlinkMacSystemFont, sans-serif" : cfg.fontFamily;
 
-  var handleLangChange = function (lang) {
+  var handleLangChange = function (newLang) {
     var allDemo = parts.every(function (p) { return p._isDemo; });
-    if (allDemo) { setParts(makeDemo(lang)); }
+    if (allDemo) { setParts(makeDemo(newLang)); }
   };
 
   var addPart = function (p) {
@@ -1268,6 +1359,7 @@ export default function App() {
             {lastSaved && <span style={{ fontSize: 11, color: th.sub }}>💾 {lastSaved}</span>}
           </div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+            <button onClick={function () { setSetlistModal(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>🎭 {t.setlists}</button>
             <button onClick={function () { setSaveOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>💾 {t.save}</button>
             <button onClick={function () { setLoadOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>📂 {t.load}</button>
             <div style={{ position: "relative" }}>
@@ -1292,6 +1384,11 @@ export default function App() {
             </div>
             <button onClick={function () { setSettOpen(true); }} style={{ padding: "6px 14px", borderRadius: 8, border: "1px solid " + th.brd, background: "transparent", color: th.text, cursor: "pointer", fontSize: 12 }}>⚙️</button>
           </div>
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 6, marginBottom: 4 }}>
+          <div style={{ width: 8, height: 8, borderRadius: 4, background: activeSetlist.color || SETLIST_COLORS[0] }} />
+          <span style={{ fontSize: 12, fontWeight: 600, color: th.acc }}>{activeSetlist.name}</span>
         </div>
 
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
@@ -1392,6 +1489,35 @@ export default function App() {
       <LoadModal open={loadOpen} onClose={function () { setLoadOpen(false); }} onLoad={function (p) { setParts(p); }} t={t} th={th} />
       <SettingsModal open={settOpen} onClose={function () { setSettOpen(false); }} cfg={cfg} setCfg={setCfg} t={t} th={th} onApplyCustom={setCustomTh} onLangChange={handleLangChange} />
       <TemplateModal open={tplOpen} onClose={function () { setTplOpen(false); }} onUse={function (tpl) { setParts(parts.concat([Object.assign({}, tpl, { id: uid() })])); }} t={t} th={th} />
+      <SetlistModal
+        open={setlistModal}
+        onClose={function () { setSetlistModal(false); }}
+        setlists={setlists}
+        activeId={activeSetlistId}
+        onSwitch={function (id) { setActiveSetlistId(id); setSetlistModal(false); }}
+        onCreate={function (name) {
+          var newId = uid();
+          var newSetlist = { id: newId, name: name, parts: [], color: SETLIST_COLORS[setlists.length % SETLIST_COLORS.length] };
+          setSetlists(function (prev) { return prev.concat(newSetlist); });
+          setActiveSetlistId(newId);
+        }}
+        onDelete={function (id) {
+          setSetlists(function (prev) {
+            var filtered = prev.filter(function (s) { return s.id !== id; });
+            if (activeSetlistId === id && filtered.length > 0) setActiveSetlistId(filtered[0].id);
+            return filtered;
+          });
+        }}
+        onDuplicate={function (id) {
+          var orig = setlists.find(function (s) { return s.id === id; });
+          if (!orig) return;
+          var newId = uid();
+          var dup = { id: newId, name: orig.name + " (Kopie)", parts: orig.parts.map(function (p) { return Object.assign({}, p, { id: uid() }); }), color: SETLIST_COLORS[setlists.length % SETLIST_COLORS.length] };
+          setSetlists(function (prev) { return prev.concat(dup); });
+        }}
+        t={t}
+        th={th}
+      />
       {toast && <Toast msg={toast} onDone={function () { setToast(""); }} />}
     </div>
   );
