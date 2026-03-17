@@ -102,7 +102,7 @@ var SETLIST_COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#8b5cf6", "#0
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v8.4", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v8.5", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -141,7 +141,7 @@ var T = {
     confirmDeleteSetlist: "Setlist wirklich löschen?"
   },
   en: {
-    title: "Magic Showrunner", ver: "v8.4", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v8.5", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -545,9 +545,9 @@ function SettingsModal(props) {
   var is = { width: "100%", padding: 8, borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginBottom: 8, boxSizing: "border-box" };
   if (!open) return null;
   var upCfg = function (k, v) { setCfg(function (c) { var o = {}; o[k] = v; return Object.assign({}, c, o); }); };
-  var tabs = ["design", "audio", "voice", "font", "lang", "help"];
-  var tiMap2 = { design: "🎨", audio: "🔊", voice: "🗣️", font: "🔤", lang: "🌐", help: "❓" };
-  var icons = { design: "Design", audio: "Audio", voice: cfg.lang === "de" ? "Stimme" : "Voice", font: cfg.lang === "de" ? "Schrift" : "Font", lang: cfg.lang === "de" ? "Sprache" : "Language", help: t.help };
+  var tabs = ["design", "audio", "voice", "font", "lang", "api", "help"];
+  var tiMap2 = { design: "🎨", audio: "🔊", voice: "🗣️", font: "🔤", lang: "🌐", api: "🔗", help: "❓" };
+  var icons = { design: "Design", audio: "Audio", voice: cfg.lang === "de" ? "Stimme" : "Voice", font: cfg.lang === "de" ? "Schrift" : "Font", lang: cfg.lang === "de" ? "Sprache" : "Language", api: "API", help: t.help };
   
   var renderTimerPreview = function(style) {
     if (style === "circle") {
@@ -691,6 +691,94 @@ function SettingsModal(props) {
         </select>
       </div>
     );
+  } else if (tab === "api") {
+    var doApiTest = function() {
+      if (!cfg.apiUrl) { alert(cfg.lang === "de" ? "Keine API URL gesetzt." : "No API URL set."); return; }
+      fetchAPIValue(cfg).then(function(val) {
+        if (val === null) {
+          alert(cfg.lang === "de" ? "Fehler beim Abrufen der API." : "Failed to fetch API.");
+        } else {
+          var preview = applyAPIValue("Beispieltext: ", val);
+          alert((cfg.lang === "de" ? "Erfolgreich!\nWert: " : "Success!\nValue: ") + val + "\n\n" + (cfg.lang === "de" ? "Vorschau: " : "Preview: ") + preview);
+        }
+      });
+    };
+    content = (
+      <div>
+        <div style={{ background: th.acc + "18", border: "1px solid " + th.acc + "44", borderRadius: 10, padding: "10px 14px", marginBottom: 14, fontSize: 12, color: th.sub, lineHeight: 1.6 }}>
+          <strong style={{ color: th.text }}>💡 {cfg.lang === "de" ? "Wie es funktioniert" : "How it works"}:</strong><br/>
+          {cfg.lang === "de" ? "Trage eine API-URL und einen Value-Key ein. Im Intro/Notizen-Text kannst du " : "Enter an API URL and a value key. In the intro/notes text you can use "}
+          <code style={{ background: th.inp, padding: "1px 5px", borderRadius: 4, color: th.acc }}>{"{{api}}"}</code>
+          {cfg.lang === "de" ? " als Platzhalter verwenden – oder der Wert wird nach dem letzten Doppelpunkt eingefügt." : " as a placeholder – or the value is inserted after the last colon."}
+        </div>
+        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, marginBottom: 12 }}>
+          <input type="checkbox" checked={!!cfg.apiEnabled} onChange={function(e){ upCfg("apiEnabled", e.target.checked); }} />
+          <strong>{cfg.lang === "de" ? "API aktivieren" : "Enable API"}</strong>
+        </label>
+        <label style={{ fontSize: 12, color: th.sub, display: "block", marginBottom: 4 }}>API URL</label>
+        <input
+          style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginBottom: 10, boxSizing: "border-box", fontFamily: "monospace", fontSize: 12 }}
+          value={cfg.apiUrl || ""}
+          onChange={function(e){ upCfg("apiUrl", e.target.value); }}
+          placeholder="https://api.example.com/data"
+        />
+        <label style={{ fontSize: 12, color: th.sub, display: "block", marginBottom: 4 }}>Value-Key <span style={{ fontWeight: 400 }}>({cfg.lang === "de" ? "z.B." : "e.g."} <code style={{ background: th.inp, padding: "1px 4px", borderRadius: 3 }}>message</code> {cfg.lang === "de" ? "oder" : "or"} <code style={{ background: th.inp, padding: "1px 4px", borderRadius: 3 }}>data.text</code>)</span></label>
+        <input
+          style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginBottom: 10, boxSizing: "border-box", fontFamily: "monospace", fontSize: 12 }}
+          value={cfg.apiValueKey || ""}
+          onChange={function(e){ upCfg("apiValueKey", e.target.value); }}
+          placeholder={cfg.lang === "de" ? "z.B. message oder result.text" : "e.g. message or result.text"}
+        />
+        <label style={{ fontSize: 12, color: th.sub, display: "block", marginBottom: 4 }}>{cfg.lang === "de" ? "Feld im Show-Teil befüllen" : "Field to update in show part"}</label>
+        <select
+          value={cfg.apiField || "intro"}
+          onChange={function(e){ upCfg("apiField", e.target.value); }}
+          style={{ width: "100%", padding: 8, borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginBottom: 10, boxSizing: "border-box" }}
+        >
+          <option value="intro">{cfg.lang === "de" ? "Intro-Ansage" : "Intro"}</option>
+          <option value="notes">{cfg.lang === "de" ? "Notizen" : "Notes"}</option>
+          <option value="preAnnText">{cfg.lang === "de" ? "Vorankündigungs-Text" : "Pre-announce text"}</option>
+        </select>
+        <label style={{ fontSize: 12, color: th.sub, display: "block", marginBottom: 4 }}>{cfg.lang === "de" ? "Abruf-Modus" : "Fetch Mode"}</label>
+        <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
+          {[
+            { val: "onPartStart", label: cfg.lang === "de" ? "⏭️ Beim Teilwechsel" : "⏭️ On Part Start" },
+            { val: "interval", label: cfg.lang === "de" ? "🔄 Konstant (Intervall)" : "🔄 Interval" },
+            { val: "both", label: cfg.lang === "de" ? "⏭️+🔄 Beides" : "⏭️+🔄 Both" }
+          ].map(function(opt) {
+            var active = (cfg.apiMode || "onPartStart") === opt.val;
+            return (
+              <button key={opt.val} onClick={function(){ upCfg("apiMode", opt.val); }}
+                style={{ padding: "6px 12px", borderRadius: 8, border: active ? "2px solid " + th.acc : "2px solid transparent", background: active ? th.acc + "22" : th.inp, color: th.text, cursor: "pointer", fontSize: 12, fontWeight: active ? 700 : 400 }}>
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+        {(cfg.apiMode === "interval" || cfg.apiMode === "both") && (
+          <div style={{ marginBottom: 10 }}>
+            <label style={{ fontSize: 12, color: th.sub, display: "block", marginBottom: 4 }}>{cfg.lang === "de" ? "Intervall" : "Interval"}: {cfg.apiInterval || 30}s</label>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <input type="range" min={5} max={120} step={5} value={cfg.apiInterval || 30}
+                onChange={function(e){ upCfg("apiInterval", +e.target.value); }} style={{ flex: 1 }} />
+              <span style={{ fontSize: 12, color: th.text, fontWeight: 700, minWidth: 36 }}>{cfg.apiInterval || 30}s</span>
+            </div>
+          </div>
+        )}
+        <button
+          onClick={doApiTest}
+          style={{ width: "100%", padding: "9px 14px", borderRadius: 8, border: "none", background: th.acc, color: "#fff", cursor: "pointer", fontWeight: 600, marginBottom: 10 }}
+        >
+          🔗 {cfg.lang === "de" ? "API testen" : "Test API"}
+        </button>
+        <div style={{ padding: "8px 12px", background: th.inp, borderRadius: 8, fontSize: 11, color: th.sub, lineHeight: 1.7 }}>
+          <strong style={{ color: th.text }}>{cfg.lang === "de" ? "Platzhalter-Beispiel" : "Placeholder example"}:</strong><br/>
+          {cfg.lang === "de" ? "Intro-Text:" : "Intro text:"} <code style={{ color: th.acc }}>{"\"Heute: {{api}}\""}</code><br/>
+          → <code style={{ color: "#22c55e" }}>{"\"Heute: [API-Wert]\""}</code><br/>
+          {cfg.lang === "de" ? "Oder mit Doppelpunkt:" : "Or with colon:"} <code style={{ color: th.acc }}>{"\"Nächster Act:\""}</code> → <code style={{ color: "#22c55e" }}>{"\"Nächster Act: [Wert]\""}</code>
+        </div>
+      </div>
+    );
   } else if (tab === "lang") {
     var langOptions = [
       { code: "de", flag: "🇩🇪", name: "Deutsch" },
@@ -756,6 +844,16 @@ function SettingsModal(props) {
     { label: "Kreis-Timer", text: "Radialer Countdown-Ring mit Fortschrittsanimation." },
     { label: "Sanduhr", text: "Grafische animierte Sanduhr." },
     { label: "Wellen-Timer", text: "Animierte Wellenlinie mit Fortschrittsbalken." }
+  ]},
+  { title: "🔗 API-Integration", items: [
+    { label: cfg.lang === "de" ? "Aktivieren" : "Activate", text: cfg.lang === "de" ? "Öffne Einstellungen → API. Aktiviere die API per Checkbox." : "Open Settings → API. Enable the API via the checkbox." },
+    { label: "URL", text: cfg.lang === "de" ? "Trage die vollständige API-URL ein (muss JSON zurückgeben)." : "Enter the full API URL (must return JSON)." },
+    { label: "Value-Key", text: cfg.lang === "de" ? "Gib den JSON-Pfad zum gewünschten Wert an, z.B. 'message' oder 'data.text'." : "Enter the JSON path to the desired value, e.g. 'message' or 'data.text'." },
+    { label: cfg.lang === "de" ? "Feld wählen" : "Choose field", text: cfg.lang === "de" ? "Wähle welches Feld im Show-Teil aktualisiert wird: Intro, Notizen oder Vorankündigungs-Text." : "Choose which field in the show part gets updated: Intro, Notes or Pre-announce text." },
+    { label: cfg.lang === "de" ? "Abruf-Modus" : "Fetch mode", text: cfg.lang === "de" ? "'Beim Teilwechsel': API wird einmalig beim Start jedes Teils abgerufen. 'Intervall': kontinuierliche Aktualisierung. 'Beides': kombiniert." : "'On Part Start': API is fetched once when each part begins. 'Interval': continuous update. 'Both': combined." },
+    { label: cfg.lang === "de" ? "Platzhalter" : "Placeholder", text: cfg.lang === "de" ? "Schreibe {{api}} in einen Intro- oder Notizen-Text – er wird durch den API-Wert ersetzt. Alternativ: Text endet mit Doppelpunkt → Wert wird dahinter eingefügt." : "Write {{api}} in an intro or notes text – it gets replaced by the API value. Alternatively: text ends with colon → value is appended after it." },
+    { label: cfg.lang === "de" ? "Testen" : "Test", text: cfg.lang === "de" ? "Mit dem 'API testen'-Button kannst du die Verbindung prüfen und eine Vorschau des Werts sehen." : "Use the 'Test API' button to check the connection and preview the value." },
+    { label: "CORS", text: cfg.lang === "de" ? "Falls die API CORS-Probleme hat, versucht die App automatisch mehrere Proxy-Fallbacks." : "If the API has CORS issues, the app automatically tries several proxy fallbacks." }
   ]},
   { title: "📦 Speichern & Laden", items: [
     { label: "Manuelles Speichern", text: "Alle Teile der Show speichern – später wieder abrufbar." },
@@ -1645,4 +1743,5 @@ export default function App() {
     </div>
   );
 }
+
 
