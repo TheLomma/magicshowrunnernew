@@ -102,7 +102,7 @@ var SETLIST_COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#8b5cf6", "#0
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v8.5", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v8.6", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -141,7 +141,7 @@ var T = {
     confirmDeleteSetlist: "Setlist wirklich löschen?"
   },
   en: {
-    title: "Magic Showrunner", ver: "v8.5", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v8.6", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -250,6 +250,38 @@ function getTemplates() { try { return JSON.parse(localStorage.getItem("ms3_temp
 function saveTemplates(arr) { localStorage.setItem("ms3_templates", JSON.stringify(arr)); }
 function getCustomTheme() { try { return JSON.parse(localStorage.getItem("ms3_custom_theme")) || DEFAULT_CUSTOM; } catch (e) { return DEFAULT_CUSTOM; } }
 function saveCustomTheme(th) { localStorage.setItem("ms3_custom_theme", JSON.stringify(th)); }
+function getCfg() { try { return JSON.parse(localStorage.getItem("ms3_cfg")) || null; } catch (e) { return null; } }
+function saveCfg(cfg) { try { localStorage.setItem("ms3_cfg", JSON.stringify(cfg)); } catch (e) {} }
+
+async function fetchAPIValue(cfg) {
+  if (!cfg.apiUrl) return null;
+  try {
+    var proxies = [
+      cfg.apiUrl,
+      "https://api.allorigins.win/raw?url=" + encodeURIComponent(cfg.apiUrl),
+      "https://corsproxy.io/?" + encodeURIComponent(cfg.apiUrl)
+    ];
+    var res = null;
+    for (var i = 0; i < proxies.length; i++) {
+      try { res = await fetch(proxies[i]); if (res.ok) break; res = null; } catch (e) { res = null; }
+    }
+    if (!res) return null;
+    var data = await res.json();
+    var key = cfg.apiValueKey || "";
+    if (!key) return JSON.stringify(data);
+    var val = key.split(".").reduce(function(o, k) { return o && o[k] !== undefined ? o[k] : undefined; }, data);
+    return val !== undefined ? (typeof val === "object" ? JSON.stringify(val) : String(val)) : null;
+  } catch (e) { return null; }
+}
+
+function applyAPIValue(text, val) {
+  if (!val) return text;
+  if (text.indexOf("{{api}}") !== -1) return text.replace(/\{\{api\}\}/g, val);
+  var lastColon = text.lastIndexOf(":");
+  if (lastColon !== -1) return text.substring(0, lastColon + 1) + " " + val;
+  return text + " " + val;
+}
+
 function getSetlists() { try { return JSON.parse(localStorage.getItem("ms3_setlists")) || []; } catch (e) { return []; } }
 function saveSetlists(arr) { localStorage.setItem("ms3_setlists", JSON.stringify(arr)); }
 function getActiveSetlistId() { try { return localStorage.getItem("ms3_active_setlist") || null; } catch (e) { return null; } }
@@ -535,8 +567,16 @@ function CustomThemeEditor(props) {
 
 function SettingsModal(props) {
   var open = props.open, onClose = props.onClose, cfg = props.cfg, setCfg = props.setCfg, t = props.t, th = props.th, onApplyCustom = props.onApplyCustom, onLangChange = props.onLangChange;
+  // Auto-save cfg to localStorage whenever cfg changes
+  useEffect(function() {
+    if (cfg) {
+      saveCfg(cfg);
+    }
+  }, [JSON.stringify(cfg)]);
   var _tab = useState("design"); var tab = _tab[0], setTab = _tab[1];
   var _v = useState([]); var voices = _v[0], setVoices = _v[1];
+  var _apiTR = useState(null); var apiTestResult = _apiTR[0]; var setApiTestResult = _apiTR[1];
+  var _apiTL = useState(false); var apiTestLoading = _apiTL[0]; var setApiTestLoading = _apiTL[1];
   useEffect(function () {
     var ld = function () { setVoices((speechSynthesis && speechSynthesis.getVoices()) || []); };
     ld(); if (speechSynthesis) speechSynthesis.addEventListener("voiceschanged", ld);
@@ -694,14 +734,18 @@ function SettingsModal(props) {
   } else if (tab === "api") {
     var doApiTest = function() {
       if (!cfg.apiUrl) { alert(cfg.lang === "de" ? "Keine API URL gesetzt." : "No API URL set."); return; }
+      setApiTestLoading(true);
+      setApiTestResult(null);
       fetchAPIValue(cfg).then(function(val) {
+        setApiTestLoading(false);
         if (val === null) {
-          alert(cfg.lang === "de" ? "Fehler beim Abrufen der API." : "Failed to fetch API.");
+          setApiTestResult({ ok: false, msg: cfg.lang === "de" ? "Fehler beim Abrufen der API." : "Failed to fetch API." });
         } else {
           var preview = applyAPIValue("Beispieltext: ", val);
-          alert((cfg.lang === "de" ? "Erfolgreich!\nWert: " : "Success!\nValue: ") + val + "\n\n" + (cfg.lang === "de" ? "Vorschau: " : "Preview: ") + preview);
+          setApiTestResult({ ok: true, val: val, preview: preview });
+          saveCfg(cfg);
         }
-      });
+      }).catch(function() { setApiTestLoading(false); setApiTestResult({ ok: false, msg: "Netzwerkfehler" }); });
     };
     content = (
       <div>
@@ -1743,5 +1787,4 @@ export default function App() {
     </div>
   );
 }
-
 
