@@ -149,7 +149,7 @@ function exportShowPDF(parts, showName) {
     '</div>',
     '<div class="header">',
     '<div><div style="font-size:18px;font-weight:800;color:#fff;">' + (showName||"Show") + '</div><div style="font-size:11px;color:#c7d2fe;margin-top:2px;">' + date + '</div></div>',
-    '<div style="font-size:12px;color:#c7d2fe;font-weight:600;">Magic Showrunner v8.9</div>',
+    '<div style="font-size:12px;color:#c7d2fe;font-weight:600;">Magic Showrunner v9.0</div>',
     '</div>',
     statsHTML,
     '<div style="font-size:13px;font-weight:700;color:#818cf8;margin-bottom:8px;letter-spacing:0.5px;">ZEITPLAN-ÜBERSICHT</div>',
@@ -157,7 +157,7 @@ function exportShowPDF(parts, showName) {
     '<div style="display:flex;justify-content:space-between;font-size:10px;color:#4a4a7a;margin-bottom:20px;"><span>0:00</span><span>' + fmtS(totalSec) + '</span></div>',
     '<div style="font-size:13px;font-weight:700;color:#818cf8;margin-bottom:10px;letter-spacing:0.5px;">ABLAUFPLAN</div>',
     cards,
-    '<div class="footer"><span>' + (showName||"Show") + ' · Magic Showrunner v8.9</span><span>' + date + '</span></div>',
+    '<div class="footer"><span>' + (showName||"Show") + ' · Magic Showrunner v9.0</span><span>' + date + '</span></div>',
     '</body></html>'
   ].join("");
 
@@ -184,7 +184,7 @@ var SETLIST_COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#8b5cf6", "#0
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v8.9", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v9.0", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -223,7 +223,7 @@ var T = {
     confirmDeleteSetlist: "Setlist wirklich löschen?"
   },
   en: {
-    title: "Magic Showrunner", ver: "v8.9", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v9.0", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -1182,6 +1182,41 @@ function PerformMode(props) {
   var _showOverrun = useState(false); var showOverrun = _showOverrun[0], setShowOverrun = _showOverrun[1];
 
   var preAnnRef = useRef({}); var introRef = useRef({}); var barRef = useRef(null);
+  var swipeTouchStartX = useRef(null);
+  var swipeTouchStartY = useRef(null);
+
+  var handleSwipeTouchStart = function (e) {
+    swipeTouchStartX.current = e.touches[0].clientX;
+    swipeTouchStartY.current = e.touches[0].clientY;
+  };
+
+  var handleSwipeTouchEnd = function (e) {
+    if (swipeTouchStartX.current === null) return;
+    var dx = e.changedTouches[0].clientX - swipeTouchStartX.current;
+    var dy = e.changedTouches[0].clientY - swipeTouchStartY.current;
+    swipeTouchStartX.current = null;
+    swipeTouchStartY.current = null;
+    // Only horizontal swipes (dx > dy to avoid scroll conflicts)
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+    if (dx < 0) {
+      // Swipe left → next part
+      if (idx < parts.length - 1) { setIdx(idx + 1); setElapsed(0); preAnnRef.current = {}; introRef.current = {}; }
+    } else {
+      // Swipe right → previous part
+      if (idx > 0) { setIdx(idx - 1); setElapsed(0); preAnnRef.current = {}; introRef.current = {}; }
+    }
+  };
+
+  var handleSwipeTouchMoveDown = function (e) {
+    if (swipeTouchStartY.current === null) return;
+    var dy = e.changedTouches[0].clientY - swipeTouchStartY.current;
+    var dx = e.changedTouches[0].clientX - swipeTouchStartX.current;
+    if (dy > 80 && Math.abs(dy) > Math.abs(dx) * 2) {
+      swipeTouchStartX.current = null;
+      swipeTouchStartY.current = null;
+      setPaused(function (p) { return !p; });
+    }
+  };
 
   var cur = parts[idx];
   var dur = cfg.testMode ? (cfg.testDur || 10) : (cur ? cur.duration : 60);
@@ -1386,7 +1421,11 @@ function PerformMode(props) {
   var bgStyle = useColorTrans ? "radial-gradient(ellipse at center, " + partColor + "22 0%, " + pt.bg + " 70%)" : pt.bg;
 
   return (
-    <div style={{ position: "fixed", inset: 0, background: bgStyle, display: "flex", flexDirection: "column", zIndex: 999, transition: useColorTrans ? "background 1.5s ease" : "none", opacity: shouldBlink ? (blinkVisible ? 1 : 0.35) : 1 }}>
+    <div
+      onTouchStart={handleSwipeTouchStart}
+      onTouchEnd={handleSwipeTouchEnd}
+      onTouchMove={handleSwipeTouchMoveDown}
+      style={{ position: "fixed", inset: 0, background: bgStyle, display: "flex", flexDirection: "column", zIndex: 999, transition: useColorTrans ? "background 1.5s ease" : "none", opacity: shouldBlink ? (blinkVisible ? 1 : 0.35) : 1 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", gap: 8, flexWrap: "wrap", pointerEvents: "auto" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
           <div style={{ fontSize: 14, fontFamily: "monospace", color: pt.text, opacity: 0.6, fontWeight: 600 }}>{clock}</div>
