@@ -149,7 +149,7 @@ function exportShowPDF(parts, showName) {
     '</div>',
     '<div class="header">',
     '<div><div style="font-size:18px;font-weight:800;color:#fff;">' + (showName||"Show") + '</div><div style="font-size:11px;color:#c7d2fe;margin-top:2px;">' + date + '</div></div>',
-    '<div style="font-size:12px;color:#c7d2fe;font-weight:600;">Magic Showrunner v8.6</div>',
+    '<div style="font-size:12px;color:#c7d2fe;font-weight:600;">Magic Showrunner v8.7</div>',
     '</div>',
     statsHTML,
     '<div style="font-size:13px;font-weight:700;color:#818cf8;margin-bottom:8px;letter-spacing:0.5px;">ZEITPLAN-ÜBERSICHT</div>',
@@ -157,7 +157,7 @@ function exportShowPDF(parts, showName) {
     '<div style="display:flex;justify-content:space-between;font-size:10px;color:#4a4a7a;margin-bottom:20px;"><span>0:00</span><span>' + fmtS(totalSec) + '</span></div>',
     '<div style="font-size:13px;font-weight:700;color:#818cf8;margin-bottom:10px;letter-spacing:0.5px;">ABLAUFPLAN</div>',
     cards,
-    '<div class="footer"><span>' + (showName||"Show") + ' · Magic Showrunner v8.6</span><span>' + date + '</span></div>',
+    '<div class="footer"><span>' + (showName||"Show") + ' · Magic Showrunner v8.7</span><span>' + date + '</span></div>',
     '</body></html>'
   ].join("");
 
@@ -184,7 +184,7 @@ var SETLIST_COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#8b5cf6", "#0
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v8.6", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v8.7", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -223,7 +223,7 @@ var T = {
     confirmDeleteSetlist: "Setlist wirklich löschen?"
   },
   en: {
-    title: "Magic Showrunner", ver: "v8.6", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v8.7", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -1447,7 +1447,22 @@ function PerformMode(props) {
         </div>
 
         {showNotes && cur.notes && (
-          <div style={{ marginTop: 16, padding: 12, background: pt.barBg, borderRadius: 10, maxWidth: 400, width: "100%", fontSize: 14, color: pt.text }}>{cur.notes}</div>
+          <div style={{ marginTop: 14, padding: "10px 18px", background: "rgba(255,255,255,0.08)", borderRadius: 12, maxWidth: 480, width: "100%", textAlign: "center", border: "1px solid rgba(255,255,255,0.12)" }}>
+              <div style={{ fontSize: 11, color: pt.text, opacity: 0.45, marginBottom: 4, textTransform: "uppercase", letterSpacing: 1 }}>📝 {t.notes}</div>
+              <div style={{ fontSize: 15, color: pt.text, lineHeight: 1.55 }}>{cur.notes}</div>
+            </div>
+          )}
+
+          {/* ── UP NEXT / DANACH Vorschau ── */}
+          {parts[idx + 1] && (
+            <div style={{ marginTop: 14, maxWidth: 480, width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "10px 16px", borderRadius: 12, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)" }}>
+              <div style={{ width: 10, height: 10, borderRadius: 5, background: parts[idx + 1].color || COLORS[0], flexShrink: 0 }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 10, color: pt.text, opacity: 0.4, textTransform: "uppercase", letterSpacing: 1, marginBottom: 2 }}>{cfg.lang === "de" ? "Danach" : "Up Next"}</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: pt.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{parts[idx + 1].title}</div>
+              </div>
+              <div style={{ fontSize: 14, fontFamily: "monospace", fontWeight: 700, color: parts[idx + 1].color || pt.bar, flexShrink: 0 }}>{fmt(cfg.testMode ? (cfg.testDur || 10) : (parts[idx + 1].duration || 0))}</div>
+            </div>
         )}
       </div>
 
@@ -1827,5 +1842,4 @@ export default function App() {
     </div>
   );
 }
-
 
