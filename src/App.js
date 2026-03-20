@@ -85,6 +85,88 @@ function useTouchDragDrop(items, setItems, dragIdx, setDragIdx) {
   return { onTouchStart: onTouchStart, onTouchMove: onTouchMove, onTouchEnd: onTouchEnd, containerRef: containerRef };
 }
 
+/* ─── PDF Export ─── */
+function exportShowPDF(parts, showName) {
+  var COLORS_MAP = {
+    "#6366f1": "#6366f1", "#ec4899": "#ec4899", "#f59e0b": "#f59e0b",
+    "#10b981": "#10b981", "#ef4444": "#ef4444", "#8b5cf6": "#8b5cf6",
+    "#06b6d4": "#06b6d4", "#f97316": "#f97316"
+  };
+  var fmtS = function(s) { var m = Math.floor(s/60); var sec = s%60; return m+":"+String(sec).padStart(2,"0"); };
+  var totalSec = parts.filter(function(p){ return p.type !== "group"; }).reduce(function(a,p){ return a + (p.duration||0); }, 0);
+  var realParts = parts.filter(function(p){ return p.type !== "group"; });
+  var date = new Date().toLocaleDateString("de-DE", { weekday:"long", year:"numeric", month:"long", day:"numeric" });
+
+  var timelineSegs = realParts.map(function(p, i) {
+    var pct = totalSec > 0 ? ((p.duration||0) / totalSec * 100).toFixed(2) : 0;
+    var col = p.color || "#6366f1";
+    return '<div style="flex:' + pct + ';background:' + col + ';height:100%;display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700;border-right:1px solid #0f0f23;box-sizing:border-box;min-width:4px;" title="' + (p.title||'') + '">' + (pct > 4 ? (i+1) : '') + '</div>';
+  }).join("");
+
+  var cards = realParts.map(function(p, i) {
+    var col = p.color || "#6366f1";
+    var rows = [
+      '<tr><td style="color:#94a3b8;font-size:10px;padding:3px 12px 3px 0;white-space:nowrap;vertical-align:top;width:90px;">⏱ Dauer</td><td style="font-size:11px;color:#e2e8f0;vertical-align:top;">' + fmtS(p.duration||0) + '</td></tr>'
+    ];
+    if (p.intro) rows.push('<tr><td style="color:#94a3b8;font-size:10px;padding:3px 12px 3px 0;white-space:nowrap;vertical-align:top;width:90px;">🎙 Intro</td><td style="font-size:11px;color:#e2e8f0;vertical-align:top;">' + p.intro + '</td></tr>');
+    if (p.preAnnText) rows.push('<tr><td style="color:#94a3b8;font-size:10px;padding:3px 12px 3px 0;white-space:nowrap;vertical-align:top;width:90px;">📢 Vorankünd.</td><td style="font-size:11px;color:#e2e8f0;vertical-align:top;">' + p.preAnnText + '</td></tr>');
+    if (p.notes) rows.push('<tr><td style="color:#94a3b8;font-size:10px;padding:3px 12px 3px 0;white-space:nowrap;vertical-align:top;width:90px;">📝 Notizen</td><td style="font-size:11px;color:#e2e8f0;vertical-align:top;">' + p.notes + '</td></tr>');
+    return [
+      '<div style="background:#1a1a35;border-radius:10px;border:1px solid #2e2e52;border-left:4px solid ' + col + ';margin-bottom:10px;padding:12px 14px;page-break-inside:avoid;">',
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">',
+      '<div style="width:26px;height:26px;border-radius:50%;background:' + col + ';display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;">' + (i+1) + '</div>',
+      '<div style="font-size:14px;font-weight:700;color:#e2e8f0;flex:1;">' + (p.title||'Ohne Titel') + '</div>',
+      '<div style="font-size:13px;font-weight:700;color:' + col + ';font-family:monospace;">' + fmtS(p.duration||0) + '</div>',
+      '</div>',
+      '<table style="border-collapse:collapse;width:100%;"><tbody>' + rows.join("") + '</tbody></table>',
+      '</div>'
+    ].join("");
+  }).join("");
+
+  var statsHTML = [
+    '<div style="display:flex;gap:12px;margin-bottom:18px;">',
+    '<div style="flex:1;background:#1a1a35;border:1px solid #2e2e52;border-radius:8px;padding:10px 14px;"><div style="font-size:10px;color:#94a3b8;margin-bottom:4px;">TEILE</div><div style="font-size:22px;font-weight:800;color:#6366f1;">' + realParts.length + '</div></div>',
+    '<div style="flex:1;background:#1a1a35;border:1px solid #2e2e52;border-radius:8px;padding:10px 14px;"><div style="font-size:10px;color:#94a3b8;margin-bottom:4px;">GESAMT</div><div style="font-size:22px;font-weight:800;color:#6366f1;">' + fmtS(totalSec) + '</div></div>',
+    realParts.length > 0 ? '<div style="flex:1;background:#1a1a35;border:1px solid #2e2e52;border-radius:8px;padding:10px 14px;"><div style="font-size:10px;color:#94a3b8;margin-bottom:4px;">KÜRZESTER</div><div style="font-size:22px;font-weight:800;color:#10b981;">' + fmtS(Math.min.apply(null, realParts.map(function(p){return p.duration||0;}))) + '</div></div>' : '',
+    realParts.length > 0 ? '<div style="flex:1;background:#1a1a35;border:1px solid #2e2e52;border-radius:8px;padding:10px 14px;"><div style="font-size:10px;color:#94a3b8;margin-bottom:4px;">LÄNGSTER</div><div style="font-size:22px;font-weight:800;color:#f59e0b;">' + fmtS(Math.max.apply(null, realParts.map(function(p){return p.duration||0;}))) + '</div></div>' : '',
+    '</div>'
+  ].join("");
+
+  var html = [
+    '<!DOCTYPE html><html><head><meta charset="UTF-8">',
+    '<title>' + (showName||"Showrunner") + ' – Ablaufplan</title>',
+    '<style>',
+    '@page { size: A4; margin: 16mm 18mm 16mm 18mm; }',
+    'body { font-family: -apple-system, Inter, Arial, sans-serif; background: #0f0f23; color: #e2e8f0; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }',
+    '.header { background: #6366f1; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; border-radius: 8px; }',
+    '.footer { position: fixed; bottom: 0; left: 0; right: 0; padding: 6px 18px; font-size: 10px; color: #4a4a7a; border-top: 1px solid #2e2e52; display: flex; justify-content: space-between; background: #0f0f23; }',
+    '@media print { .no-print { display: none !important; } body { background: #0f0f23 !important; } }',
+    '</style></head>',
+    '<body>',
+    '<div class="no-print" style="position:fixed;top:12px;right:12px;z-index:9999;">',
+    '<button onclick="window.print()" style="background:#6366f1;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:14px;font-weight:700;cursor:pointer;">🖨️ Drucken / Als PDF speichern</button>',
+    '<button onclick="window.close()" style="margin-left:8px;background:#2e2e52;color:#e2e8f0;border:none;border-radius:8px;padding:10px 16px;font-size:14px;cursor:pointer;">✕</button>',
+    '</div>',
+    '<div class="header">',
+    '<div><div style="font-size:18px;font-weight:800;color:#fff;">' + (showName||"Show") + '</div><div style="font-size:11px;color:#c7d2fe;margin-top:2px;">' + date + '</div></div>',
+    '<div style="font-size:12px;color:#c7d2fe;font-weight:600;">Magic Showrunner v8.6</div>',
+    '</div>',
+    statsHTML,
+    '<div style="font-size:13px;font-weight:700;color:#818cf8;margin-bottom:8px;letter-spacing:0.5px;">ZEITPLAN-ÜBERSICHT</div>',
+    '<div style="display:flex;height:22px;border-radius:6px;overflow:hidden;margin-bottom:6px;background:#1a1a35;">' + timelineSegs + '</div>',
+    '<div style="display:flex;justify-content:space-between;font-size:10px;color:#4a4a7a;margin-bottom:20px;"><span>0:00</span><span>' + fmtS(totalSec) + '</span></div>',
+    '<div style="font-size:13px;font-weight:700;color:#818cf8;margin-bottom:10px;letter-spacing:0.5px;">ABLAUFPLAN</div>',
+    cards,
+    '<div class="footer"><span>' + (showName||"Show") + ' · Magic Showrunner v8.6</span><span>' + date + '</span></div>',
+    '</body></html>'
+  ].join("");
+
+  var win = window.open("", "_blank", "width=900,height=700");
+  if (!win) { alert("Popup blockiert! Bitte Popup-Blocker deaktivieren."); return; }
+  win.document.write(html);
+  win.document.close();
+}
+
 var uid = function () { return Math.random().toString(36).slice(2, 9); };
 var fmt = function (s) { var m = Math.floor(s / 60); var sec = s % 60; return m + ":" + String(sec).padStart(2, "0"); };
 
@@ -110,7 +192,7 @@ var T = {
     preAnnTxt: "Vorankündigungs-Text", notesL: "Notizen", colorL: "Farbe", saveBtn: "Speichern",
     cancel: "Abbrechen", showName: "Show-Name", overwrite: "Überschreiben", noSaved: "Keine Shows.",
     pause: "Pause", resume: "Weiter", prev: "Zurück", next: "Weiter", partOf: "Teil", of: "/",
-    dup: "⧉", del: "Löschen", edit: "✏️", sek: "Sek", csv: "CSV",
+    dup: "⧉", del: "Löschen", edit: "✏️", sek: "Sek", csv: "CSV", pdfBtn: "🖨️ PDF", pdfExport: "PDF",
     fontSize: "Größe", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo",
     ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen", voiceControl: "Sprachsteuerung", voiceControl: "Sprachsteuerung",
     stop: "Stop", setlist: "Setlist", elapsed: "Vergangen", remaining: "Verbleibend",
@@ -149,7 +231,8 @@ var T = {
     preAnnTxt: "Pre-announce text", notesL: "Notes", colorL: "Color", saveBtn: "Save",
     cancel: "Cancel", showName: "Show Name", overwrite: "Overwrite", noSaved: "No saved shows.",
     pause: "Pause", resume: "Resume", prev: "Back", next: "Next", partOf: "Part", of: "/",
-    dup: "⧉", del: "Delete", edit: "✏️", sek: "sec", csv: "CSV",
+    dup: "⧉", del: "Delete", edit: "✏️", sek: "sec", csv: "CSV", pdfBtn: "🖨️ PDF",
+    pdfExport: "🖨️ PDF",
     fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed",
     ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes", voiceControl: "Voice Control", voiceControl: "Voice Control",
     stop: "Stop", setlist: "Setlist", elapsed: "Elapsed", remaining: "Remaining",
@@ -250,38 +333,6 @@ function getTemplates() { try { return JSON.parse(localStorage.getItem("ms3_temp
 function saveTemplates(arr) { localStorage.setItem("ms3_templates", JSON.stringify(arr)); }
 function getCustomTheme() { try { return JSON.parse(localStorage.getItem("ms3_custom_theme")) || DEFAULT_CUSTOM; } catch (e) { return DEFAULT_CUSTOM; } }
 function saveCustomTheme(th) { localStorage.setItem("ms3_custom_theme", JSON.stringify(th)); }
-function getCfg() { try { return JSON.parse(localStorage.getItem("ms3_cfg")) || null; } catch (e) { return null; } }
-function saveCfg(cfg) { try { localStorage.setItem("ms3_cfg", JSON.stringify(cfg)); } catch (e) {} }
-
-async function fetchAPIValue(cfg) {
-  if (!cfg.apiUrl) return null;
-  try {
-    var proxies = [
-      cfg.apiUrl,
-      "https://api.allorigins.win/raw?url=" + encodeURIComponent(cfg.apiUrl),
-      "https://corsproxy.io/?" + encodeURIComponent(cfg.apiUrl)
-    ];
-    var res = null;
-    for (var i = 0; i < proxies.length; i++) {
-      try { res = await fetch(proxies[i]); if (res.ok) break; res = null; } catch (e) { res = null; }
-    }
-    if (!res) return null;
-    var data = await res.json();
-    var key = cfg.apiValueKey || "";
-    if (!key) return JSON.stringify(data);
-    var val = key.split(".").reduce(function(o, k) { return o && o[k] !== undefined ? o[k] : undefined; }, data);
-    return val !== undefined ? (typeof val === "object" ? JSON.stringify(val) : String(val)) : null;
-  } catch (e) { return null; }
-}
-
-function applyAPIValue(text, val) {
-  if (!val) return text;
-  if (text.indexOf("{{api}}") !== -1) return text.replace(/\{\{api\}\}/g, val);
-  var lastColon = text.lastIndexOf(":");
-  if (lastColon !== -1) return text.substring(0, lastColon + 1) + " " + val;
-  return text + " " + val;
-}
-
 function getSetlists() { try { return JSON.parse(localStorage.getItem("ms3_setlists")) || []; } catch (e) { return []; } }
 function saveSetlists(arr) { localStorage.setItem("ms3_setlists", JSON.stringify(arr)); }
 function getActiveSetlistId() { try { return localStorage.getItem("ms3_active_setlist") || null; } catch (e) { return null; } }
@@ -567,16 +618,8 @@ function CustomThemeEditor(props) {
 
 function SettingsModal(props) {
   var open = props.open, onClose = props.onClose, cfg = props.cfg, setCfg = props.setCfg, t = props.t, th = props.th, onApplyCustom = props.onApplyCustom, onLangChange = props.onLangChange;
-  // Auto-save cfg to localStorage whenever cfg changes
-  useEffect(function() {
-    if (cfg) {
-      saveCfg(cfg);
-    }
-  }, [JSON.stringify(cfg)]);
   var _tab = useState("design"); var tab = _tab[0], setTab = _tab[1];
   var _v = useState([]); var voices = _v[0], setVoices = _v[1];
-  var _apiTR = useState(null); var apiTestResult = _apiTR[0]; var setApiTestResult = _apiTR[1];
-  var _apiTL = useState(false); var apiTestLoading = _apiTL[0]; var setApiTestLoading = _apiTL[1];
   useEffect(function () {
     var ld = function () { setVoices((speechSynthesis && speechSynthesis.getVoices()) || []); };
     ld(); if (speechSynthesis) speechSynthesis.addEventListener("voiceschanged", ld);
@@ -734,18 +777,14 @@ function SettingsModal(props) {
   } else if (tab === "api") {
     var doApiTest = function() {
       if (!cfg.apiUrl) { alert(cfg.lang === "de" ? "Keine API URL gesetzt." : "No API URL set."); return; }
-      setApiTestLoading(true);
-      setApiTestResult(null);
       fetchAPIValue(cfg).then(function(val) {
-        setApiTestLoading(false);
         if (val === null) {
-          setApiTestResult({ ok: false, msg: cfg.lang === "de" ? "Fehler beim Abrufen der API." : "Failed to fetch API." });
+          alert(cfg.lang === "de" ? "Fehler beim Abrufen der API." : "Failed to fetch API.");
         } else {
           var preview = applyAPIValue("Beispieltext: ", val);
-          setApiTestResult({ ok: true, val: val, preview: preview });
-          saveCfg(cfg);
+          alert((cfg.lang === "de" ? "Erfolgreich!\nWert: " : "Success!\nValue: ") + val + "\n\n" + (cfg.lang === "de" ? "Vorschau: " : "Preview: ") + preview);
         }
-      }).catch(function() { setApiTestLoading(false); setApiTestResult({ ok: false, msg: "Netzwerkfehler" }); });
+      });
     };
     content = (
       <div>
@@ -1634,7 +1673,8 @@ export default function App() {
                   {[
                     { label: "⬇ JSON exportieren", fn: function () { exportJSON(parts); } },
                     { label: "⬆ JSON importieren", fn: function () { importJSON(setParts, setToast); } },
-                    { label: "📊 CSV exportieren", fn: function () { exportCSV(parts); } }
+                    { label: "📊 CSV exportieren", fn: function () { exportCSV(parts); } },
+                      { label: "🖨️ PDF exportieren", fn: function () { exportShowPDF(parts, cfg.showName || "Show"); } }
                   ].map(function (item, i) {
                     return (
                       <div key={i} onClick={function () { item.fn(); setShowExport(false); }} style={{ padding: "10px 16px", cursor: "pointer", fontSize: 13, color: th.text, borderBottom: i < 2 ? "1px solid " + th.brd : "none" }}
@@ -1787,4 +1827,5 @@ export default function App() {
     </div>
   );
 }
+
 
