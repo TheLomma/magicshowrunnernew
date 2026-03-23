@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 const defaultTiles = [
   { id: 11, title: "RP Einkauf", description: "", group: "Intern", favorite: false, url: "https://rp.sharepoint.com/sites/Einkauf", color: "#0078D4", size: "medium", newTab: true, icon: "🛒", showUrl: false },
@@ -7,7 +7,7 @@ const defaultTiles = [
   { id: 1, title: "Google", description: "", group: "Tools", favorite: false, url: "https://google.com", color: "#4285F4", size: "medium", newTab: true, icon: "🔍", showUrl: false },
   { id: 4, title: "RP Online", description: "", group: "News", favorite: false, url: "https://rp-online.de", color: "#E30613", size: "medium", newTab: true, icon: "📰", showUrl: false },
   { id: 7, title: "Jira", description: "", group: "Tools", favorite: false, url: "https://promgm.atlassian.net/jira/software/c/projects/S4HANA/boards/1522", color: "#0052CC", size: "medium", newTab: true, icon: "jira", showUrl: false },
-  { id: 6, title: "Ariba", description: "", group: "Intern", favorite: false, url: "https://s1-eu.ariba.com/Sourcing/Main/aw?awh=r&awssk=4ZKLv3K6vaB.A7cf&realm=745237532-T&passwordadapter=ThirdPartyUser&dard=1#b0", color: "#00B7F0", size: "medium", newTab: true, icon: "ariba", showUrl: false },
+  { id: 6, title: "Ariba", description: "", group: "Intern", favorite: false, url: "https://s1-eu.ariba.com", color: "#00B7F0", size: "medium", newTab: true, icon: "ariba", showUrl: false },
   { id: 8, title: "RP E-Paper", description: "", group: "News", favorite: false, url: "https://epaper.rp-online.de", color: "#E30613", size: "medium", newTab: true, icon: "📄", showUrl: false },
   { id: 5, title: "SAP Test", description: "", group: "Intern", favorite: false, url: "https://my424364.s4hana.cloud.sap/ui#Shell-home", color: "#0070F2", size: "medium", newTab: true, icon: "🔷", showUrl: false },
 ]
@@ -66,7 +66,7 @@ function TileIcon({ icon, isDark }) {
   return <span className="text-4xl mb-2 drop-shadow-lg">{icon}</span>
 }
 
-function TileForm({ tile, setTile, onSave, onCancel, saveLabel, th }) {
+function TileForm({ tile, setTile, onSave, onCancel, saveLabel, th, allGroups }) {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={onCancel}>
       <div className={`rounded-2xl p-6 w-full max-w-md border shadow-2xl ${th.modal}`} onClick={e => e.stopPropagation()}>
@@ -116,7 +116,7 @@ function TileForm({ tile, setTile, onSave, onCancel, saveLabel, th }) {
             <label className={`block text-sm font-medium mb-1 ${th.label}`}>Gruppe <span className="font-normal opacity-60">(optional)</span></label>
             <input className={`w-full rounded-lg px-4 py-2.5 border focus:border-blue-500 focus:outline-none ${th.modalInput}`} value={tile.group || ""} onChange={e => setTile({ ...tile, group: e.target.value })} placeholder="z.B. Intern, Tools, News…" list="group-suggestions" />
             <datalist id="group-suggestions">
-              {[...new Set((typeof tiles !== 'undefined' ? [] : []).filter(Boolean))].map(g => <option key={g} value={g} />)}
+              {allGroups.map(g => <option key={g} value={g} />)}
             </datalist>
           </div>
           <div>
@@ -145,19 +145,38 @@ function TileForm({ tile, setTile, onSave, onCancel, saveLabel, th }) {
   )
 }
 
-function DraggableTile({ tile, index, moveTile, isDark, sizeClasses, showSettings, setEditingTile, deleteTile, toggleFavorite, updateTileColor, duplicateTile, th }) {
+function UrlTooltip({ tile, isDark, th }) {
+  const domain = (() => { try { return new URL(tile.url).hostname } catch { return "" } })()
+  const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=32`
+  return (
+    <div className={`absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 rounded-xl shadow-2xl border p-3 pointer-events-none ${th.modal}`} style={{ backdropFilter: 'blur(12px)' }}>
+      <div className="flex items-center gap-2 mb-1.5">
+        <img src={faviconUrl} alt="" className="w-4 h-4 flex-shrink-0" onError={e => e.target.style.display='none'} />
+        <span className={`font-semibold text-sm truncate ${th.text}`}>{tile.title}</span>
+      </div>
+      {tile.description && <p className={`text-xs mb-1 ${th.label}`}>{tile.description}</p>}
+      <p className={`text-xs truncate ${th.subtext}`}>{tile.url.replace(/https?:\/\//, '').replace(/\/$/, '')}</p>
+      <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0" style={{ borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderTop: `6px solid ${isDark ? '#374151' : '#e5e7eb'}` }} />
+    </div>
+  )
+}
+
+function DraggableTile({ tile, index, moveTile, isDark, sizeClasses, showSettings, setEditingTile, deleteTile, toggleFavorite, updateTileColor, duplicateTile, toggleHiddenTile, th, showUrlTooltip }) {
   const [isDragOver, setIsDragOver] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
+  const [showTooltip, setShowTooltip] = useState(false)
+  const hoverTimer = useRef(null)
+
   const dragStart = (e) => { e.dataTransfer.setData("tileIndex", index); setIsDragging(true) }
   const dragEnd = () => setIsDragging(false)
   const dragOver = (e) => { e.preventDefault(); setIsDragOver(true) }
   const dragLeave = () => setIsDragOver(false)
   const drop = (e) => {
-    e.preventDefault()
-    setIsDragOver(false)
+    e.preventDefault(); setIsDragOver(false)
     const from = parseInt(e.dataTransfer.getData("tileIndex"))
     if (from !== index) moveTile(from, index)
   }
+
   return (
     <a
       href={showSettings ? undefined : tile.url}
@@ -170,40 +189,135 @@ function DraggableTile({ tile, index, moveTile, isDark, sizeClasses, showSetting
       onDragLeave={dragLeave}
       onDrop={drop}
       onClick={e => { if (showSettings) e.preventDefault() }}
-      className={`${sizeClasses[tile.size]} relative group rounded-2xl overflow-hidden flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-grab active:cursor-grabbing ${isDragging ? 'opacity-40 scale-95' : ''} ${isDragOver ? 'scale-105 ring-4 ring-blue-400 ring-opacity-80' : ''} ${tile.hidden ? 'opacity-40' : ''}`}
+      onMouseEnter={() => { if (!showSettings && showUrlTooltip) { hoverTimer.current = setTimeout(() => setShowTooltip(true), 500) } }}
+      onMouseLeave={() => { clearTimeout(hoverTimer.current); setShowTooltip(false) }}
+      className={`${sizeClasses[tile.size]} relative group rounded-2xl overflow-visible flex flex-col items-center justify-center transition-all duration-300 hover:scale-105 hover:shadow-2xl cursor-grab active:cursor-grabbing ${isDragging ? 'opacity-40 scale-95' : ''} ${isDragOver ? 'scale-105 ring-4 ring-blue-400 ring-opacity-80' : ''} ${tile.hidden ? 'opacity-40' : ''}`}
       style={{
         background: isDark ? `linear-gradient(135deg, ${tile.color}, ${tile.color}cc)` : "#ffffff",
         border: isDark ? `1px solid rgba(255,255,255,0.1)` : `2px solid ${tile.color}`,
         boxShadow: isDark ? "none" : `0 4px 20px ${tile.color}33`
       }}
     >
-      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all" />
+      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all rounded-2xl" />
+      {showTooltip && !showSettings && <UrlTooltip tile={tile} isDark={isDark} th={th} />}
       <TileIcon icon={tile.icon} isDark={isDark} />
       <span className="font-semibold text-sm tracking-wide" style={{ color: isDark ? "#fff" : tile.color }}>{tile.title}</span>
-      {tile.description && (
-        <span className="text-xs mt-1 px-3 text-center opacity-70" style={{ color: isDark ? "rgba(255,255,255,0.6)" : tile.color + "bb" }}>{tile.description}</span>
-      )}
-      {tile.showUrl && (
-        <span className="text-xs mt-1 truncate max-w-full px-4" style={{ color: isDark ? "rgba(255,255,255,0.5)" : tile.color + "99" }}>
-          {tile.url.replace(/https?:\/\//, "").replace(/\/$/, "")}
-        </span>
-      )}
+      {tile.description && <span className="text-xs mt-1 px-3 text-center opacity-70" style={{ color: isDark ? "rgba(255,255,255,0.6)" : tile.color + "bb" }}>{tile.description}</span>}
+      {tile.showUrl && <span className="text-xs mt-1 truncate max-w-full px-4" style={{ color: isDark ? "rgba(255,255,255,0.5)" : tile.color + "99" }}>{tile.url.replace(/https?:\/\//, "").replace(/\/$/, "")}</span>}
       {showSettings && (
-        <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center gap-1.5 z-10 p-2">
+        <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col items-center justify-center gap-1.5 z-10 p-2 rounded-2xl">
           <span className="text-white text-xs font-semibold text-center truncate max-w-full opacity-80 mb-1">{tile.title}</span>
-          <div className="flex gap-1.5">
-          <button className={`p-2 rounded-lg text-sm transition-colors ${tile.favorite ? 'bg-yellow-400 bg-opacity-90 hover:bg-opacity-100' : 'bg-white bg-opacity-20 hover:bg-opacity-40'} text-white`} onClick={e => { e.preventDefault(); toggleFavorite(tile.id) }} title={tile.favorite ? 'Favorit entfernen' : 'Als Favorit markieren'}>⭐</button>
-            <label className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white p-2 rounded-lg text-sm cursor-pointer flex items-center justify-center" title="Farbe ändern" onClick={e => e.stopPropagation()}>🎨<input type="color" className="w-0 h-0 opacity-0 absolute" value={tile.color} onChange={e => updateTileColor(tile.id, e.target.value)} /></label>
+          <div className="flex gap-1.5 flex-wrap justify-center">
+            <button className={`p-2 rounded-lg text-sm transition-colors ${tile.favorite ? 'bg-yellow-400 bg-opacity-90' : 'bg-white bg-opacity-20 hover:bg-opacity-40'} text-white`} onClick={e => { e.preventDefault(); toggleFavorite(tile.id) }} title={tile.favorite ? 'Favorit entfernen' : 'Als Favorit'}>⭐</button>
+            <label className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white p-2 rounded-lg text-sm cursor-pointer flex items-center justify-center relative" title="Farbe" onClick={e => e.stopPropagation()}>🎨<input type="color" className="w-0 h-0 opacity-0 absolute" value={tile.color} onChange={e => updateTileColor(tile.id, e.target.value)} /></label>
             <button className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white p-2 rounded-lg text-sm" onClick={e => { e.preventDefault(); setEditingTile({ ...tile }) }}>✏️</button>
-            <button className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white p-2 rounded-lg text-sm" title="Kachel duplizieren" onClick={e => { e.preventDefault(); duplicateTile(tile) }}>⧉</button>
-            <button className={`p-2 rounded-lg text-sm transition-colors ${tile.hidden ? 'bg-gray-500 bg-opacity-80 hover:bg-opacity-100 text-white' : 'bg-white bg-opacity-20 hover:bg-opacity-40 text-white'}`} title={tile.hidden ? 'Einblenden' : 'Ausblenden'} onClick={e => { e.preventDefault(); toggleHiddenTile(tile.id) }}>{tile.hidden ? '🙈' : '👁️'}</button>
+            <button className="bg-white bg-opacity-20 hover:bg-opacity-40 text-white p-2 rounded-lg text-sm" title="Duplizieren" onClick={e => { e.preventDefault(); duplicateTile(tile) }}>⧉</button>
+            <button className={`p-2 rounded-lg text-sm transition-colors ${tile.hidden ? 'bg-gray-500 bg-opacity-80 text-white' : 'bg-white bg-opacity-20 hover:bg-opacity-40 text-white'}`} title={tile.hidden ? 'Einblenden' : 'Ausblenden'} onClick={e => { e.preventDefault(); toggleHiddenTile(tile.id) }}>{tile.hidden ? '🙈' : '👁️'}</button>
             <button className="bg-red-600 bg-opacity-80 hover:bg-opacity-100 text-white p-2 rounded-lg text-sm" onClick={e => { e.preventDefault(); deleteTile(tile.id) }}>🗑️</button>
           </div>
         </div>
       )}
       {tile.favorite && <span className="absolute top-2 left-2 text-sm">⭐</span>}
-      {tile.newTab && <span className={`absolute text-xs ${tile.favorite ? 'top-2 right-2' : 'top-2 right-2'}`} style={{ color: isDark ? "rgba(255,255,255,0.4)" : tile.color + "88" }}>↗</span>}
+      {tile.newTab && <span className="absolute top-2 right-2 text-xs" style={{ color: isDark ? "rgba(255,255,255,0.4)" : tile.color + "88" }}>↗</span>}
     </a>
+  )
+}
+
+function EasterEgg() {
+  const icons = Array.from({ length: 60 }, (_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    delay: Math.random() * 2,
+    duration: 3 + Math.random() * 3,
+    size: 16 + Math.random() * 32,
+    rotation: Math.random() * 360,
+  }))
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+      {icons.map(icon => (
+        <div key={icon.id} style={{ position: 'absolute', left: `${icon.left}%`, top: '-60px', fontSize: `${icon.size}px`, animation: `fall ${icon.duration}s ${icon.delay}s linear forwards`, transform: `rotate(${icon.rotation}deg)` }}>📰</div>
+      ))}
+      <style>{`@keyframes fall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0.7; } }`}</style>
+    </div>
+  )
+}
+
+function BackgroundModal({ th, onClose }) {
+  const [gradStart, setGradStart] = useState(() => localStorage.getItem("rp-bg-grad-start") || "#1a1a2e")
+  const [gradEnd, setGradEnd] = useState(() => localStorage.getItem("rp-bg-grad-end") || "#16213e")
+  const [bgUrl, setBgUrl] = useState(() => localStorage.getItem("rp-bg-url") || "")
+  const [bgUrlInput, setBgUrlInput] = useState(() => localStorage.getItem("rp-bg-url") || "")
+
+  const apply = () => {
+    localStorage.setItem("rp-bg-grad-start", gradStart)
+    localStorage.setItem("rp-bg-grad-end", gradEnd)
+    localStorage.setItem("rp-bg-url", bgUrlInput)
+    setBgUrl(bgUrlInput)
+    window.dispatchEvent(new Event("rp-bg-changed"))
+    onClose()
+  }
+
+  const reset = () => {
+    localStorage.removeItem("rp-bg-grad-start")
+    localStorage.removeItem("rp-bg-grad-end")
+    localStorage.removeItem("rp-bg-url")
+    setBgUrl("")
+    setBgUrlInput("")
+    setGradStart("#1a1a2e")
+    setGradEnd("#16213e")
+    window.dispatchEvent(new Event("rp-bg-changed"))
+    onClose()
+  }
+
+  const preview = bgUrlInput
+    ? { backgroundImage: `url(${bgUrlInput})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+    : { background: `linear-gradient(135deg, ${gradStart}, ${gradEnd})` }
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={onClose}>
+      <div className={`rounded-2xl p-6 w-full max-w-md border shadow-2xl ${th.modal}`} onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-5">
+          <h3 className={`text-lg font-bold ${th.text}`}>🎨 Hintergrund anpassen</h3>
+          <button className={`p-1.5 rounded-lg border ${th.btn}`} onClick={onClose}>✕</button>
+        </div>
+
+        <div className="w-full h-20 rounded-xl mb-5 border" style={{ ...preview, borderColor: 'rgba(255,255,255,0.1)' }} />
+
+        <div className="space-y-4">
+          <div>
+            <label className={`block text-sm font-medium mb-2 ${th.label}`}>Gradient-Farben</label>
+            <div className="flex gap-3 items-center">
+              <div className="flex flex-col items-center gap-1">
+                <span className={`text-xs ${th.label}`}>Start</span>
+                <input type="color" className="w-12 h-10 rounded cursor-pointer bg-transparent border-0" value={gradStart} onChange={e => { setGradStart(e.target.value); setBgUrlInput("") }} />
+              </div>
+              <div className="flex-1 h-px" style={{ background: `linear-gradient(to right, ${gradStart}, ${gradEnd})` }} />
+              <div className="flex flex-col items-center gap-1">
+                <span className={`text-xs ${th.label}`}>Ende</span>
+                <input type="color" className="w-12 h-10 rounded cursor-pointer bg-transparent border-0" value={gradEnd} onChange={e => { setGradEnd(e.target.value); setBgUrlInput("") }} />
+              </div>
+            </div>
+          </div>
+
+          <div className={`border-t pt-4 ${th.divider}`}>
+            <label className={`block text-sm font-medium mb-2 ${th.label}`}>Hintergrundbild (URL)</label>
+            <input
+              className={`w-full rounded-lg px-4 py-2.5 border focus:border-blue-500 focus:outline-none text-sm ${th.modalInput}`}
+              placeholder="https://example.com/bild.jpg"
+              value={bgUrlInput}
+              onChange={e => setBgUrlInput(e.target.value)}
+            />
+            <p className={`text-xs mt-1 ${th.label}`}>Bild hat Vorrang vor Gradient-Farben</p>
+          </div>
+        </div>
+
+        <div className="flex gap-3 mt-6">
+          <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg transition-colors" onClick={apply}>Übernehmen</button>
+          <button className={`px-4 font-medium py-2.5 rounded-lg transition-colors border ${th.btn}`} onClick={reset}>Zurücksetzen</button>
+          <button className={`px-4 font-medium py-2.5 rounded-lg transition-colors border ${th.btn}`} onClick={onClose}>Abbrechen</button>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -212,6 +326,29 @@ export default function LinkDashboard() {
   const [isDark, setIsDark] = useState(true)
   const [showThemeMenu, setShowThemeMenu] = useState(false)
   const [showSettingsMenu, setShowSettingsMenu] = useState(false)
+  const [showBgModal, setShowBgModal] = useState(false)
+
+  const [bgStyle, setBgStyle] = useState(() => {
+    const url = localStorage.getItem("rp-bg-url")
+    const start = localStorage.getItem("rp-bg-grad-start")
+    const end = localStorage.getItem("rp-bg-grad-end")
+    if (url) return { backgroundImage: `url(${url})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' }
+    if (start && end) return { background: `linear-gradient(135deg, ${start}, ${end})` }
+    return {}
+  })
+
+  useEffect(() => {
+    const handler = () => {
+      const url = localStorage.getItem("rp-bg-url")
+      const start = localStorage.getItem("rp-bg-grad-start")
+      const end = localStorage.getItem("rp-bg-grad-end")
+      if (url) setBgStyle({ backgroundImage: `url(${url})`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed' })
+      else if (start && end) setBgStyle({ background: `linear-gradient(135deg, ${start}, ${end})` })
+      else setBgStyle({})
+    }
+    window.addEventListener("rp-bg-changed", handler)
+    return () => window.removeEventListener("rp-bg-changed", handler)
+  }, [])
 
   useEffect(() => {
     localStorage.setItem("rp-theme", themeMode)
@@ -235,22 +372,30 @@ export default function LinkDashboard() {
     } catch { return defaultTiles }
   })
 
-  useEffect(() => {
-    localStorage.setItem("rp-dashboard-tiles", JSON.stringify(tiles))
-  }, [tiles])
+  useEffect(() => { localStorage.setItem("rp-dashboard-tiles", JSON.stringify(tiles)) }, [tiles])
 
   const [showSettings, setShowSettings] = useState(false)
   const [editingTile, setEditingTile] = useState(null)
   const [showAdd, setShowAdd] = useState(false)
   const [newTile, setNewTile] = useState({ title: "", url: "", color: "#4285F4", size: "medium", newTab: true, icon: "🔗", showUrl: false, description: "", group: "" })
   const [searchQuery, setSearchQuery] = useState("")
-
   const [showSearch, setShowSearch] = useState(() => localStorage.getItem("rp-show-search") === "true")
   const [showGroups, setShowGroups] = useState(() => localStorage.getItem("rp-show-groups") === "true")
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [showHidden, setShowHidden] = useState(false)
   const [showFullscreenBtn, setShowFullscreenBtn] = useState(() => localStorage.getItem("rp-show-fullscreen") === "true")
+  const [showUrlTooltip, setShowUrlTooltip] = useState(() => localStorage.getItem("rp-show-tooltip") === "true")
   const [sortMode, setSortMode] = useState(() => localStorage.getItem("rp-sort-mode") || "manual")
+  const [listView, setListView] = useState(() => localStorage.getItem("rp-list-view") === "true")
+  const [removingId, setRemovingId] = useState(null)
+  const [addingId, setAddingId] = useState(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
+  const [showHelp, setShowHelp] = useState(false)
+  const [showBackup, setShowBackup] = useState(false)
+  const [showWartung, setShowWartung] = useState(false)
+  const [logoClickCount, setLogoClickCount] = useState(0)
+  const [easterEgg, setEasterEgg] = useState(false)
+  const logoClickTimer = useRef(null)
 
   useEffect(() => {
     const handler = () => setIsFullscreen(!!document.fullscreenElement)
@@ -258,26 +403,29 @@ export default function LinkDashboard() {
     return () => document.removeEventListener("fullscreenchange", handler)
   }, [])
 
+  useEffect(() => { localStorage.setItem("rp-list-view", listView) }, [listView])
+  useEffect(() => { localStorage.setItem("rp-show-search", showSearch) }, [showSearch])
+  useEffect(() => { localStorage.setItem("rp-show-groups", showGroups) }, [showGroups])
+  useEffect(() => { localStorage.setItem("rp-show-fullscreen", showFullscreenBtn) }, [showFullscreenBtn])
+  useEffect(() => { localStorage.setItem("rp-show-tooltip", showUrlTooltip) }, [showUrlTooltip])
+  useEffect(() => { localStorage.setItem("rp-sort-mode", sortMode) }, [sortMode])
+
   const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {})
-    } else {
-      document.exitFullscreen().catch(() => {})
-    }
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {})
+    else document.exitFullscreen().catch(() => {})
   }
 
-  const toggleHiddenTile = (id) => setTiles(tiles.map(t => t.id === id ? { ...t, hidden: !t.hidden } : t))
+  const toggleHiddenTile = (id) => setTiles(prev => prev.map(t => t.id === id ? { ...t, hidden: !t.hidden } : t))
+  const toggleFavorite = (id) => setTiles(prev => prev.map(t => t.id === id ? { ...t, favorite: !t.favorite } : t))
+  const updateTileColor = (id, color) => setTiles(prev => prev.map(t => t.id === id ? { ...t, color } : t))
 
-  const toggleFavorite = (id) => setTiles(tiles.map(t => t.id === id ? { ...t, favorite: !t.favorite } : t))
-  const updateTileColor = (id, color) => setTiles(tiles.map(t => t.id === id ? { ...t, color } : t))
   const duplicateTile = (tile) => {
-    const newId = Date.now()
-    const copy = { ...tile, id: newId, title: tile.title + ' (Kopie)' }
+    const copy = { ...tile, id: Date.now(), title: tile.title + ' (Kopie)' }
     const idx = tiles.findIndex(t => t.id === tile.id)
     const updated = [...tiles]
     updated.splice(idx + 1, 0, copy)
     setTiles(updated)
-    setAddingId(newId)
+    setAddingId(copy.id)
     setTimeout(() => setAddingId(null), 400)
   }
 
@@ -291,6 +439,7 @@ export default function LinkDashboard() {
       return (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0)
     })
 
+  const allGroups = [...new Set(tiles.map(t => t.group || "").filter(Boolean))]
   const groups = [...new Set(filteredTiles.map(t => t.group || ""))]
   const groupedTiles = groups.map(g => ({ group: g, tiles: filteredTiles.filter(t => (t.group || "") === g) }))
   const sizeClasses = { small: "col-span-1 h-32", medium: "col-span-1 h-40", large: "col-span-2 h-40" }
@@ -298,9 +447,9 @@ export default function LinkDashboard() {
   const addTile = () => {
     if (!newTile.title || !newTile.url) return
     const url = newTile.url.startsWith("http") ? newTile.url : "https://" + newTile.url
-    const newId = Date.now()
-    setTiles([...tiles, { ...newTile, url, id: newId }])
-    setAddingId(newId)
+    const id = Date.now()
+    setTiles(prev => [...prev, { ...newTile, url, id }])
+    setAddingId(id)
     setTimeout(() => setAddingId(null), 400)
     setNewTile({ title: "", url: "", color: "#4285F4", size: "medium", newTab: true, icon: "🔗", showUrl: false, description: "", group: "" })
     setShowAdd(false)
@@ -308,26 +457,17 @@ export default function LinkDashboard() {
 
   const updateTile = () => {
     if (!editingTile) return
-    setTiles(tiles.map(t => t.id === editingTile.id ? editingTile : t))
+    setTiles(prev => prev.map(t => t.id === editingTile.id ? editingTile : t))
     setEditingTile(null)
   }
 
-  const [removingId, setRemovingId] = useState(null)
-  const [addingId, setAddingId] = useState(null)
-
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
-
-  const deleteTile = (id) => {
-    setConfirmDeleteId(id)
-  }
+  const deleteTile = (id) => setConfirmDeleteId(id)
 
   const confirmDelete = () => {
-    setRemovingId(confirmDeleteId)
+    const id = confirmDeleteId
+    setRemovingId(id)
     setConfirmDeleteId(null)
-    setTimeout(() => {
-      setTiles(tiles.filter(t => t.id !== confirmDeleteId))
-      setRemovingId(null)
-    }, 300)
+    setTimeout(() => { setTiles(prev => prev.filter(t => t.id !== id)); setRemovingId(null) }, 300)
   }
 
   const moveTile = (from, to) => {
@@ -337,84 +477,42 @@ export default function LinkDashboard() {
     setTiles(updated)
   }
 
-  const [listView, setListView] = useState(() => localStorage.getItem("rp-list-view") === "true")
-
-  useEffect(() => {
-    localStorage.setItem("rp-list-view", listView)
-  }, [listView])
-
-  useEffect(() => {
-    localStorage.setItem("rp-show-search", showSearch)
-  }, [showSearch])
-
-  useEffect(() => {
-    localStorage.setItem("rp-show-groups", showGroups)
-  }, [showGroups])
-
-  useEffect(() => {
-    localStorage.setItem("rp-show-fullscreen", showFullscreenBtn)
-  }, [showFullscreenBtn])
-
-  useEffect(() => {
-    localStorage.setItem("rp-sort-mode", sortMode)
-  }, [sortMode])
-
   const resetTiles = () => {
-    if (window.confirm("Alle Kacheln auf Standard zurücksetzen?")) {
-      setTiles(defaultTiles)
-      setShowSettingsMenu(false)
-    }
+    if (window.confirm("Alle Kacheln auf Standard zurücksetzen?")) setTiles(defaultTiles)
   }
 
   const exportTiles = () => {
     const blob = new Blob([JSON.stringify(tiles, null, 2)], { type: "application/json" })
     const url = URL.createObjectURL(blob)
     const a = document.createElement("a")
-    a.href = url
-    a.download = "rp-dashboard-kacheln.json"
-    a.click()
+    a.href = url; a.download = "rp-dashboard-kacheln.json"; a.click()
     URL.revokeObjectURL(url)
-    setShowSettingsMenu(false)
   }
 
   const importTiles = (e) => {
-    const file = e.target.files[0]
-    if (!file) return
+    const file = e.target.files[0]; if (!file) return
     const reader = new FileReader()
     reader.onload = (ev) => {
       try {
         const imported = JSON.parse(ev.target.result)
         if (Array.isArray(imported) && imported.length > 0) {
-          if (window.confirm(`${imported.length} Kacheln importieren? Aktuelle Kacheln werden ersetzt.`)) {
-            setTiles(imported)
-            setShowSettingsMenu(false)
-          }
-        } else {
-          alert("Ungültige Datei – keine Kacheln gefunden.")
-        }
+          if (window.confirm(`${imported.length} Kacheln importieren?`)) setTiles(imported)
+        } else alert("Ungültige Datei.")
       } catch { alert("Fehler beim Lesen der Datei.") }
     }
-    reader.readAsText(file)
-    e.target.value = ""
+    reader.readAsText(file); e.target.value = ""
   }
 
-  const [showHelp, setShowHelp] = useState(false)
-
-  const [showBackup, setShowBackup] = useState(false)
-
-  const [showWartung, setShowWartung] = useState(false)
-
-  const [logoClickCount, setLogoClickCount] = useState(0)
-  const [easterEgg, setEasterEgg] = useState(false)
-  const logoClickTimer = useState(null)
-
   const handleLogoClick = () => {
+    clearTimeout(logoClickTimer.current)
     const newCount = logoClickCount + 1
     setLogoClickCount(newCount)
     if (newCount >= 5) {
       setLogoClickCount(0)
       setEasterEgg(true)
       setTimeout(() => setEasterEgg(false), 7000)
+    } else {
+      logoClickTimer.current = setTimeout(() => setLogoClickCount(0), 2000)
     }
   }
 
@@ -426,42 +524,68 @@ export default function LinkDashboard() {
     return <span>☀️</span>
   }
 
+  const helpItems = [
+    { icon: '➕', title: 'Kachel hinzufügen', text: 'Klicke oben rechts auf "+ Neue Kachel". Gib Titel, URL, Icon und Farbe ein und bestätige mit "Hinzufügen".' },
+    { icon: '✏️', title: 'Kachel bearbeiten', text: 'Aktiviere den Bearbeitungsmodus über das ✏️-Symbol. Dann erscheint auf jeder Kachel ein Bearbeitungsoverlay.' },
+    { icon: '🗑️', title: 'Kachel löschen', text: 'Im Bearbeitungsmodus auf 🗑️ klicken. Es erscheint eine Sicherheitsabfrage.' },
+    { icon: '↕️', title: 'Drag & Drop', text: 'Im Bearbeitungsmodus kannst du Kacheln per Drag & Drop verschieben.' },
+    { icon: '⭐', title: 'Favoriten', text: 'Im Bearbeitungsmodus auf ⭐ klicken. Favoriten erscheinen bei manueller Sortierung ganz oben.' },
+    { icon: '🔍', title: 'Suchfeld', text: 'Das Suchfeld kann über ⚙️ → "Suchfeld anzeigen" ein- oder ausgeblendet werden.' },
+    { icon: '📋', title: 'Listenansicht', text: 'Über ⚙️ → "Listenansicht" zwischen Kachel- und kompakter Listenansicht wechseln.' },
+    { icon: '🗂️', title: 'Gruppen anzeigen', text: 'Über ⚙️ → "Gruppen anzeigen" werden Kacheln nach Gruppen mit Trennlinien gegliedert.' },
+    { icon: '👁️', title: 'Kacheln ausblenden', text: 'Im Bearbeitungsmodus auf 👁️ klicken um eine Kachel auszublenden. Über ⚙️ → "Versteckte anzeigen" wieder sichtbar machen.' },
+    { icon: '⛶', title: 'Vollbild-Modus', text: 'Über ⚙️ → "Vollbild-Button" aktivieren. Dann erscheint ein Vollbild-Button im Header. ESC beendet den Vollbildmodus.' },
+    { icon: '⇅', title: 'Sortierung', text: 'Über den Sortier-Button im Header zwischen manuell, A–Z, Gruppe und Farbe wechseln.' },
+    { icon: '🎨', title: 'Hintergrund anpassen', text: 'Über ⚙️ → "🎨 Hintergrund" kannst du einen Farbverlauf oder ein eigenes Hintergrundbild per URL festlegen.' },
+    { icon: '🔎', title: 'URL-Vorschau', text: 'Über ⚙️ → "URL-Vorschau beim Hover" aktivieren. Beim Hovern über eine Kachel erscheint ein Tooltip mit URL und Favicon.' },
+    { icon: '🌐', title: 'Favicon als Icon', text: 'Im Kachel-Formular auf "🌐 Favicon" klicken, um das Logo der Website automatisch zu laden.' },
+    { icon: '💾', title: 'Backup', text: 'Über ⚙️ → "Backup" kannst du alle Kacheln als JSON exportieren und auf einem anderen Gerät importieren.' },
+    { icon: '🌙', title: 'Theme wechseln', text: 'Über den 🌙-Button zwischen Dunkel, Hell und Automatisch wechseln.' },
+  ]
+
+  const hasBgStyle = Object.keys(bgStyle).length > 0
+
   return (
-    <div className={`min-h-screen ${th.bg} ${th.text} transition-colors duration-300`} onClick={closeMenus}>
+    <div
+      className={`min-h-screen ${hasBgStyle ? '' : th.bg} ${th.text} transition-colors duration-300`}
+      style={hasBgStyle ? bgStyle : {}}
+      onClick={closeMenus}
+    >
+      {easterEgg && <EasterEgg />}
+      {showBgModal && <BackgroundModal th={th} onClose={() => setShowBgModal(false)} />}
+
       <header className={`sticky top-0 z-40 backdrop-blur-xl border-b ${th.header} transition-colors duration-300`}>
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex flex-col leading-none select-none cursor-pointer" onClick={e => { e.stopPropagation(); handleLogoClick() }}>
-              <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontWeight: 900, fontSize: "1.35rem", letterSpacing: "-0.01em", color: th.logoText, lineHeight: 1.1 }}>RHEINISCHE ROST</span>
+              <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontWeight: 900, fontSize: "1.35rem", letterSpacing: "-0.01em", color: th.logoText, lineHeight: 1.1 }}>Rheinische Rost</span>
               <div style={{ height: "4px", background: "#F97316", borderRadius: "1px", marginTop: "3px" }} />
             </div>
             <div className={`ml-4 pl-4 border-l ${th.divider} flex flex-col justify-center`}>
               <span style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontWeight: 400, fontSize: "0.95rem", letterSpacing: "0.04em", color: th.appName, lineHeight: 1.2 }}>Dashboard</span>
-              <span style={{ fontSize: "0.65rem", letterSpacing: "0.08em", color: th.version, lineHeight: 1.2, marginTop: "1px" }}>Version 2.9</span>
+              <span style={{ fontSize: "0.65rem", letterSpacing: "0.08em", color: th.version, lineHeight: 1.2, marginTop: "1px" }}>Version 3.0</span>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 flex-wrap justify-end">
             {showSearch && (
-            <div className="relative">
-              <input className={`text-sm rounded-xl pl-10 pr-4 py-2.5 w-48 border focus:border-blue-500 focus:outline-none transition-all ${th.input}`} placeholder="Suchen…" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onClick={e => e.stopPropagation()} />
-              <span className="absolute left-3 top-2.5 text-gray-500">🔍</span>
-            </div>
+              <div className="relative">
+                <input className={`text-sm rounded-xl pl-10 pr-4 py-2.5 w-48 border focus:border-blue-500 focus:outline-none transition-all ${th.input}`} placeholder="Suchen…" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} onClick={e => e.stopPropagation()} />
+                <span className="absolute left-3 top-2.5 text-gray-500">🔍</span>
+              </div>
             )}
-            <div className="relative" onClick={e => e.stopPropagation()}>
-              <button
-                className={`p-2.5 rounded-xl transition-colors border text-sm ${sortMode !== 'manual' ? 'bg-blue-600 border-blue-600 text-white' : th.btn}`}
-                title="Sortierung"
-                onClick={() => {
-                  const modes = ['manual', 'name', 'group', 'color']
-                  const next = modes[(modes.indexOf(sortMode) + 1) % modes.length]
-                  setSortMode(next)
-                }}
-              >
-                {sortMode === 'manual' ? '⇅' : sortMode === 'name' ? 'A–Z' : sortMode === 'group' ? '🗂' : '🎨'}
+            <button
+              className={`p-2.5 rounded-xl transition-colors border text-sm font-medium ${sortMode !== 'manual' ? 'bg-blue-600 border-blue-600 text-white' : th.btn}`}
+              title="Sortierung wechseln"
+              onClick={e => { e.stopPropagation(); const modes = ['manual','name','group','color']; setSortMode(modes[(modes.indexOf(sortMode)+1)%modes.length]) }}
+            >
+              {sortMode === 'manual' ? '⇅' : sortMode === 'name' ? 'A–Z' : sortMode === 'group' ? '🗂' : '🎨'}
+            </button>
+            {showFullscreenBtn && (
+              <button className={`px-4 py-2.5 rounded-xl transition-colors border text-sm font-medium ${isFullscreen ? 'bg-blue-600 border-blue-600 text-white' : th.btn}`} onClick={e => { e.stopPropagation(); toggleFullscreen() }}>
+                {isFullscreen ? 'Vollbild ✕' : 'Vollbild'}
               </button>
-            </div>
-            {showFullscreenBtn && <button className={`px-4 py-2.5 rounded-xl transition-colors border text-sm font-medium ${isFullscreen ? 'bg-blue-600 border-blue-600 text-white' : th.btn}`} onClick={e => { e.stopPropagation(); toggleFullscreen() }}>{isFullscreen ? 'Vollbild ✕' : 'Vollbild'}</button>}
-            <button className={`p-2.5 rounded-xl transition-colors border text-sm ${showSettings ? 'bg-blue-600 border-blue-600 text-white' : th.btn}`} title={showSettings ? 'Bearbeiten beenden' : 'Kacheln bearbeiten'} onClick={e => { e.stopPropagation(); setShowSettings(!showSettings); setShowSettingsMenu(false) }}>✏️</button>
+            )}
+            <button className={`p-2.5 rounded-xl transition-colors border text-sm ${showSettings ? 'bg-blue-600 border-blue-600 text-white' : th.btn}`} title="Bearbeitungsmodus" onClick={e => { e.stopPropagation(); setShowSettings(!showSettings); setShowSettingsMenu(false) }}>✏️</button>
             <button className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-colors flex items-center gap-2 shadow-lg" onClick={e => { e.stopPropagation(); setShowAdd(true) }}>
               <span className="text-lg leading-none">+</span> Neue Kachel
             </button>
@@ -480,53 +604,33 @@ export default function LinkDashboard() {
               )}
             </div>
             <div className="relative" onClick={e => e.stopPropagation()}>
-              <button className={`p-2.5 rounded-xl transition-colors border ${showSettings ? "bg-blue-600 border-blue-600 text-white" : th.btn}`} onClick={() => { setShowSettingsMenu(!showSettingsMenu); setShowThemeMenu(false) }}>⚙️</button>
+              <button className={`p-2.5 rounded-xl transition-colors border ${th.btn}`} onClick={() => { setShowSettingsMenu(!showSettingsMenu); setShowThemeMenu(false) }}>⚙️</button>
               {showSettingsMenu && (
                 <div className={`absolute right-0 mt-2 w-60 rounded-xl shadow-2xl border overflow-hidden z-50 ${th.panelBg}`}>
                   <div className="p-2 space-y-1">
-                    <label className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors cursor-pointer ${th.themeInactiveBg}`} onClick={e => e.stopPropagation()}>
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${showSearch ? 'bg-blue-600 border-blue-600' : 'border-gray-400 bg-transparent'}`} onClick={() => { setShowSearch(!showSearch); if (showSearch) setSearchQuery(""); setShowSettingsMenu(false) }}>
-                        {showSearch && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
-                      </div>
-                      <span>🔍</span> Suchfeld anzeigen
-                    </label>
-                    <label className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors cursor-pointer ${th.themeInactiveBg}`} onClick={e => e.stopPropagation()}>
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${listView ? 'bg-blue-600 border-blue-600' : 'border-gray-400 bg-transparent'}`} onClick={() => { setListView(!listView); setShowSettingsMenu(false) }}>
-                        {listView && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
-                      </div>
-                      <span>📋</span> Listenansicht
-                    </label>
-                    <label className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors cursor-pointer ${th.themeInactiveBg}`} onClick={e => e.stopPropagation()}>
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${showGroups ? 'bg-blue-600 border-blue-600' : 'border-gray-400 bg-transparent'}`} onClick={() => { setShowGroups(!showGroups); setShowSettingsMenu(false) }}>
-                        {showGroups && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
-                      </div>
-                        <span>🗂️</span> Gruppen anzeigen
-                    </label>
-                    <label className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors cursor-pointer ${th.themeInactiveBg}`} onClick={e => e.stopPropagation()}>
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${showHidden ? 'bg-blue-600 border-blue-600' : 'border-gray-400 bg-transparent'}`} onClick={() => { setShowHidden(!showHidden); setShowSettingsMenu(false) }}>
-                        {showHidden && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
-                      </div>
-                      <span>👁️</span> Versteckte anzeigen
-                    </label>
-                    <label className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors cursor-pointer ${th.themeInactiveBg}`} onClick={e => e.stopPropagation()}>
-                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${showFullscreenBtn ? 'bg-blue-600 border-blue-600' : 'border-gray-400 bg-transparent'}`} onClick={() => { setShowFullscreenBtn(!showFullscreenBtn); setShowSettingsMenu(false) }}>
-                        {showFullscreenBtn && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
-                      </div>
-                      <span>⛶</span> Vollbild-Button
-                    </label>
-
+                    {[
+                      { label: "Suchfeld anzeigen", icon: "🔍", val: showSearch, set: () => { setShowSearch(v => !v); setShowSettingsMenu(false) } },
+                      { label: "Listenansicht", icon: "📋", val: listView, set: () => { setListView(v => !v); setShowSettingsMenu(false) } },
+                      { label: "Gruppen anzeigen", icon: "🗂️", val: showGroups, set: () => { setShowGroups(v => !v); setShowSettingsMenu(false) } },
+                      { label: "Versteckte anzeigen", icon: "👁️", val: showHidden, set: () => { setShowHidden(v => !v); setShowSettingsMenu(false) } },
+                      { label: "Vollbild-Button", icon: "⛶", val: showFullscreenBtn, set: () => { setShowFullscreenBtn(v => !v); setShowSettingsMenu(false) } },
+                      { label: "URL-Vorschau beim Hover", icon: "🔎", val: showUrlTooltip, set: () => { setShowUrlTooltip(v => !v); setShowSettingsMenu(false) } },
+                    ].map(item => (
+                      <label key={item.label} className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors cursor-pointer ${th.themeInactiveBg}`} onClick={e => e.stopPropagation()}>
+                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${item.val ? 'bg-blue-600 border-blue-600' : 'border-gray-400 bg-transparent'}`} onClick={item.set}>
+                          {item.val && <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>}
+                        </div>
+                        <span>{item.icon}</span> {item.label}
+                      </label>
+                    ))}
                     <div className={`my-1 border-t ${th.divider}`} />
-                    <button className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors ${th.themeInactiveBg}`} onClick={() => { setShowBackup(true); setShowSettingsMenu(false) }}>
-                      <span>💾</span> Backup
-                    </button>
+                    <button className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors ${th.themeInactiveBg}`} onClick={() => { setShowBgModal(true); setShowSettingsMenu(false) }}>🎨 Hintergrund</button>
                     <div className={`my-1 border-t ${th.divider}`} />
-                    <button className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors ${th.themeInactiveBg}`} onClick={() => { setShowHelp(true); setShowSettingsMenu(false) }}>
-                      <span>❓</span> Anleitung
-                    </button>
+                    <button className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors ${th.themeInactiveBg}`} onClick={() => { setShowBackup(true); setShowSettingsMenu(false) }}>💾 Backup</button>
                     <div className={`my-1 border-t ${th.divider}`} />
-                    <button className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors ${th.themeInactiveBg}`} onClick={() => { setShowWartung(true); setShowSettingsMenu(false) }}>
-                      <span>🛠️</span> Wartung
-                    </button>
+                    <button className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors ${th.themeInactiveBg}`} onClick={() => { setShowHelp(true); setShowSettingsMenu(false) }}>❓ Anleitung</button>
+                    <div className={`my-1 border-t ${th.divider}`} />
+                    <button className={`w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors ${th.themeInactiveBg}`} onClick={() => { setShowWartung(true); setShowSettingsMenu(false) }}>🛠️ Wartung</button>
                   </div>
                 </div>
               )}
@@ -534,6 +638,7 @@ export default function LinkDashboard() {
           </div>
         </div>
       </header>
+
       <main className="max-w-7xl mx-auto px-4 py-8">
         {filteredTiles.length === 0 ? (
           <div className={`text-center py-24 ${th.emptyText}`}>
@@ -541,91 +646,58 @@ export default function LinkDashboard() {
             {searchQuery ? (
               <>
                 <p className="text-lg">Keine Treffer für "{searchQuery}"</p>
-                <button className="mt-4 text-blue-400 hover:text-blue-300 text-sm flex items-center gap-2 mx-auto" onClick={() => setSearchQuery("")}>✕ Suche zurücksetzen</button>
+                <button className="mt-4 text-blue-400 hover:text-blue-300 text-sm" onClick={() => setSearchQuery("")}>✕ Suche zurücksetzen</button>
               </>
             ) : (
               <>
                 <p className="text-lg">Keine Kacheln gefunden.</p>
-                <button className="mt-4 text-blue-400 hover:text-blue-300 text-sm" onClick={() => { setSearchQuery(""); setShowAdd(true) }}>Neue Kachel hinzufügen</button>
+                <button className="mt-4 text-blue-400 hover:text-blue-300 text-sm" onClick={() => setShowAdd(true)}>Neue Kachel hinzufügen</button>
               </>
             )}
           </div>
         ) : listView ? (
-          <div className="space-y-8">
-            {groupedTiles.map(({ group, tiles: groupTiles }) => (
+          <div className="space-y-6">
+            {groupedTiles.map(({ group, tiles: gTiles }) => (
               <div key={group}>
-                {group ? (
-                  <div className={`flex items-center gap-3 mb-2`}>
-                    <span className={`text-xs font-bold uppercase tracking-widest ${th.label}`}>{group}</span>
-                    <div className={`flex-1 h-px ${th.divider} border-t`} />
-                  </div>
-                ) : null}
+                {group && <div className="flex items-center gap-3 mb-2"><span className={`text-xs font-bold uppercase tracking-widest ${th.label}`}>{group}</span><div className={`flex-1 h-px border-t ${th.divider}`} /></div>}
                 <div className={`rounded-2xl border overflow-hidden ${th.panelBg}`}>
-                {groupTiles.map((tile, index) => (
-              <a
-                key={tile.id}
-                href={showSettings ? undefined : tile.url}
-                target={tile.newTab ? "_blank" : "_self"}
-                rel="noopener noreferrer"
-                onClick={e => { if (showSettings) e.preventDefault() }}
-                className={`flex items-center gap-4 px-4 py-3 transition-colors hover:bg-opacity-10 hover:bg-blue-400 ${index !== 0 ? `border-t ${th.divider}` : ''}`}
-              >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `linear-gradient(135deg, ${tile.color}, ${tile.color}cc)` }}>
-  {tile.icon && tile.icon.startsWith('https://') ? (
-                    <img src={tile.icon} alt="icon" style={{ width: 24, height: 24, objectFit: 'contain' }} />
-                  ) : tile.icon === 'ariba' ? (
-                    <span style={{ fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '-0.5px', lineHeight: 1 }}>ariba</span>
-                  ) : tile.icon === 'jira' ? (
-                    <svg viewBox="0 0 32 32" style={{ width: 24, height: 24 }}>
-                      <defs><linearGradient id="jiraGrad2" x1="100%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stopColor="#2684FF" /><stop offset="100%" stopColor="#0052CC" /></linearGradient></defs>
-                      <path d="M15.98 0.16L8.1 8.04 3.9 3.84a1.3 1.3 0 00-1.84 0L.16 5.74a1.3 1.3 0 000 1.84l7.02 7.02-7.02 7.02a1.3 1.3 0 000 1.84l1.9 1.9a1.3 1.3 0 001.84 0l4.2-4.2 7.88 7.88a1.3 1.3 0 001.84 0l1.9-1.9a1.3 1.3 0 000-1.84L11.7 17.28l4.28-4.28 7.88-7.88a1.3 1.3 0 000-1.84L21.96.16a1.3 1.3 0 00-1.84 0z" fill="url(#jiraGrad2)" transform="translate(4,4) scale(0.9)" />
-                    </svg>
-                  ) : (
-                    <span style={{ fontSize: 20 }}>{tile.icon}</span>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className={`font-medium text-sm flex items-center gap-1 ${th.text}`}>
-                    {tile.favorite && <span className="text-xs">⭐</span>}
-                    {tile.title}
-                    {tile.newTab && <span className="text-xs opacity-40">↗</span>}
-                  </div>
-                  <div className={`text-xs truncate ${th.subtext}`}>{tile.url.replace(/https?:\/\//, '').replace(/\/$/, '')}</div>
-                </div>
-                {showSettings && (
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <button className={`p-1.5 rounded-lg text-sm transition-colors ${tile.favorite ? 'bg-yellow-400 text-white' : `border ${th.btn}`}`} onClick={e => { e.preventDefault(); toggleFavorite(tile.id) }}>⭐</button>
-                    <button className={`p-1.5 rounded-lg text-sm border transition-colors ${th.btn}`} onClick={e => { e.preventDefault(); setEditingTile({ ...tile }) }}>✏️</button>
-                    <button className={`p-1.5 rounded-lg text-sm transition-colors border ${tile.hidden ? 'bg-gray-500 text-white border-gray-500' : th.btn}`} title={tile.hidden ? 'Einblenden' : 'Ausblenden'} onClick={e => { e.preventDefault(); toggleHiddenTile(tile.id) }}>{tile.hidden ? '🙈' : '👁️'}</button>
-                    <button className="p-1.5 rounded-lg text-sm bg-red-600 bg-opacity-80 hover:bg-opacity-100 text-white transition-colors" onClick={e => { e.preventDefault(); deleteTile(tile.id) }}>🗑️</button>
-                  </div>
-                )}
-              </a>
-            ))}
+                  {gTiles.map((tile, idx) => (
+                    <a key={tile.id} href={showSettings ? undefined : tile.url} target={tile.newTab ? "_blank" : "_self"} rel="noopener noreferrer" onClick={e => { if (showSettings) e.preventDefault() }}
+                      className={`flex items-center gap-4 px-4 py-3 transition-colors hover:bg-blue-400 hover:bg-opacity-10 ${idx !== 0 ? `border-t ${th.divider}` : ''} ${tile.hidden ? 'opacity-40' : ''}`}>
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `linear-gradient(135deg, ${tile.color}, ${tile.color}cc)` }}>
+                        {tile.icon && tile.icon.startsWith('https://') ? <img src={tile.icon} alt="icon" style={{ width: 24, height: 24, objectFit: 'contain' }} /> : tile.icon === 'ariba' ? <span style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>ariba</span> : tile.icon === 'jira' ? <span style={{ color: '#fff', fontSize: 16 }}>J</span> : <span style={{ fontSize: 20 }}>{tile.icon}</span>}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className={`font-medium text-sm flex items-center gap-1 ${th.text}`}>{tile.favorite && <span className="text-xs">⭐</span>}{tile.title}{tile.newTab && <span className="text-xs opacity-40">↗</span>}</div>
+                        <div className={`text-xs truncate ${th.subtext}`}>{tile.url.replace(/https?:\/\//, '').replace(/\/$/, '')}</div>
+                      </div>
+                      {showSettings && (
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <button className={`p-1.5 rounded-lg text-sm ${tile.favorite ? 'bg-yellow-400 text-white' : `border ${th.btn}`}`} onClick={e => { e.preventDefault(); toggleFavorite(tile.id) }}>⭐</button>
+                          <button className={`p-1.5 rounded-lg text-sm border ${th.btn}`} onClick={e => { e.preventDefault(); setEditingTile({ ...tile }) }}>✏️</button>
+                          <button className={`p-1.5 rounded-lg text-sm border ${tile.hidden ? 'bg-gray-500 text-white border-gray-500' : th.btn}`} onClick={e => { e.preventDefault(); toggleHiddenTile(tile.id) }}>{tile.hidden ? '🙈' : '👁️'}</button>
+                          <button className="p-1.5 rounded-lg text-sm bg-red-600 text-white" onClick={e => { e.preventDefault(); deleteTile(tile.id) }}>🗑️</button>
+                        </div>
+                      )}
+                    </a>
+                  ))}
                 </div>
               </div>
             ))}
           </div>
         ) : (
           <div className="space-y-8">
-            {(showGroups ? groupedTiles : [{ group: "", tiles: filteredTiles }]).map(({ group, tiles: groupTiles }) => (
+            {(showGroups ? groupedTiles : [{ group: "", tiles: filteredTiles }]).map(({ group, tiles: gTiles }) => (
               <div key={group}>
-                {showGroups && group ? (
-                  <div className={`flex items-center gap-3 mb-4`}>
+                {showGroups && group && (
+                  <div className="flex items-center gap-3 mb-4">
                     <span className={`text-xs font-bold uppercase tracking-widest ${th.label}`}>{group}</span>
-                    <div className={`flex-1 h-px ${th.divider} border-t`} />
+                    <div className={`flex-1 h-px border-t ${th.divider}`} />
                   </div>
-                ) : null}
+                )}
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {groupTiles.map((tile, index) => (
-                    <div
-                      key={tile.id}
-                      style={{
-                        transition: 'opacity 0.3s ease, transform 0.3s ease',
-                        opacity: removingId === tile.id ? 0 : addingId === tile.id ? 0 : 1,
-                        transform: removingId === tile.id ? 'scale(0.8)' : addingId === tile.id ? 'scale(0.8)' : 'scale(1)',
-                      }}
-                    >
+                  {gTiles.map((tile) => (
+                    <div key={tile.id} style={{ transition: 'opacity 0.3s, transform 0.3s', opacity: removingId === tile.id || addingId === tile.id ? 0 : 1, transform: removingId === tile.id || addingId === tile.id ? 'scale(0.8)' : 'scale(1)' }}>
                       <DraggableTile
                         tile={tile}
                         index={filteredTiles.indexOf(tile)}
@@ -638,7 +710,9 @@ export default function LinkDashboard() {
                         toggleFavorite={toggleFavorite}
                         updateTileColor={updateTileColor}
                         duplicateTile={duplicateTile}
+                        toggleHiddenTile={toggleHiddenTile}
                         th={th}
+                        showUrlTooltip={showUrlTooltip}
                       />
                     </div>
                   ))}
@@ -648,134 +722,92 @@ export default function LinkDashboard() {
           </div>
         )}
       </main>
+
+      {showAdd && <TileForm tile={newTile} setTile={setNewTile} onSave={addTile} onCancel={() => setShowAdd(false)} saveLabel="Hinzufügen" th={th} allGroups={allGroups} />}
+      {editingTile && <TileForm tile={editingTile} setTile={setEditingTile} onSave={updateTile} onCancel={() => setEditingTile(null)} saveLabel="Speichern" th={th} allGroups={allGroups} />}
+
       {confirmDeleteId && (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={() => setConfirmDeleteId(null)}>
-      <div className={`rounded-2xl p-6 w-full max-w-sm border shadow-2xl ${th.modal}`} onClick={e => e.stopPropagation()}>
-        <p className="text-4xl text-center mb-3">🗑️</p>
-        <h3 className={`text-lg font-bold text-center mb-2 ${th.text}`}>Kachel löschen?</h3>
-        <p className={`text-sm text-center mb-6 ${th.label}`}>"{tiles.find(t => t.id === confirmDeleteId)?.title}" wird unwiderruflich gelöscht.</p>
-        <div className="flex gap-3">
-          <button className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-lg transition-colors" onClick={confirmDelete}>Löschen</button>
-          <button className={`flex-1 font-medium py-2.5 rounded-lg transition-colors border ${th.btn}`} onClick={() => setConfirmDeleteId(null)}>Abbrechen</button>
-        </div>
-      </div>
-    </div>
-  )}
-  {showWartung && (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={() => setShowWartung(false)}>
-      <div className={`rounded-2xl p-6 w-full max-w-sm border shadow-2xl ${th.modal}`} onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-6">
-          <h3 className={`text-lg font-bold flex items-center gap-2 ${th.text}`}>🛠️ Wartung</h3>
-          <button className={`p-1.5 rounded-lg transition-colors border ${th.btn}`} onClick={() => setShowWartung(false)}>✕</button>
-        </div>
-        <div className="space-y-3">
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-yellow-500 border-opacity-40 bg-yellow-500 bg-opacity-10 hover:bg-opacity-20 transition-colors" onClick={() => { if (window.confirm('Cache leeren und neu laden?')) { localStorage.clear(); window.location.reload() } }}>
-            <span className="text-2xl">🗑️</span>
-            <div className="text-left">
-              <p className="font-medium text-sm text-yellow-500">Cache leeren & neu laden</p>
-              <p className={`text-xs ${th.label}`}>Alle gespeicherten Daten löschen</p>
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={() => setConfirmDeleteId(null)}>
+          <div className={`rounded-2xl p-6 w-full max-w-sm border shadow-2xl ${th.modal}`} onClick={e => e.stopPropagation()}>
+            <p className="text-4xl text-center mb-3">🗑️</p>
+            <h3 className={`text-lg font-bold text-center mb-2 ${th.text}`}>Kachel löschen?</h3>
+            <p className={`text-sm text-center mb-6 ${th.label}`}>"{tiles.find(t => t.id === confirmDeleteId)?.title}" wird unwiderruflich gelöscht.</p>
+            <div className="flex gap-3">
+              <button className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-lg" onClick={confirmDelete}>Löschen</button>
+              <button className={`flex-1 font-medium py-2.5 rounded-lg border ${th.btn}`} onClick={() => setConfirmDeleteId(null)}>Abbrechen</button>
             </div>
-          </button>
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-red-500 border-opacity-40 bg-red-500 bg-opacity-10 hover:bg-opacity-20 transition-colors" onClick={() => { resetTiles(); setShowWartung(false) }}>
-            <span className="text-2xl">🔄</span>
-            <div className="text-left">
-              <p className="font-medium text-sm text-red-500">Auf Standard zurücksetzen</p>
-              <p className={`text-xs ${th.label}`}>Alle Kacheln auf Standardwerte zurücksetzen</p>
+          </div>
+        </div>
+      )}
+
+      {showHelp && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={() => setShowHelp(false)}>
+          <div className={`rounded-2xl w-full max-w-lg border shadow-2xl overflow-hidden ${th.modal}`} onClick={e => e.stopPropagation()}>
+            <div className={`flex items-center justify-between px-6 py-4 border-b ${th.divider}`}>
+              <h3 className={`text-lg font-bold ${th.text}`}>❓ Anleitung</h3>
+              <button className={`p-1.5 rounded-lg border ${th.btn}`} onClick={() => setShowHelp(false)}>✕</button>
             </div>
-          </button>
-        </div>
-      </div>
-    </div>
-  )}
-  {showBackup && (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={() => setShowBackup(false)}>
-      <div className={`rounded-2xl p-6 w-full max-w-sm border shadow-2xl ${th.modal}`} onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-6">
-          <h3 className={`text-lg font-bold flex items-center gap-2 ${th.text}`}>💾 Backup</h3>
-          <button className={`p-1.5 rounded-lg transition-colors border ${th.btn}`} onClick={() => setShowBackup(false)}>✕</button>
-        </div>
-        <div className="space-y-3">
-          <button className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors ${th.themeInactiveBg}`} onClick={() => { exportTiles(); setShowBackup(false) }}>
-            <span className="text-2xl">📤</span>
-            <div className="text-left">
-              <p className={`font-medium text-sm ${th.text}`}>Exportieren</p>
-              <p className={`text-xs ${th.label}`}>Kacheln als JSON-Datei speichern</p>
+            <div className="overflow-y-auto max-h-96 px-6 py-4 space-y-4">
+              {helpItems.map(item => (
+                <div key={item.title} className="flex gap-3">
+                  <span className="text-xl flex-shrink-0">{item.icon}</span>
+                  <div>
+                    <p className={`font-semibold text-sm ${th.text}`}>{item.title}</p>
+                    <p className={`text-xs mt-0.5 ${th.label}`}>{item.text}</p>
+                  </div>
+                </div>
+              ))}
             </div>
-          </button>
-          <label className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors cursor-pointer ${th.themeInactiveBg}`}>
-            <span className="text-2xl">📥</span>
-            <div className="text-left">
-              <p className={`font-medium text-sm ${th.text}`}>Importieren</p>
-              <p className={`text-xs ${th.label}`}>Kacheln aus JSON-Datei laden</p>
+          </div>
+        </div>
+      )}
+
+      {showBackup && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={() => setShowBackup(false)}>
+          <div className={`rounded-2xl p-6 w-full max-w-sm border shadow-2xl ${th.modal}`} onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className={`text-lg font-bold ${th.text}`}>💾 Backup</h3>
+              <button className={`p-1.5 rounded-lg border ${th.btn}`} onClick={() => setShowBackup(false)}>✕</button>
             </div>
-            <input type="file" accept=".json" className="hidden" onChange={(e) => { importTiles(e); setShowBackup(false) }} />
-          </label>
-        </div>
-      </div>
-    </div>
-  )}
-  {showHelp && (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={() => setShowHelp(false)}>
-      <div className={`rounded-2xl w-full max-w-lg border shadow-2xl overflow-hidden ${th.modal}`} onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-          <h3 className={`text-lg font-bold flex items-center gap-2 ${th.text}`}>❓ Anleitung</h3>
-          <button className={`p-1.5 rounded-lg transition-colors border ${th.btn}`} onClick={() => setShowHelp(false)}>✕</button>
-        </div>
-        <div className="overflow-y-auto max-h-[70vh] px-6 py-4 space-y-5">
-          {[
-            { icon: '➕', title: 'Kachel hinzufügen', text: 'Klicke oben rechts auf "+ Neue Kachel". Gib Titel, URL, Icon und Farbe ein und bestätige mit "Hinzufügen".' },
-            { icon: '✏️', title: 'Kachel bearbeiten', text: 'Aktiviere den Bearbeitungsmodus über ⚙️ → "Kacheln bearbeiten". Dann erscheint auf jeder Kachel ein ✏️-Button.' },
-            { icon: '🗑️', title: 'Kachel löschen', text: 'Im Bearbeitungsmodus auf 🗑️ klicken. Es erscheint eine Sicherheitsabfrage bevor die Kachel gelöscht wird.' },
-            { icon: '↕️', title: 'Drag & Drop', text: 'Im Bearbeitungsmodus kannst du Kacheln per Drag & Drop verschieben. Die Ziel-Kachel leuchtet blau auf.' },
-            { icon: '⭐', title: 'Favoriten', text: 'Im Bearbeitungsmodus auf ⭐ klicken, um eine Kachel als Favorit zu markieren. Favoriten erscheinen immer ganz oben.' },
-            { icon: '🔍', title: 'Suchfeld', text: 'Das Suchfeld kann über ⚙️ → Checkbox "Suchfeld anzeigen" ein- oder ausgeblendet werden.' },
-            { icon: '📋', title: 'Listenansicht', text: 'Über ⚙️ → Checkbox "Listenansicht" kannst du zwischen Kachel- und kompakter Listenansicht wechseln.' },
-            { icon: '🌐', title: 'Favicon als Icon', text: 'Im Kachel-Formular auf "🌐 Favicon" klicken, um das Logo der Website automatisch als Icon zu laden.' },
-            { icon: '📤', title: 'Export & Import', text: 'Über ⚙️ kannst du alle Kacheln als JSON-Datei exportieren und auf einem anderen Gerät wieder importieren.' },
-            { icon: '🌙', title: 'Theme wechseln', text: 'Über den 🌙-Button oben rechts kannst du zwischen Dunkel, Hell und Automatisch (Systemeinstellung) wechseln.' },
-            { icon: '🗂️', title: 'Gruppen anzeigen', text: 'Über ⚙️ → Checkbox "Gruppen anzeigen" werden Kacheln nach ihrer Gruppe mit Trennlinien gegliedert. Standard: aus.' },
-            { icon: '👁️', title: 'Kacheln ausblenden', text: 'Im Bearbeitungsmodus auf 👁️ klicken, um eine Kachel auszublenden. Ausgeblendete Kacheln bleiben gespeichert und können über ⚙️ → "Versteckte anzeigen" wieder sichtbar gemacht werden.' },
-            { icon: '⛶', title: 'Vollbild-Modus', text: 'Den Vollbild-Button kann über ⚙️ → Checkbox "Vollbild-Button" eingeblendet werden. Ein Klick darauf öffnet das Dashboard im Browser-Vollbild. Beenden mit ESC oder erneutem Klick.' },
-          ].map(item => (
-            <div key={item.title} className={`flex gap-3 p-3 rounded-xl ${th.themeInactiveBg}`}>
-              <span className="text-2xl flex-shrink-0">{item.icon}</span>
-              <div>
-                <p className={`font-semibold text-sm mb-0.5 ${th.text}`}>{item.title}</p>
-                <p className={`text-xs leading-relaxed ${th.label}`}>{item.text}</p>
-              </div>
+            <div className="space-y-3">
+              <button className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors ${th.themeInactiveBg}`} onClick={() => { exportTiles(); setShowBackup(false) }}>
+                <span className="text-2xl">📤</span>
+                <div className="text-left"><p className={`font-medium text-sm ${th.text}`}>Exportieren</p><p className={`text-xs ${th.label}`}>Kacheln als JSON speichern</p></div>
+              </button>
+              <label className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors cursor-pointer ${th.themeInactiveBg}`}>
+                <span className="text-2xl">📥</span>
+                <div className="text-left"><p className={`font-medium text-sm ${th.text}`}>Importieren</p><p className={`text-xs ${th.label}`}>Kacheln aus JSON laden</p></div>
+                <input type="file" accept=".json" className="hidden" onChange={e => { importTiles(e); setShowBackup(false) }} />
+              </label>
             </div>
-          ))}
+          </div>
         </div>
-        <div className={`px-6 py-4 border-t text-xs text-center ${th.label}`} style={{ borderColor: 'rgba(255,255,255,0.1)' }}>Version 2.9 • RHEINISCHE ROST Dashboard</div>
-      </div>
-    </div>
-  )}
-  {easterEgg && (
-    <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden">
-      {Array.from({ length: 60 }).map((_, i) => (
-        <span
-          key={i}
-          style={{
-            position: 'absolute',
-            left: `${Math.random() * 100}%`,
-            top: `-${Math.random() * 80 + 20}px`,
-            fontSize: `${Math.random() * 24 + 16}px`,
-            animation: `fall ${Math.random() * 1 + 1}s linear ${Math.random() * 1}s forwards`,
-            opacity: 0,
-          }}
-        >📰</span>
-      ))}
-      <style>{`
-        @keyframes fall {
-          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-          100% { transform: translateY(110vh) rotate(${Math.random() > 0.5 ? '' : '-'}${Math.floor(Math.random() * 360)}deg); opacity: 0.8; }
-        }
-      `}</style>
-    </div>
-  )}
-  {showAdd && <TileForm tile={newTile} setTile={setNewTile} onSave={addTile} onCancel={() => setShowAdd(false)} saveLabel="Hinzufügen" th={th} />}
-      {editingTile && <TileForm tile={editingTile} setTile={setEditingTile} onSave={updateTile} onCancel={() => setEditingTile(null)} saveLabel="Speichern" th={th} />}
-      <footer className={`text-center py-6 text-xs ${th.footer}`}>{tiles.length} Kacheln{tiles.filter(t => t.favorite).length > 0 ? ` • ${tiles.filter(t => t.favorite).length} Favoriten` : ''} • Dashboard</footer>
+      )}
+
+      {showWartung && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4" onClick={() => setShowWartung(false)}>
+          <div className={`rounded-2xl p-6 w-full max-w-sm border shadow-2xl ${th.modal}`} onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h3 className={`text-lg font-bold ${th.text}`}>🛠️ Wartung</h3>
+              <button className={`p-1.5 rounded-lg border ${th.btn}`} onClick={() => setShowWartung(false)}>✕</button>
+            </div>
+            <div className="space-y-3">
+              <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-yellow-500 border-opacity-40 bg-yellow-500 bg-opacity-10 hover:bg-opacity-20 transition-colors" onClick={() => { if (window.confirm('Cache leeren und neu laden?')) { localStorage.clear(); window.location.reload() } }}>
+                <span className="text-2xl">🗑️</span>
+                <div className="text-left"><p className="font-medium text-sm text-yellow-500">Cache leeren & neu laden</p><p className={`text-xs ${th.label}`}>Alle gespeicherten Daten löschen</p></div>
+              </button>
+              <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-red-500 border-opacity-40 bg-red-500 bg-opacity-10 hover:bg-opacity-20 transition-colors" onClick={() => { resetTiles(); setShowWartung(false) }}>
+                <span className="text-2xl">🔄</span>
+                <div className="text-left"><p className="font-medium text-sm text-red-500">Auf Standard zurücksetzen</p><p className={`text-xs ${th.label}`}>Alle Kacheln zurücksetzen</p></div>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <footer className={`text-center py-6 text-xs ${th.footer}`}>
+        Rheinische Post Mediengruppe · Dashboard v2.9
+      </footer>
     </div>
   )
 }
