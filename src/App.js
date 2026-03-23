@@ -7,6 +7,8 @@ function useTouchDragDrop(items, setItems, dragIdx, setDragIdx) {
   var ghostRef = useRef(null);
   var dropTargetIdx = useRef(null);
   var containerRef = useRef(null);
+  var dragActivated = useRef(false);
+  var longPressTimer = useRef(null);
 
   var cleanupGhost = function () {
     if (ghostRef.current && ghostRef.current.parentNode) {
@@ -18,40 +20,39 @@ function useTouchDragDrop(items, setItems, dragIdx, setDragIdx) {
   var onTouchStart = function (e, idx) {
     var touch = e.touches[0];
     touchStartY.current = touch.clientY;
-    touchCurrentIdx.current = idx;
-    setDragIdx(idx);
-
-    // Create ghost element
-    var el = e.currentTarget;
-    var rect = el.getBoundingClientRect();
-    var ghost = el.cloneNode(true);
-    ghost.style.position = "fixed";
-    ghost.style.left = rect.left + "px";
-    ghost.style.top = rect.top + "px";
-    ghost.style.width = rect.width + "px";
-    ghost.style.height = rect.height + "px";
-    ghost.style.opacity = "0.85";
-    ghost.style.zIndex = "9999";
-    ghost.style.pointerEvents = "none";
-    ghost.style.transform = "scale(1.04)";
-    ghost.style.boxShadow = "0 8px 32px rgba(0,0,0,0.35)";
-    ghost.style.borderRadius = "12px";
-    ghost.style.transition = "transform 0.15s";
-    document.body.appendChild(ghost);
-    ghostRef.current = ghost;
+    dragActivated.current = false;
+    touchCurrentIdx.current = null;
+    var capturedTarget = e.currentTarget;
+    longPressTimer.current = setTimeout(function () {
+      touchCurrentIdx.current = idx;
+      dragActivated.current = true;
+      setDragIdx(idx);
+      var rect = capturedTarget.getBoundingClientRect();
+      var ghost = capturedTarget.cloneNode(true);
+      ghost.style.position = "fixed";
+      ghost.style.left = rect.left + "px";
+      ghost.style.top = rect.top + "px";
+      ghost.style.width = rect.width + "px";
+      ghost.style.height = rect.height + "px";
+      ghost.style.opacity = "0.85";
+      ghost.style.zIndex = "9999";
+      ghost.style.pointerEvents = "none";
+      ghost.style.transform = "scale(1.04)";
+      ghost.style.boxShadow = "0 8px 32px rgba(0,0,0,0.35)";
+      ghost.style.borderRadius = "12px";
+      ghost.style.transition = "transform 0.15s";
+      document.body.appendChild(ghost);
+      ghostRef.current = ghost;
+    }, 400);
   };
 
   var onTouchMove = function (e, itemRefs) {
-    if (touchCurrentIdx.current == null) return;
+    if (!dragActivated.current || touchCurrentIdx.current == null) return;
     e.preventDefault();
     var touch = e.touches[0];
-
-    // Move ghost
     if (ghostRef.current) {
       ghostRef.current.style.top = (touch.clientY - 30) + "px";
     }
-
-    // Find drop target
     dropTargetIdx.current = null;
     if (itemRefs && itemRefs.current) {
       for (var i = 0; i < itemRefs.current.length; i++) {
@@ -66,7 +67,8 @@ function useTouchDragDrop(items, setItems, dragIdx, setDragIdx) {
   };
 
   var onTouchEnd = function () {
-    if (touchCurrentIdx.current != null && dropTargetIdx.current != null && touchCurrentIdx.current !== dropTargetIdx.current) {
+    if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null; }
+    if (dragActivated.current && touchCurrentIdx.current != null && dropTargetIdx.current != null && touchCurrentIdx.current !== dropTargetIdx.current) {
       var from = touchCurrentIdx.current;
       var to = dropTargetIdx.current;
       setItems(function (prev) {
@@ -76,6 +78,7 @@ function useTouchDragDrop(items, setItems, dragIdx, setDragIdx) {
         return next;
       });
     }
+    dragActivated.current = false;
     touchCurrentIdx.current = null;
     dropTargetIdx.current = null;
     setDragIdx(null);
@@ -149,7 +152,7 @@ function exportShowPDF(parts, showName) {
     '</div>',
     '<div class="header">',
     '<div><div style="font-size:18px;font-weight:800;color:#fff;">' + (showName||"Show") + '</div><div style="font-size:11px;color:#c7d2fe;margin-top:2px;">' + date + '</div></div>',
-    '<div style="font-size:12px;color:#c7d2fe;font-weight:600;">Magic Showrunner v9.0</div>',
+    '<div style="font-size:12px;color:#c7d2fe;font-weight:600;">Magic Showrunner v9.1</div>',
     '</div>',
     statsHTML,
     '<div style="font-size:13px;font-weight:700;color:#818cf8;margin-bottom:8px;letter-spacing:0.5px;">ZEITPLAN-ÜBERSICHT</div>',
@@ -157,7 +160,7 @@ function exportShowPDF(parts, showName) {
     '<div style="display:flex;justify-content:space-between;font-size:10px;color:#4a4a7a;margin-bottom:20px;"><span>0:00</span><span>' + fmtS(totalSec) + '</span></div>',
     '<div style="font-size:13px;font-weight:700;color:#818cf8;margin-bottom:10px;letter-spacing:0.5px;">ABLAUFPLAN</div>',
     cards,
-    '<div class="footer"><span>' + (showName||"Show") + ' · Magic Showrunner v9.0</span><span>' + date + '</span></div>',
+    '<div class="footer"><span>' + (showName||"Show") + ' · Magic Showrunner v9.1</span><span>' + date + '</span></div>',
     '</body></html>'
   ].join("");
 
@@ -184,7 +187,7 @@ var SETLIST_COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#8b5cf6", "#0
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v9.0", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v9.1", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -223,7 +226,7 @@ var T = {
     confirmDeleteSetlist: "Setlist wirklich löschen?"
   },
   en: {
-    title: "Magic Showrunner", ver: "v9.0", save: "Save", load: "Load", newPart: "New Part",
+    title: "Magic Showrunner", ver: "v9.1", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
