@@ -141,7 +141,7 @@ function exportShowPDF(parts, showName) {
     '</div>',
     '<div class="header">',
     '<div><div style="font-size:18px;font-weight:800;color:#fff;">' + (showName||"Show") + '</div><div style="font-size:11px;color:#c7d2fe;margin-top:2px;">' + date + '</div></div>',
-    '<div style="font-size:12px;color:#c7d2fe;font-weight:600;">Magic Showrunner v9.1</div>',
+    '<div style="font-size:12px;color:#c7d2fe;font-weight:600;">Magic Showrunner v9.2</div>',
     '</div>',
     statsHTML,
     '<div style="font-size:13px;font-weight:700;color:#818cf8;margin-bottom:8px;letter-spacing:0.5px;">ZEITPLAN-ÜBERSICHT</div>',
@@ -149,7 +149,7 @@ function exportShowPDF(parts, showName) {
     '<div style="display:flex;justify-content:space-between;font-size:10px;color:#4a4a7a;margin-bottom:20px;"><span>0:00</span><span>' + fmtS(totalSec) + '</span></div>',
     '<div style="font-size:13px;font-weight:700;color:#818cf8;margin-bottom:10px;letter-spacing:0.5px;">ABLAUFPLAN</div>',
     cards,
-    '<div class="footer"><span>' + (showName||"Show") + ' · Magic Showrunner v9.1</span><span>' + date + '</span></div>',
+    '<div class="footer"><span>' + (showName||"Show") + ' · Magic Showrunner v9.2</span><span>' + date + '</span></div>',
     '</body></html>'
   ].join("");
 
@@ -177,7 +177,7 @@ var SETLIST_COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#8b5cf6", "#0
 var T = {
   de: {
     lang: "de",
-    title: "Magic Showrunner", ver: "v9.1", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    title: "Magic Showrunner", ver: "v9.2", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -216,7 +216,7 @@ var T = {
     confirmDeleteSetlist: "Setlist wirklich löschen?"
   },
   en: {
-    lang: "en", title: "Magic Showrunner", ver: "v9.1", save: "Save", load: "Load", newPart: "New Part",
+    lang: "en", title: "Magic Showrunner", ver: "v9.2", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -869,81 +869,164 @@ function SettingsModal(props) {
       </div>
     );
   } else if (tab === "help") {
-    var helpContent = [
-  { title: "📘 Gesamtübersicht", items: [
-    { label: "Grundidee", text: "Magic Showrunner ist eine komplette Lösung zur Planung, Organisation und Live-Durchführung einer Bühnenshow. Du erstellst Teile, sortierst sie, nutzt Timer, Sprachsteuerung, Themes, Setlists, Vorlagen und Live-Tools wie Ansagen und Countdown." },
-    { label: "Hauptbereiche", text: "Die App besteht aus: Planungsmodus, Showmodus, Einstellungen, Setlists, Vorlagen, Timer-Stilen, Audio-Einstellungen, Sprach-Einstellungen, Schrift-Einstellungen und Drag & Drop-Organisation." }
-  ]},
-  { title: "📑 Planungsmodus", items: [
-    { label: "Teile anlegen", text: "Über 'Neuer Teil' erstellst du beliebige Showteile: Titel, Dauer, Intro-Ansage (TTS), Vorankündigung, Vorankündigungs-Text, Farbe und Notizen." },
-    { label: "Akte (Gruppen)", text: "Du kannst Teile in Akte gruppieren. Gruppen funktionieren wie Überschriften und helfen bei längeren Shows." },
-    { label: "Bearbeiten & Duplizieren", text: "Mit ✏️ bearbeitest du Teile. Mit ⧉ duplizierst du sie blitzschnell." },
-    { label: "Drag & Drop", text: "Teile einfach per Maus oder Touch bewegen. Mobile: lang drücken → verschieben." }
-  ]},
-  { title: "⏱️ Showmodus", items: [
-    { label: "Timer", text: "Jeder Teil hat einen Live-Timer. Du kannst zurück, weiter, pausieren, fortsetzen oder stoppen." },
-    { label: "Intro-Ansage", text: "Vor jedem Teil kann per TTS der Intro-Text automatisch gesprochen werden." },
-    { label: "Vorankündigung", text: "X Sekunden vor Teil-Ende wird ein Hinweistext gesprochen – perfekt für Übergänge oder Umbauten." },
-    { label: "Live-Themes", text: "Im Showmodus stehen dunkle, helle und kontraststarke Themes zur Auswahl." },
-    { label: "Ziel-Endzeit", text: "Du kannst eine gewünschte Endzeit angeben. Das System zeigt an: im Zeitplan, voraus oder im Rückstand." }
-  ]},
-  { title: "🗂️ Setlists", items: [
-    { label: "Setlists verwalten", text: "Du kannst mehrere Shows/Programme erstellen. Jede Setlist enthält beliebig viele Teile und Akte." },
-    { label: "Wechseln & Duplizieren", text: "Wähle aktive Setlists, dupliziere sie oder lösche sie – perfekt für Variationen." },
-    { label: "Farbkennzeichnungen", text: "Jede Setlist erhält automatisch eine eigene farbliche Markierung." }
-  ]},
-  { title: "⭐ Vorlagen (Templates)", items: [
-    { label: "Vorlage speichern", text: "Teile können als Vorlage gespeichert werden – z.B. Standardtricks, Moderationen, Wiederholer." },
-    { label: "Vorlage nutzen", text: "Mit einem Klick fügst du gespeicherte Vorlagen direkt deiner aktuellen Show hinzu." }
-  ]},
-  { title: "🎨 Themes & Custom Design", items: [
-    { label: "Standard-Themes", text: "Light, Dark, Midnight und Ember stehen zur Auswahl." },
-    { label: "Custom Theme", text: "Du kannst komplett eigene Farben definieren: Hintergrund, Karte, Text, Akzent, Rahmen, Inputs, Subtext." },
-    { label: "Perform-Theme", text: "Separates Theme speziell für den Showmodus für optimale Lesbarkeit." }
-  ]},
-  { title: "🔊 Audio", items: [
-    { label: "Beeps", text: "Aktiviere oder deaktiviere Signaltöne für Teil-Ende und Vorankündigung." },
-    { label: "Sound-Auswahl", text: "Wähle zwischen Beep, Glocke, Gong, Chime, Buzz, Click, Soft – alle direkt testbar." },
-    { label: "Lautstärke", text: "Regle die Lautstärke unabhängig vom Gerätesound." }
-  ]},
-  { title: "🗣️ Sprache & TTS", items: [
-    { label: "Sprachsteuerung", text: "Wenn aktiviert, kannst du per Sprache steuern: 'Start', 'Pause', 'Weiter', 'Nächster Teil', etc." },
-    { label: "TTS Stimme", text: "Wähle Sprache, Stimme, Geschwindigkeit und Tonhöhe." },
-    { label: "Preview", text: "Mit einem Klick vorhören, wie die Stimme klingt." }
-  ]},
-  { title: "🔤 Schrift & Anzeige", items: [
-    { label: "Skalierung", text: "Im Showmodus kannst du die Größe extrem anpassen: 0.4× bis 4.0×." },
-    { label: "Schriftgröße", text: "Globale Schriftgröße einstellen – perfekt für Tablets oder Projektoren." },
-    { label: "Schriftarten", text: "System, Arial, Georgia, Courier New, Verdana." }
-  ]},
-  { title: "⏳ Timer-Stile", items: [
-    { label: "Balken-Timer", text: "Ein horizontaler Fortschrittsbalken." },
-    { label: "Kreis-Timer", text: "Radialer Countdown-Ring mit Fortschrittsanimation." },
-    { label: "Sanduhr", text: "Grafische animierte Sanduhr." },
-    { label: "Wellen-Timer", text: "Animierte Wellenlinie mit Fortschrittsbalken." }
-  ]},
-  { title: "🔗 API-Integration", items: [
-    { label: cfg.lang === "de" ? "Aktivieren" : "Activate", text: cfg.lang === "de" ? "Öffne Einstellungen → API. Aktiviere die API per Checkbox." : "Open Settings → API. Enable the API via the checkbox." },
-    { label: "URL", text: cfg.lang === "de" ? "Trage die vollständige API-URL ein (muss JSON zurückgeben)." : "Enter the full API URL (must return JSON)." },
-    { label: "Value-Key", text: cfg.lang === "de" ? "Gib den JSON-Pfad zum gewünschten Wert an, z.B. 'message' oder 'data.text'." : "Enter the JSON path to the desired value, e.g. 'message' or 'data.text'." },
-    { label: cfg.lang === "de" ? "Feld wählen" : "Choose field", text: cfg.lang === "de" ? "Wähle welches Feld im Show-Teil aktualisiert wird: Intro, Notizen oder Vorankündigungs-Text." : "Choose which field in the show part gets updated: Intro, Notes or Pre-announce text." },
-    { label: cfg.lang === "de" ? "Abruf-Modus" : "Fetch mode", text: cfg.lang === "de" ? "'Beim Teilwechsel': API wird einmalig beim Start jedes Teils abgerufen. 'Intervall': kontinuierliche Aktualisierung. 'Beides': kombiniert." : "'On Part Start': API is fetched once when each part begins. 'Interval': continuous update. 'Both': combined." },
-    { label: cfg.lang === "de" ? "Platzhalter" : "Placeholder", text: cfg.lang === "de" ? "Schreibe {{api}} in einen Intro- oder Notizen-Text – er wird durch den API-Wert ersetzt. Alternativ: Text endet mit Doppelpunkt → Wert wird dahinter eingefügt." : "Write {{api}} in an intro or notes text – it gets replaced by the API value. Alternatively: text ends with colon → value is appended after it." },
-    { label: cfg.lang === "de" ? "Testen" : "Test", text: cfg.lang === "de" ? "Mit dem 'API testen'-Button kannst du die Verbindung prüfen und eine Vorschau des Werts sehen." : "Use the 'Test API' button to check the connection and preview the value." },
-    { label: "CORS", text: cfg.lang === "de" ? "Falls die API CORS-Probleme hat, versucht die App automatisch mehrere Proxy-Fallbacks." : "If the API has CORS issues, the app automatically tries several proxy fallbacks." }
-  ]},
-  { title: "📦 Speichern & Laden", items: [
-    { label: "Manuelles Speichern", text: "Alle Teile der Show speichern – später wieder abrufbar." },
-    { label: "Autosave", text: "Die App speichert automatisch den aktuellen Stand." },
-    { label: "Vorige Saves", text: "Frühere Versionen deiner Shows bleiben abrufbar." }
-  ]},
-  { title: "📱 Touch & Mobile", items: [
-    { label: "Touch Drag & Drop", text: "Einfach per langem Druck ein Element verschieben." },
-    { label: "Ghost Preview", text: "Während des Verschiebens erscheint ein schwebender 'Ghost'." },
-    { label: "Drop Zones", text: "Teile werden automatisch an die richtige Stelle einsortiert." }
-  ]}
-];
-    content = (
+    var helpContent = cfg.lang === "de" ? [
+    { title: "📘 Gesamtübersicht", items: [
+      { label: "Grundidee", text: "Magic Showrunner v9.2 ist eine vollständige Lösung zur Planung, Organisation und Live-Durchführung von Bühnenshows. Du erstellst Teile, sortierst sie, nutzt Timer, Bluetooth-Sprachsteuerung, Themes, Setlists, Vorlagen, API-Integration und Live-Tools wie TTS-Ansagen und Countdown." },
+      { label: "Hauptbereiche", text: "Planungsmodus, Showmodus, Einstellungen (Design, Audio, Stimme, Schrift, Sprache, API, Anleitung), Setlists, Vorlagen, Timer-Stile, Drag & Drop-Organisation und Bluetooth-Mikrofon-Steuerung." }
+    ]},
+    { title: "📑 Planungsmodus", items: [
+      { label: "Teile anlegen", text: "Über '+' → 'Neuer Teil' erstellst du Showteile: Titel, Dauer, Intro-Ansage (TTS), Vorankündigung, Vorankündigungs-Text, Farbe und Notizen." },
+      { label: "Akte (Gruppen)", text: "Mit '+' → 'Neuer Akt' gruppierst du Teile. Akte funktionieren wie Überschriften und helfen bei langen Shows." },
+      { label: "Bearbeiten & Duplizieren", text: "Mit ✏️ bearbeitest du Teile. Mit ⧉ duplizierst du sie blitzschnell. Mit 🗑️ löschst du sie." },
+      { label: "Rückgängig / Wiederholen", text: "Mit ↩ und ↪ kannst du Änderungen rückgängig machen oder wiederholen." },
+      { label: "Drag & Drop", text: "Teile per Maus ziehen. Auf dem Handy: Element lang drücken → verschieben. Ghost-Vorschau erscheint beim Ziehen." }
+    ]},
+    { title: "⏱️ Showmodus", items: [
+      { label: "Timer", text: "Jeder Teil hat einen Live-Timer. Per Klick auf den Timer wechselst du zwischen 'Verbleibend' und 'Vergangen'." },
+      { label: "Navigation", text: "Mit 'Zurück' und 'Weiter' springst du zwischen Teilen. Wischen nach links/rechts funktioniert auf Touch-Geräten." },
+      { label: "Pause", text: "Pause zeigt an wie lange pausiert wurde. Der Button pulsiert rot als visuelle Warnung." },
+      { label: "Intro-Ansage", text: "Vor jedem Teil wird der Intro-Text automatisch per Text-to-Speech gesprochen." },
+      { label: "Vorankündigung", text: "X Sekunden vor Teil-Ende wird ein Hinweistext gesprochen – perfekt für Übergänge oder Umbauten." },
+      { label: "Ziel-Endzeit", text: "Gewünschte Show-Endzeit eingeben (HH:MM). Die App zeigt an: im Zeitplan, voraus oder im Rückstand." },
+      { label: "Blackout", text: "🌙-Button blendet alles aus – nur der Timer bleibt sichtbar. Antippen beendet den Blackout." },
+      { label: "Setlist-Panel", text: "📜-Button öffnet eine seitliche Übersicht aller Teile – direktes Anspringen per Klick möglich." },
+      { label: "Notizen", text: "📝-Button zeigt die Notizen des aktuellen Teils an." },
+      { label: "Größenskalierung", text: "Schieberegler oben rechts passt die Anzeigegröße live an (0.4× bis 4.0×) – ideal für Tablets und Projektoren." },
+      { label: "Overrun", text: "Wenn die Show das Ende überschreitet, wechselt die Anzeige in den roten Overrun-Modus mit Überschreitungs-Timer." }
+    ]},
+    { title: "🎤 Bluetooth-Sprachsteuerung", items: [
+      { label: "Aktivieren", text: "Einstellungen (⚙️) → Tab 'Design' → Checkbox 'Sprachsteuerung' aktivieren. Der Browser fragt einmalig nach Mikrofon-Erlaubnis." },
+      { label: "Bluetooth-Mikrofon verbinden", text: "Bluetooth-Mikrofon am iPhone/iPad oder Mac koppeln. In den Systemeinstellungen als Audioeingabe setzen – der Browser nutzt es automatisch." },
+      { label: "Browser-Empfehlung", text: "Chrome (Mac/Android) und Safari (iOS/macOS 14+) werden empfohlen. Firefox unterstützt keine Web Speech API." },
+      { label: "Sprachbefehle (Deutsch)", text: "'Start' / 'Los' → Weiter. 'Pause' → Pausieren. 'Weiter' / 'Resume' → Fortsetzen. 'Nächster' → Nächster Teil. 'Zurück' → Vorheriger Teil. 'Stop' → Show beenden. 'Blackout' → Blackout. 'Notizen' → Notizen ein/aus. 'Setlist' → Setlist ein/aus." },
+      { label: "Indikator", text: "Grüner 🎤 ON-Badge im Showmodus zeigt: Mikrofon aktiv. Blinkt rot wenn ein Befehl erkannt wurde." },
+      { label: "Hinweis iOS", text: "Auf iOS Safari läuft die Spracherkennung nur wenn die App im Vordergrund ist und der Bildschirm aktiv bleibt (Wake Lock aktiv)." }
+    ]},
+    { title: "🗂️ Setlists", items: [
+      { label: "Setlists verwalten", text: "Mehrere Shows/Programme anlegen. Jede Setlist enthält beliebig viele Teile und Akte." },
+      { label: "Wechseln & Duplizieren", text: "Aktive Setlist wählen, duplizieren oder löschen – perfekt für Variationen einer Show." },
+      { label: "Farbkennzeichnung", text: "Jede Setlist erhält automatisch eine eigene Farbe zur schnellen Orientierung." }
+    ]},
+    { title: "⭐ Vorlagen (Templates)", items: [
+      { label: "Vorlage speichern", text: "Im Teil-Editor auf ⭐ klicken – speichert den Teil als Vorlage (z.B. Standardtricks, Moderationen)." },
+      { label: "Vorlage nutzen", text: "Über '⭐ Vorlagen' eine gespeicherte Vorlage mit einem Klick zur aktuellen Show hinzufügen." }
+    ]},
+    { title: "🎨 Themes & Design", items: [
+      { label: "Standard-Themes", text: "Light, Dark, Midnight und Ember – sofort umschaltbar." },
+      { label: "Custom Theme", text: "Eigene Farben definieren: Hintergrund, Karte, Text, Akzent, Rahmen, Inputs, Subtext. Mit 'Anwenden' aktivieren." },
+      { label: "Perform-Theme", text: "Separates Theme für den Showmodus: Light, Dark oder Black – für optimale Lesbarkeit auf der Bühne." },
+      { label: "Animationen", text: "Farbübergänge und Blink-Effekte können einzeln aktiviert/deaktiviert werden." }
+    ]},
+    { title: "🔊 Audio & Signaltöne", items: [
+      { label: "Signaltöne", text: "Aktiviere Töne für Teil-Ende und Vorankündigung. Wähle aus: Beep, Glocke, Gong, Chime, Buzz, Click, Soft." },
+      { label: "Lautstärke", text: "Unabhängig vom Gerätevolume regelbar. 'Testton'-Button zum direkten Ausprobieren." }
+    ]},
+    { title: "🗣️ TTS & Stimme", items: [
+      { label: "Stimme wählen", text: "Alle verfügbaren Browser-Stimmen werden angezeigt. Sprache, Tempo und Tonhöhe einstellbar." },
+      { label: "Preview", text: "'Vorschau'-Button spricht einen Testtext mit den aktuellen Einstellungen." }
+    ]},
+    { title: "⏳ Timer-Stile", items: [
+      { label: "Balken-Timer", text: "Horizontaler Fortschrittsbalken mit Seek-Funktion (Klicken/Ziehen zum Springen)." },
+      { label: "Kreis-Timer", text: "Radialer Countdown-Ring mit zentrierter Zeitanzeige." },
+      { label: "Sanduhr", text: "Animierte grafische Sanduhr." },
+      { label: "Wellen-Timer", text: "Animierte Wellenlinie mit Fortschrittsbalken." }
+    ]},
+    { title: "🔗 API-Integration", items: [
+      { label: "Aktivieren", text: "Einstellungen → API → Checkbox 'API aktivieren'. URL und Value-Key eintragen." },
+      { label: "Platzhalter", text: "Schreibe {{api}} in Intro- oder Notizen-Text – wird durch den API-Wert ersetzt. Oder Text mit Doppelpunkt enden lassen → Wert wird angehängt." },
+      { label: "Abruf-Modi", text: "'Beim Teilwechsel': einmalig pro Teil. 'Intervall': kontinuierlich. 'Beides': kombiniert." },
+      { label: "Testen", text: "'API testen'-Button prüft die Verbindung und zeigt eine Vorschau des Werts." }
+    ]},
+    { title: "📦 Speichern & Laden", items: [
+      { label: "Manuell speichern", text: "💾-Button → Show-Name eingeben → Speichern. Bestehende Namen überschreiben die alte Version." },
+      { label: "Autosave", text: "Die App speichert bei jeder Änderung automatisch. Letzter Autosave im Lade-Dialog abrufbar." },
+      { label: "Export/Import", text: "JSON-Export für Backups, JSON-Import zum Wiederherstellen, CSV-Export für Tabellenkalkulationen, PDF-Export als druckbarer Ablaufplan." }
+    ]},
+    { title: "📱 Touch & Mobile", items: [
+      { label: "Drag & Drop", text: "Element lang drücken → verschieben → loslassen. Ghost-Element zeigt Position an." },
+      { label: "Wisch-Gesten", text: "Im Showmodus: links/rechts wischen → nächster/vorheriger Teil. Runter wischen → Pause umschalten." },
+      { label: "Wake Lock", text: "Die App verhindert automatisch dass der Bildschirm sich ausschaltet (sofern vom Browser unterstützt)." }
+    ]}
+  ] : [
+    { title: "📘 Overview", items: [
+      { label: "Concept", text: "Magic Showrunner v9.2 is a complete solution for planning, organizing and running live stage shows. Create parts, sort them, use timers, Bluetooth voice control, themes, setlists, templates, API integration and live tools like TTS announcements and countdown." },
+      { label: "Main areas", text: "Planning mode, Show mode, Settings (Design, Audio, Voice, Font, Language, API, Help), Setlists, Templates, Timer styles, Drag & Drop organization and Bluetooth microphone control." }
+    ]},
+    { title: "📑 Planning Mode", items: [
+      { label: "Creating parts", text: "Tap '+' → 'New Part' to create show parts: title, duration, intro (TTS), pre-announce, pre-announce text, color and notes." },
+      { label: "Acts (Groups)", text: "Use '+' → 'New Act' to group parts. Acts work like headings and help organize longer shows." },
+      { label: "Edit & Duplicate", text: "✏️ edits a part. ⧉ duplicates it instantly. 🗑️ deletes it." },
+      { label: "Undo / Redo", text: "Use ↩ and ↪ to undo or redo any changes." },
+      { label: "Drag & Drop", text: "Drag parts with the mouse. On mobile: long press → drag. A ghost preview appears while dragging." }
+    ]},
+    { title: "⏱️ Show Mode", items: [
+      { label: "Timer", text: "Each part has a live timer. Tap the timer to toggle between 'Remaining' and 'Elapsed'." },
+      { label: "Navigation", text: "Use 'Back' and 'Next' to move between parts. Swipe left/right on touch devices." },
+      { label: "Pause", text: "Pause shows how long the show has been paused. The button pulses red as a visual warning." },
+      { label: "Intro announcement", text: "The intro text is automatically spoken via TTS at the start of each part." },
+      { label: "Pre-announcement", text: "X seconds before the part ends, a hint text is spoken – perfect for transitions or scene changes." },
+      { label: "Target end time", text: "Enter a desired show end time (HH:MM). The app shows whether you are on schedule, ahead or behind." },
+      { label: "Blackout", text: "🌙 hides everything – only the timer remains visible. Tap to exit blackout." },
+      { label: "Setlist panel", text: "📜 opens a side panel with all parts – click any to jump directly to it." },
+      { label: "Notes", text: "📝 shows the notes of the current part." },
+      { label: "Size scaling", text: "Slider in the top right adjusts display size live (0.4× to 4.0×) – ideal for tablets and projectors." },
+      { label: "Overrun", text: "When the show exceeds its end, the display switches to a red overrun mode with an overrun timer." }
+    ]},
+    { title: "🎤 Bluetooth Voice Control", items: [
+      { label: "Activate", text: "Settings (⚙️) → 'Design' tab → enable 'Voice Control' checkbox. The browser will ask for microphone permission once." },
+      { label: "Connect Bluetooth mic", text: "Pair your Bluetooth microphone with your iPhone/iPad or Mac. Set it as the audio input in system settings – the browser uses it automatically." },
+      { label: "Browser recommendation", text: "Chrome (Mac/Android) and Safari (iOS/macOS 14+) are recommended. Firefox does not support the Web Speech API." },
+      { label: "Voice commands (English)", text: "'Start' → Resume. 'Pause' → Pause. 'Resume' / 'Next' → go forward. 'Back' / 'Previous' → go back. 'Stop' → end show. 'Blackout' → toggle blackout. 'Notes' → toggle notes. 'Setlist' → toggle setlist." },
+      { label: "Indicator", text: "Green 🎤 ON badge in show mode means the mic is active. Flashes red when a command is recognized." },
+      { label: "iOS note", text: "On iOS Safari, voice recognition only works while the app is in the foreground and the screen stays on (Wake Lock active)." }
+    ]},
+    { title: "🗂️ Setlists", items: [
+      { label: "Manage setlists", text: "Create multiple shows/programs. Each setlist can contain any number of parts and acts." },
+      { label: "Switch & Duplicate", text: "Switch the active setlist, duplicate or delete it – perfect for show variations." },
+      { label: "Color coding", text: "Each setlist automatically gets its own color for quick identification." }
+    ]},
+    { title: "⭐ Templates", items: [
+      { label: "Save template", text: "Click ⭐ in the part editor to save a part as a template (e.g. standard tricks, intros)." },
+      { label: "Use template", text: "Open '⭐ Templates' and add any saved template to your current show with one click." }
+    ]},
+    { title: "🎨 Themes & Design", items: [
+      { label: "Built-in themes", text: "Light, Dark, Midnight and Ember – switch instantly." },
+      { label: "Custom theme", text: "Define your own colors: background, card, text, accent, border, inputs, subtext. Apply with the 'Apply' button." },
+      { label: "Perform theme", text: "Separate theme for show mode: Light, Dark or Black – for optimal readability on stage." },
+      { label: "Animations", text: "Color transitions and blink effects can be toggled individually." }
+    ]},
+    { title: "🔊 Audio & Beeps", items: [
+      { label: "Beeps", text: "Enable sounds for part end and pre-announcement. Choose from: Beep, Bell, Gong, Chime, Buzz, Click, Soft." },
+      { label: "Volume", text: "Adjustable independently of device volume. Use 'Test Tone' to try it directly." }
+    ]},
+    { title: "🗣️ TTS & Voice", items: [
+      { label: "Choose voice", text: "All available browser voices are listed. Set language, speed and pitch." },
+      { label: "Preview", text: "'Preview' button speaks a test text with current settings." }
+    ]},
+    { title: "⏳ Timer Styles", items: [
+      { label: "Bar Timer", text: "Horizontal progress bar with seek function (click/drag to jump)." },
+      { label: "Circle Timer", text: "Radial countdown ring with centered time display." },
+      { label: "Hourglass", text: "Animated graphical hourglass." },
+      { label: "Wave Timer", text: "Animated wave line with progress bar." }
+    ]},
+    { title: "🔗 API Integration", items: [
+      { label: "Activate", text: "Settings → API → enable 'Enable API' checkbox. Enter URL and value key." },
+      { label: "Placeholder", text: "Write {{api}} in intro or notes text – replaced by the API value. Or end text with a colon → value is appended." },
+      { label: "Fetch modes", text: "'On Part Start': once per part. 'Interval': continuously. 'Both': combined." },
+      { label: "Test", text: "'Test API' button checks the connection and shows a preview of the value." }
+    ]},
+    { title: "📦 Save & Load", items: [
+      { label: "Manual save", text: "💾 → enter show name → Save. Using an existing name overwrites the previous version." },
+      { label: "Autosave", text: "The app saves automatically on every change. Last autosave is accessible in the load dialog." },
+      { label: "Export/Import", text: "JSON export for backups, JSON import to restore, CSV export for spreadsheets, PDF export as a printable runsheet." }
+    ]},
+    { title: "📱 Touch & Mobile", items: [
+      { label: "Drag & Drop", text: "Long press an item → drag → release. A ghost element shows the target position." },
+      { label: "Swipe gestures", text: "In show mode: swipe left/right → next/previous part. Swipe down → toggle pause." },
+      { label: "Wake Lock", text: "The app automatically prevents the screen from turning off (if supported by the browser)." }
+    ]}
+  ];
+      content = (
       <div style={{ maxHeight: "60vh", overflowY: "auto", paddingRight: 8 }}>
         {helpContent.map(function (section, i) {
           return (
