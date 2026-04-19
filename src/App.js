@@ -2,12 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 
 /* ─── Touch Drag & Drop Helper ─── */
 function useTouchDragDrop(items, setItems, dragIdx, setDragIdx) {
-  var touchStartY = useRef(null);
   var touchCurrentIdx = useRef(null);
   var ghostRef = useRef(null);
   var dropTargetIdx = useRef(null);
-  var containerRef = useRef(null);
-
   var cleanupGhost = function () {
     if (ghostRef.current && ghostRef.current.parentNode) {
       ghostRef.current.parentNode.removeChild(ghostRef.current);
@@ -82,16 +79,11 @@ function useTouchDragDrop(items, setItems, dragIdx, setDragIdx) {
     cleanupGhost();
   };
 
-  return { onTouchStart: onTouchStart, onTouchMove: onTouchMove, onTouchEnd: onTouchEnd, containerRef: containerRef };
+  return { onTouchStart: onTouchStart, onTouchMove: onTouchMove, onTouchEnd: onTouchEnd };
 }
 
 /* ─── PDF Export ─── */
 function exportShowPDF(parts, showName) {
-  var COLORS_MAP = {
-    "#6366f1": "#6366f1", "#ec4899": "#ec4899", "#f59e0b": "#f59e0b",
-    "#10b981": "#10b981", "#ef4444": "#ef4444", "#8b5cf6": "#8b5cf6",
-    "#06b6d4": "#06b6d4", "#f97316": "#f97316"
-  };
   var fmtS = function(s) { var m = Math.floor(s/60); var sec = s%60; return m+":"+String(sec).padStart(2,"0"); };
   var totalSec = parts.filter(function(p){ return p.type !== "group"; }).reduce(function(a,p){ return a + (p.duration||0); }, 0);
   var realParts = parts.filter(function(p){ return p.type !== "group"; });
@@ -149,7 +141,7 @@ function exportShowPDF(parts, showName) {
     '</div>',
     '<div class="header">',
     '<div><div style="font-size:18px;font-weight:800;color:#fff;">' + (showName||"Show") + '</div><div style="font-size:11px;color:#c7d2fe;margin-top:2px;">' + date + '</div></div>',
-    '<div style="font-size:12px;color:#c7d2fe;font-weight:600;">Magic Showrunner v9.0</div>',
+    '<div style="font-size:12px;color:#c7d2fe;font-weight:600;">Magic Showrunner v9.1</div>',
     '</div>',
     statsHTML,
     '<div style="font-size:13px;font-weight:700;color:#818cf8;margin-bottom:8px;letter-spacing:0.5px;">ZEITPLAN-ÜBERSICHT</div>',
@@ -157,7 +149,7 @@ function exportShowPDF(parts, showName) {
     '<div style="display:flex;justify-content:space-between;font-size:10px;color:#4a4a7a;margin-bottom:20px;"><span>0:00</span><span>' + fmtS(totalSec) + '</span></div>',
     '<div style="font-size:13px;font-weight:700;color:#818cf8;margin-bottom:10px;letter-spacing:0.5px;">ABLAUFPLAN</div>',
     cards,
-    '<div class="footer"><span>' + (showName||"Show") + ' · Magic Showrunner v9.0</span><span>' + date + '</span></div>',
+    '<div class="footer"><span>' + (showName||"Show") + ' · Magic Showrunner v9.1</span><span>' + date + '</span></div>',
     '</body></html>'
   ].join("");
 
@@ -184,7 +176,8 @@ var SETLIST_COLORS = ["#6366f1", "#ec4899", "#f59e0b", "#10b981", "#8b5cf6", "#0
 
 var T = {
   de: {
-    title: "Magic Showrunner", ver: "v9.0", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
+    lang: "de",
+    title: "Magic Showrunner", ver: "v9.1", save: "Speichern", load: "Laden", newPart: "Neuer Teil",
     start: "Show starten", test: "Testmodus", parts: "Teile", total: "Gesamt", settings: "Einstellungen",
     planTheme: "Planungs-Theme", perfTheme: "Perform-Theme", beeps: "Signaltöne",
     volume: "Lautstärke", testTone: "Testton", testDur: "Testdauer/Teil", titleL: "Titel",
@@ -194,7 +187,7 @@ var T = {
     pause: "Pause", resume: "Weiter", prev: "Zurück", next: "Weiter", partOf: "Teil", of: "/",
     dup: "⧉", del: "Löschen", edit: "✏️", sek: "Sek", csv: "CSV", pdfBtn: "🖨️ PDF", pdfExport: "PDF",
     fontSize: "Größe", fontFamily: "Schriftart", ttsVoice: "Stimme", ttsRate: "Tempo",
-    ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen", voiceControl: "Sprachsteuerung", voiceControl: "Sprachsteuerung",
+    ttsPitch: "Tonhöhe", ttsPreview: "Vorschau", animations: "Animationen", notes: "Notizen", voiceControl: "Sprachsteuerung",
     stop: "Stop", setlist: "Setlist", elapsed: "Vergangen", remaining: "Verbleibend",
     soundLabel: "Signalton", colorTrans: "Farb-Übergänge", blackout: "Blackout",
     startBlackout: "Start mit Countdown", countdown: "Countdown", countdownSek: "Countdown (Sek)",
@@ -223,7 +216,7 @@ var T = {
     confirmDeleteSetlist: "Setlist wirklich löschen?"
   },
   en: {
-    title: "Magic Showrunner", ver: "v9.0", save: "Save", load: "Load", newPart: "New Part",
+    lang: "en", title: "Magic Showrunner", ver: "v9.1", save: "Save", load: "Load", newPart: "New Part",
     start: "Start Show", test: "Test Mode", parts: "Parts", total: "Total", settings: "Settings",
     planTheme: "Plan Theme", perfTheme: "Perform Theme", beeps: "Beeps",
     volume: "Volume", testTone: "Test Tone", testDur: "Test dur/part", titleL: "Title",
@@ -234,7 +227,7 @@ var T = {
     dup: "⧉", del: "Delete", edit: "✏️", sek: "sec", csv: "CSV", pdfBtn: "🖨️ PDF",
     pdfExport: "🖨️ PDF",
     fontSize: "Size", fontFamily: "Font family", ttsVoice: "Voice", ttsRate: "Speed",
-    ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes", voiceControl: "Voice Control", voiceControl: "Voice Control",
+    ttsPitch: "Pitch", ttsPreview: "Preview", animations: "Animations", notes: "Notes", voiceControl: "Voice Control",
     stop: "Stop", setlist: "Setlist", elapsed: "Elapsed", remaining: "Remaining",
     soundLabel: "Alert Sound", colorTrans: "Color Transitions", blackout: "Blackout",
     startBlackout: "Start with Countdown", countdown: "Countdown", countdownSek: "Countdown (sec)",
@@ -441,7 +434,7 @@ function GroupEditor(props) {
   var is = { width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid " + th.brd, background: th.inp, color: th.text, marginBottom: 8, boxSizing: "border-box" };
   if (!open) return null;
   return (
-    <Modal open={open} onClose={onClose} title={group ? "Akt bearbeiten" : t.newGroup} th={th}>
+    <Modal open={open} onClose={onClose} title={group ? (t.editGroup || "Akt bearbeiten") : t.newGroup} th={th}>
       <label style={{ fontSize: 12, color: th.sub }}>{t.titleL}</label>
       <input style={is} value={f.title} onChange={function (e) { setF(function (p) { return Object.assign({}, p, { title: e.target.value }); }); }} />
       <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
@@ -629,7 +622,7 @@ function SettingsModal(props) {
   if (!open) return null;
   var upCfg = function (k, v) { setCfg(function (c) { var o = {}; o[k] = v; return Object.assign({}, c, o); }); };
   var tabs = ["design", "audio", "voice", "font", "lang", "api", "help"];
-  var tiMap2 = { design: "🎨", audio: "🔊", voice: "🗣️", font: "🔤", lang: "🌐", api: "🔗", help: "❓" };
+  var tiMap = { design: "🎨", audio: "🔊", voice: "🗣️", font: "🔤", lang: "🌐", api: "🔗", help: "❓" };
   var icons = { design: "Design", audio: "Audio", voice: cfg.lang === "de" ? "Stimme" : "Voice", font: cfg.lang === "de" ? "Schrift" : "Font", lang: cfg.lang === "de" ? "Sprache" : "Language", api: "API", help: t.help };
   
   var renderTimerPreview = function(style) {
@@ -644,8 +637,9 @@ function SettingsModal(props) {
       return (
         <svg width="60" height="80" viewBox="0 0 60 80" style={{ display: "block", margin: "0 auto" }}>
           <path d="M10 10 L50 10 L30 40 L50 70 L10 70 L30 40 Z" fill="none" stroke={th.acc} strokeWidth="3" />
-          <rect x="15" y="15" width="30" height="15" fill={th.acc} opacity="0.6" />
-          <animate attributeName="height" values="15;5;15" dur="3s" repeatCount="indefinite" />
+          <rect x="15" y="15" width="30" height="15" fill={th.acc} opacity="0.6">
+            <animate attributeName="height" values="15;5;15" dur="3s" repeatCount="indefinite" />
+          </rect>
         </svg>
       );
     } else if (style === "wave") {
@@ -977,7 +971,7 @@ function SettingsModal(props) {
           var active = tab === k;
           return (
             <button key={k} onClick={function () { setTab(k); }} style={{ flex: "0 0 auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "7px 10px", borderRadius: 10, border: active ? "2px solid " + th.acc : "2px solid transparent", background: active ? th.acc + "22" : th.inp, color: active ? th.acc : th.sub, cursor: "pointer", minWidth: 50 }}>
-              <span style={{ fontSize: 18 }}>{tiMap2[k]}</span>
+              <span style={{ fontSize: 18 }}>{tiMap[k]}</span>
               <span style={{ fontSize: 9, fontWeight: active ? 700 : 400 }}>{icons[k]}</span>
             </button>
           );
@@ -1732,7 +1726,7 @@ export default function App() {
                       { label: "🖨️ PDF exportieren", fn: function () { exportShowPDF(parts, cfg.showName || "Show"); } }
                   ].map(function (item, i) {
                     return (
-                      <div key={i} onClick={function () { item.fn(); setShowExport(false); }} style={{ padding: "10px 16px", cursor: "pointer", fontSize: 13, color: th.text, borderBottom: i < 2 ? "1px solid " + th.brd : "none" }}
+                      <div key={i} onClick={function () { item.fn(); setShowExport(false); }} style={{ padding: "10px 16px", cursor: "pointer", fontSize: 13, color: th.text, borderBottom: i < 3 ? "1px solid " + th.brd : "none" }}
                         onMouseEnter={function (e) { e.currentTarget.style.background = th.inp; }}
                         onMouseLeave={function (e) { e.currentTarget.style.background = "transparent"; }}>
                         {item.label}
